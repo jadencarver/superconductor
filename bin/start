@@ -1,0 +1,3 @@
+#!/bin/bash
+cargo rustc -- -A overflowing-literals
+rackup

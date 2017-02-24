@@ -1,0 +1,38 @@
+[root]
+name = "superconductor"
+version = "0.1.0"
+dependencies = [
+ "libc 0.2.20 (registry+https://github.com/rust-lang/crates.io-index)",
+ "maud 0.16.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "maud_macros 0.16.1 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "if_chain"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "libc"
+version = "0.2.20"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "maud"
+version = "0.16.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "maud_macros"
+version = "0.16.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "if_chain 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "maud 0.16.1 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[metadata]
+"checksum if_chain 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)" = "61bb90bdd39e3af69b0172dfc6130f6cd6332bf040fbb9bdd4401d37adbd48b8"
+"checksum libc 0.2.20 (registry+https://github.com/rust-lang/crates.io-index)" = "684f330624d8c3784fb9558ca46c4ce488073a8d22450415c5eb4f4cfb0d11b5"
+"checksum maud 0.16.1 (registry+https://github.com/rust-lang/crates.io-index)" = "859935a71f2dafa147f039225d861225d6d49a86e71389f295efebb84e4be46e"
+"checksum maud_macros 0.16.1 (registry+https://github.com/rust-lang/crates.io-index)" = "4824f4b72c280858f44e135ad8488817bc3b3d25a45245527db653589831e7e3"

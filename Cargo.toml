@@ -1,0 +1,12 @@
+[package]
+name = "superconductor"
+version = "0.1.0"
+authors = ["Jaden Carver <jaden.carver@gmail.com>"]
+
+[lib]
+crate-type = ["dylib"]
+
+[dependencies]
+maud = "*"
+maud_macros = "*"
+libc = "*"
