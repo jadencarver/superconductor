@@ -7,8 +7,9 @@ module Superconductor
 
   extend Fiddle::Importer
   dlload "./target/debug/libsuperconductor.dylib"
-  extern "char* hello_world()"
-  extern "void cleanup(char *)"
+  extern "char* panel_js()"
+  extern "char* panel_xslt()"
+  extern "void start()"
 
   #extern "unsigned char u8_return_test()"
   #extern "short i16_return_test()"

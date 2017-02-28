@@ -1,9 +1,47 @@
 (function(window, PM) {
   var panel;
+  var panelElement;
   var panelSpeed = 500;
+
+  var processorRequest = new XMLHttpRequest();
+  var processor = new XSLTProcessor();
+  var state = document.implementation.createDocument("", "", null);
+
+  // Fake Data
+  root = state.createElement('state');
+  state.appendChild(root);
+  ident = state.createElement('ident');
+  ident.textContent = "Jaden";
+  root.appendChild(ident);
+  //\\
+
+  processorRequest.open("GET", "/__panel.xslt", false);
+  processorRequest.send(null);
+  processor.importStylesheet(processorRequest.responseXML);
+
   document.addEventListener('keypress', function (event) {
     if (event.which == 96) { PM.toggle(); }
   });
+
+  var socket = new WebSocket("ws://127.0.0.1:2794", "superconductor");
+  socket.onmessage = function (event) {
+    state = event.data;
+    render();
+  }
+
+  function render() {
+    var fragment = processor.transformToFragment(state, document);
+    if (fragment) {
+      if (panel && panel.parentElement) {
+        document.body.removeChild(panel);
+      }
+      panel = document.createElement('div');
+      var shadow = panel.attachShadow({mode: 'open'});
+      panelElement = fragment.firstChild;
+      shadow.appendChild(panelElement);
+      document.body.appendChild(panel);
+    }
+  }
 
   PM.toggle = function () {
     if (panel) PM.close();
@@ -11,45 +49,23 @@
   };
 
   PM.close = function () {
-    panel.style.maxHeight = '0';
+    if (!panel) return false
+      panelElement.style.maxHeight = '0';
     setTimeout(function() {
-      document.body.removeChild(panel);
+      if (!panel || !panel.parentElement) return false
+        document.body.removeChild(panel);
       panel = false;
     }, panelSpeed);
   };
 
   PM.open = function () {
     if (panel) return true;
-    panel = document.createElement('div');
-    panel.setAttribute('id', '__pm_panel');
-    panel.setAttribute('style', ''
-                       + 'box-sizing: border-box;'
-                       + 'background-color: #000000;'
-                       + 'color: #FFFFFF;'
-                       + 'position: fixed;'
-                       + 'bottom: 0;'
-                       + 'left: 0;'
-                       + 'right: 0;'
-                       + 'line-height: 1rem;'
-                       + 'transition: max-height '+panelSpeed+'ms;'
-                      );
-    document.body.appendChild(panel);
-    panel.innerHTML = (''
-    + '<div style="margin: 5pt; font-weight: 400;">Project Management</div>'
-    + '<ul style="margin: 0; font-size: 0.8em; list-style-type: none; display: flex; padding: 0;">'
-    +   '<li style="width: 100pt; height: 100pt; background-color: #666666; padding: 5pt; margin: 5pt;">'
-    +     '<strong>'+PM.current.name+'</strong>'
-    +   '</li>'
-    +   '<li style="width: 100pt; height: 100pt; background-color: #666666; padding: 5pt; margin: 5pt;">'
-    +     '<strong>'+PM.current.name+'</strong>'
-    +   '</li>'
-    +   '<li style="width: 100pt; height: 100pt; background-color: #666666; padding: 5pt; margin: 5pt;">'
-    +     '<strong>'+PM.current.name+'</strong>'
-    +   '</li>'
-    + '</ul>'
-    );
-    height = panel.offsetHeight;
-    panel.style.maxHeight = '0';
-    setTimeout(function () { panel.style.maxHeight = height+'px'; }, 1);
+    render();
+    height = panelElement.offsetHeight;
+    panelElement.style.maxHeight = '0';
+    setTimeout(function () {
+      panelElement.classList.add('transition');
+      panelElement.style.maxHeight = height+'px';
+    }, 1);
   };
 })(window, PM);
