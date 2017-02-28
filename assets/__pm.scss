@@ -70,17 +70,27 @@
     &::after { content: ''; display: block; clear: both; }
   }
 
-  button, .button {
+  button, input[type="submit"], .button {
     border-style: solid;
     border-width: 1px;
     border-color: #B8B7B7 #A3A3A3 #A3A3A3;
     background-color: #F5F5F5;
     border-radius: 2pt;
-    height: 2.5em;
+    height: 2em;
     margin: 0.25em 0;
     padding: 0 0.5em;
+    font-size: 1em;
     &:active {
       color: #B8B7B7;
+    }
+  }
+
+  details {
+    margin-left: 1em;
+    summary, summary:focus {
+      margin-left: -1em;
+      cursor: pointer;
+      outline: none;
     }
   }
 
@@ -89,7 +99,6 @@
   }
 
   .button--tiny {
-    @extend .button;
     font-size: 0.75em;
     height: 1.75em;
     margin: 0.1em;
@@ -102,12 +111,6 @@
     li button {
       float: right;
     }
-  }
-
-  input[type=submit] {
-    @extend .button;
-    height: 2em;
-    font-size: 1em;
   }
 
   textarea {
@@ -141,4 +144,35 @@
     padding: 5pt;
     margin: 0 5pt 1em;
   }
+
+
+  /* CHECKBOX */
+  input[type="checkbox"] {
+    display: none;
+    + label {
+      position: relative;
+      &:before {
+        display: inline-block;
+        vertical-align: middle;
+        content: ' ';
+        background-color: #F5F5F5;
+        width: 1em;
+        line-height: 1.1em;
+        height: 1em;
+        border: solid 1px #A3A3A3;
+        text-align: center;
+        margin-right: 0.25em;
+      }
+    }
+    &:checked + label {
+      font-weight: bold;
+      &:after {
+        content: '+';
+        position: absolute;
+        left: 0.2em;
+        top: -0.1em;
+      }
+    }
+  }
+
 }

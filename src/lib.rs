@@ -64,8 +64,38 @@ pub extern "C" fn panel_xslt() -> *mut c_char {
             xsl:template match="/" {
                 div#__pm__panel {
                     style type="text/css" (css)
-                    form#__pm__commit style="" {
+                    form#__pm__commit {
                         ul#__pm__commits {
+                            li {
+                                img src="http://en.gravatar.com/userimage/12799253/b889c035ec76c57ce679d12cbe01f2f4.png?s=24" {}
+                                ul.properties {
+                                    li {
+                                        span.name "Status"
+                                        span.before "In Progress"
+                                        span.after  "Blocked"
+                                    }
+                                    li {
+                                        span.name "Estimate"
+                                        span.before "3"
+                                        span.after  "5"
+                                    }
+                                }
+                            }
+                            li {
+                                img src="http://en.gravatar.com/userimage/12799253/b889c035ec76c57ce679d12cbe01f2f4.png?s=24" {}
+                                ul.properties {
+                                    li {
+                                        span.name "Status"
+                                        span.before "In Progress"
+                                        span.after  "Blocked"
+                                    }
+                                    li {
+                                        span.name "Estimate"
+                                        span.before "3"
+                                        span.after  "5"
+                                    }
+                                }
+                            }
                             li {
                                 img src="http://en.gravatar.com/userimage/12799253/b889c035ec76c57ce679d12cbe01f2f4.png?s=24" {}
                                 ul.properties {
@@ -98,23 +128,19 @@ pub extern "C" fn panel_xslt() -> *mut c_char {
                                 }
                             }
                         }
-                        textarea name="message" {}
+                        textarea id="__pm__commit__message" name="message" {}
                         input type="submit" value="Save Update" {}
                         details {
                             summary { "Include Changes" }
                             ul#__pm__commit__changes {
                                 li {
-                                    label {
-                                        input type="checkbox" {}
-                                        span "somefile.html"
-                                    }
+                                    input  id="__pm__changes_somefile" type="checkbox" {}
+                                    label for="__pm__changes_somefile" "somefile.html"
                                     button.button--tiny { " +10 -10" }
                                 }
                                 li {
-                                    label {
-                                        input type="checkbox" {}
-                                        span "someotherfile.html"
-                                    }
+                                    input  id="__pm__changes_someotherfile" type="checkbox" {}
+                                    label for="__pm__changes_someotherfile" "someotherfile.html"
                                     button.button--tiny { " +1 -0" }
                                 }
                             }
