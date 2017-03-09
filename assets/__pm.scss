@@ -18,9 +18,13 @@
   left: 0px;
   right: 0px;
   line-height: 2.5em;
-  &.transition {
-    transition: max-height 500ms ease-out;
-    -webkit-transition: max-height 500ms;
+  opacity: 0.0;
+  height: 33%;
+  transition: all 250ms ease-out;
+  transform: scale(1.015);
+  &.open {
+    transform: scale(1.0);
+    opacity: 1.0;
   }
 
   #__pm__commit {
@@ -145,6 +149,9 @@
     margin: 0 5pt 1em;
   }
 
+  li.remove {
+    color: red;
+  }
 
   /* CHECKBOX */
   input[type="checkbox"] {
@@ -153,7 +160,7 @@
       position: relative;
       &:before {
         display: inline-block;
-        vertical-align: middle;
+        vertical-align: bottom;
         content: ' ';
         background-color: #F5F5F5;
         width: 1em;

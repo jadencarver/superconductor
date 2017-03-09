@@ -1,71 +1,76 @@
 (function(window, PM) {
-  var panel;
-  var panelElement;
-  var panelSpeed = 500;
+  var document = window.document;
+  var host = document.createElement('div');
+  var root = document.createElement('div');
+  var DOM = host.attachShadow({mode: 'open'});
+  DOM.appendChild(root);
+  document.body.appendChild(host);
 
-  var processorRequest = new XMLHttpRequest();
-  var processor = new XSLTProcessor();
-  var state = document.implementation.createDocument("", "", null);
-
-  // Fake Data
-  root = state.createElement('state');
-  state.appendChild(root);
-  ident = state.createElement('ident');
-  ident.textContent = "Jaden";
-  root.appendChild(ident);
-  //\\
-
-  processorRequest.open("GET", "/__panel.xslt", false);
-  processorRequest.send(null);
-  processor.importStylesheet(processorRequest.responseXML);
+  var processor = loadProcessor();
+  var parser = new DOMParser();
+  var socket = openSocket();
 
   document.addEventListener('keypress', function (event) {
     if (event.which == 96) { PM.toggle(); }
   });
 
-  var socket = new WebSocket("ws://127.0.0.1:2794", "superconductor");
-  socket.onmessage = function (event) {
-    state = event.data;
-    render();
+  setState(fakeState());
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+
+  function loadProcessor() {
+    var processor = new XSLTProcessor();
+    var processorRequest = new XMLHttpRequest();
+    processorRequest.open("GET", "/__panel.xslt", false);
+    processorRequest.send(null);
+    processor.importStylesheet(processorRequest.responseXML);
+    return processor;
   }
 
-  function render() {
-    var fragment = processor.transformToFragment(state, document);
-    if (fragment) {
-      if (panel && panel.parentElement) {
-        document.body.removeChild(panel);
-      }
-      panel = document.createElement('div');
-      var shadow = panel.attachShadow({mode: 'open'});
-      panelElement = fragment.firstChild;
-      shadow.appendChild(panelElement);
-      document.body.appendChild(panel);
+  function openSocket() {
+    var socket = new WebSocket("ws://127.0.0.1:2794", "superconductor");
+    socket.onmessage = function (event) {
+      var state = parser.parseFromString(event.data, "text/xml");
+      setState(state);
     }
+    return socket;
+  }
+
+  function setState(state) {
+    var open, fragment = processor.transformToFragment(state, document);
+    if (root) {
+      open = root.classList.contains('open');
+      DOM.removeChild(root);
+    }
+    if (fragment) {
+      root = fragment.firstChild;
+    } else {
+      root = document.createElement('div.error');
+      root.textContent = "An Error Occurred";
+    }
+    if (open) root.classList.add('open');
+    DOM.appendChild(root);
+  }
+
+  function fakeState() {
+    var state = document.implementation.createDocument("", "", null);
+    var stateRoot  = state.createElement('state');
+    var stateIdent = state.createElement('ident');
+    stateIdent.textContent = "Jaden";
+    stateRoot.appendChild(stateIdent);
+    state.appendChild(stateRoot);
+    return state;
   }
 
   PM.toggle = function () {
-    if (panel) PM.close();
-    else PM.open();
+    root.classList.toggle('open');
   };
 
   PM.close = function () {
-    if (!panel) return false
-      panelElement.style.maxHeight = '0';
-    setTimeout(function() {
-      if (!panel || !panel.parentElement) return false
-        document.body.removeChild(panel);
-      panel = false;
-    }, panelSpeed);
+    root.classList.remove('open');
   };
 
   PM.open = function () {
-    if (panel) return true;
-    render();
-    height = panelElement.offsetHeight;
-    panelElement.style.maxHeight = '0';
-    setTimeout(function () {
-      panelElement.classList.add('transition');
-      panelElement.style.maxHeight = height+'px';
-    }, 1);
+    root.classList.add('open');
   };
 })(window, PM);

@@ -30,9 +30,22 @@ pub extern "C" fn start() {
     thread::spawn(move || {
         for connection in server {
             let request = connection.unwrap().read_request().unwrap();
+            let headers = request.headers.clone();
             request.validate().unwrap();
             let mut response = request.accept();
             println!("Connection");
+            if let Some(&WebSocketProtocol(ref protocols)) = headers.get() {
+                if protocols.contains(&("rust-websocket".to_string())) {
+                    response.headers.set(WebSocketProtocol(vec!["superconductor".to_string()]));
+                }
+            }
+            let mut client = response.send().unwrap();
+            let message: Message = Message::text(html! {
+                state {
+                    ident "XML"
+                }
+            }.into_string());
+            client.send_message(&message).unwrap();
         }
     });
 }
@@ -142,6 +155,11 @@ pub extern "C" fn panel_xslt() -> *mut c_char {
                                     input  id="__pm__changes_someotherfile" type="checkbox" {}
                                     label for="__pm__changes_someotherfile" "someotherfile.html"
                                     button.button--tiny { " +1 -0" }
+                                }
+                                li.remove {
+                                    input  id="__pm__changes_somemissingfile" type="checkbox" {}
+                                    label for="__pm__changes_somemissingfile" "somemissingfile.html"
+                                    button.button--tiny { " +0 -40" }
                                 }
                             }
                         }
