@@ -11,10 +11,9 @@
   var socket = openSocket();
 
   document.addEventListener('keypress', function (event) {
+    if (!root) return true;
     if (event.which == 96) { PM.toggle(); }
   });
-
-  setState(fakeState());
 
   //////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -31,6 +30,7 @@
     var socket = new WebSocket("ws://127.0.0.1:2794", "superconductor");
     socket.onmessage = function (event) {
       var state = parser.parseFromString(event.data, "text/xml");
+      console.log(state);
       setState(state);
     }
     return socket;
@@ -50,16 +50,6 @@
     }
     if (open) root.classList.add('open');
     DOM.appendChild(root);
-  }
-
-  function fakeState() {
-    var state = document.implementation.createDocument("", "", null);
-    var stateRoot  = state.createElement('state');
-    var stateIdent = state.createElement('ident');
-    stateIdent.textContent = "Jaden";
-    stateRoot.appendChild(stateIdent);
-    state.appendChild(stateRoot);
-    return state;
   }
 
   PM.toggle = function () {

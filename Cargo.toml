@@ -10,8 +10,5 @@ crate-type = ["dylib"]
 maud = "*"
 maud_macros = "*"
 libc = "*"
-#git2 = "0.6"
-serde = "0.9.8"
-serde_json = "0.9.8"
-serde_derive = "0.9.8"
-websocket = "*"
+git2 = { version = "*", default-features = false }
+websocket = { version = "*", default-features = false }
