@@ -18,6 +18,9 @@ pub fn panel_xslt() -> String {
                         xsl:if test="included='true'" {
                             xsl:attribute name="checked" {}
                         }
+                        xsl:if test="removal='true'" {
+                            xsl:attribute name="class" { "delete" }
+                        }
                     }
                     label for="__pm__changes_{path}" {
                         xsl:value-of select="path" {}
@@ -92,11 +95,11 @@ pub fn panel_xslt() -> String {
                                 }
                             }
                         }
-                        textarea id="__pm__commit__message" name="message" {}
+                        textarea id="__pm__commit__message" name="message" placeholder="Enter your message" {}
                         input type="submit" value="Save Update" {}
-                        details {
+                        details#__pm__commit__changes {
                             summary { "Include Changes" }
-                            ul#__pm__commit__changes {
+                            ul {
                                 xsl:apply-templates select="/state/changes/change" {}
                             }
                         }

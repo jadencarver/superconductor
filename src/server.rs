@@ -47,9 +47,13 @@ pub fn start() {
                             change {
                                 path (change.path().unwrap())
                                 //in-index (status.index_to_workdir().unwrap()(|d| d.status() == Delta::Added))
-                                included @match change.index_to_workdir().map(|d| d.status()).unwrap_or(Delta::Unreadable) {
-                                    Delta::Untracked, Delta::Modified => "false",
-                                    _ => "true"
+                                included @match change.head_to_index().map(|d| d.status()).unwrap_or(Delta::Unreadable) {
+                                    Delta::Modified | Delta::Added | Delta::Deleted => "true",
+                                    _ => "false"
+                                }
+                                removal @match change.head_to_index().map(|d| d.status()).unwrap_or(Delta::Unreadable) {
+                                    Delta::Deleted => "true",
+                                    _ => "false"
                                 }
                             }
                         }
