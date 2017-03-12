@@ -12,3 +12,5 @@ maud_macros = "*"
 libc = "*"
 git2 = { version = "*", default-features = false }
 websocket = { version = "*", default-features = false }
+yaml-rust = "*"
+crypto = "*"

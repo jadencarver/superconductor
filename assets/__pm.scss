@@ -28,7 +28,7 @@ $color5: #4e4432;
   right: 0px;
   line-height: 2.5em;
   opacity: 0.0;
-  height: 33%;
+  height: 50%;
   transition: all 250ms ease-out;
   transform: scale(1.015);
   &.open {
@@ -64,9 +64,24 @@ $color5: #4e4432;
       border-radius: 2pt;
       padding: 0;
       line-height: 1.4em;
-      img { float: left; height: 3em; max-width: 3em; }
+      > * {
+        margin: 0.25em;
+      }
+      img {
+        float: left;
+        width: 4em;
+        height: 4em;
+        max-width: 4em;
+        border-radius: 1pt;
+      }
       blockquote {
-        margin-left: 3.5em;
+        .user__name {
+          margin-right: 1em;
+          font-weight: bold;
+          font-size: 0.9em;
+          text-decoration: none;
+          color: $color3;
+        }
       }
       button.attachments {
         margin: 0.5em;
@@ -76,9 +91,10 @@ $color5: #4e4432;
         font-size: 0.8em;
         list-style-type: none;
         line-height: 1.5em;
+        margin-left: 4em;
         li {
           margin: 0.25em 4em; 
-          .name { float: left; width: 8em; }
+          .name { float: left; width: 9em; }
           .name::after   { content: ':';   display: inline; }
           .before::after { content: ' → '; display: inline; }
         }
