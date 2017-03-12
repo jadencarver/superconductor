@@ -15,20 +15,13 @@
     if (event.which == 96) { PM.toggle(); }
   });
   DOM.addEventListener('focus', function (event) {
-    var stickToBottom = function () {
-      commit.scrollTop = commit.scrollHeight;
-      window.requestAnimationFrame(stickToBottom);
-    };
-    var commit = DOM.querySelector('#__pm__commit');
     var changes = DOM.querySelector('#__pm__commit__changes');
-    if (event.target.parentElement === changes) {
-      setTimeout(function () { stickToBottom = function () {} }, 250);
-      stickToBottom();
-    } else if (event.target.id === "__pm__commit__message") {
+    var shouldStick = event.target.parentElement === changes;
+    if (event.target.id === "__pm__commit__message") {
       changes.removeAttribute('open');
-      setTimeout(function () { stickToBottom = function () {} }, 250);
-      stickToBottom();
+      shouldStick = true;
     }
+    if (shouldStick) { stickToBottom(); }
   }, true);
 
   //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,6 +59,17 @@
     }
     if (open) root.classList.add('open');
     DOM.appendChild(root);
+    stickToBottom();
+  }
+
+  function stickToBottom() {
+    var stickToBottomCallback = function () {
+      commit.scrollTop = commit.scrollHeight;
+      window.requestAnimationFrame(stickToBottomCallback);
+    };
+    var commit = DOM.querySelector('#__pm__commit');
+    setTimeout(function () { stickToBottomCallback = function () {} }, 250);
+    stickToBottomCallback();
   }
 
   PM.toggle = function () {

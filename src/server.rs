@@ -30,6 +30,7 @@ pub fn start() {
 
             let repo = Repository::open("/Users/jadencarver/dev/superconductor").unwrap();
             let mut revwalk = repo.revwalk().unwrap();
+            revwalk.set_sorting(git2::SORT_REVERSE);
             revwalk.push_head();
             let mut status_opts = StatusOptions::new();
             status_opts.include_untracked(true);
@@ -54,7 +55,9 @@ pub fn start() {
                                         email (commit.author().email().unwrap())
                                         image "http://en.gravatar.com/userimage/12799253/b889c035ec76c57ce679d12cbe01f2f4.png?s=64"
                                     }
-                                    message (commit.message().unwrap())
+                                    @let mut message = commit.message().unwrap().split("\n---") {
+                                        message (message.next().unwrap())
+                                    }
                                     changes {
                                     }
                                 }
