@@ -17,10 +17,12 @@ pub fn panel_xslt() -> String {
                         }
                         textarea id="__pm__commit__message" name="message" placeholder="Enter your message" {}
                         input type="submit" value="Save Update" {}
-                        details#__pm__commit__changes {
-                            summary { "Include Changes" }
-                            ul {
-                                xsl:apply-templates select="/state/changes/change" {}
+                        xsl:if test="/state/changes/change" {
+                            details#__pm__commit__changes {
+                                summary { "Include Changes" }
+                                ul {
+                                    xsl:apply-templates select="/state/changes/change" {}
+                                }
                             }
                         }
                     }

@@ -17,7 +17,7 @@
   DOM.addEventListener('focus', function (event) {
     var changes = DOM.querySelector('#__pm__commit__changes');
     var shouldStick = event.target.parentElement === changes;
-    if (event.target.id === "__pm__commit__message") {
+    if (changes && event.target.id === "__pm__commit__message") {
       changes.removeAttribute('open');
       shouldStick = true;
     }
