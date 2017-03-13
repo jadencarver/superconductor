@@ -11,17 +11,19 @@ pub fn panel_xslt() -> String {
             xsl:template match="/" {
                 div#__pm__panel {
                     style type="text/css" (css)
-                    form#__pm__commit {
+                    form#__pm__commit method="post" {
                         ul#__pm__commits {
                             xsl:apply-templates select="/state/history/commit" {}
                         }
                         textarea id="__pm__commit__message" name="message" placeholder="Enter your message" {}
-                        input type="submit" value="Save Update" {}
-                        xsl:if test="/state/changes/change" {
-                            details#__pm__commit__changes {
-                                summary { "Include Changes" }
-                                ul {
-                                    xsl:apply-templates select="/state/changes/change" {}
+                        div#__pm__new_commit {
+                            input type="submit" value="Save Update" {}
+                            xsl:if test="/state/changes/change" {
+                                fieldset#__pm__commit__changes.details {
+                                    legend { "Include Changes" }
+                                    ul {
+                                        xsl:apply-templates select="/state/changes/change" {}
+                                    }
                                 }
                             }
                         }

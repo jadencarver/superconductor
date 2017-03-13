@@ -10,6 +10,8 @@ use self::git2::Statuses;
 use self::git2::StatusOptions;
 use self::git2::Delta;
 
+extern crate md5;
+
 use project;
 
 pub fn start() {
@@ -51,9 +53,13 @@ pub fn start() {
                                 commit {
                                     id (commit.id())
                                     user {
-                                        name  (commit.author().name().unwrap())
-                                        email (commit.author().email().unwrap())
-                                        image "http://en.gravatar.com/userimage/12799253/b889c035ec76c57ce679d12cbe01f2f4.png?s=64"
+                                        @let author = commit.author() {
+                                            name  (author.name().unwrap())
+                                            @let email = author.email().unwrap().trim() {
+                                                email (email)
+                                                image (format!("https://www.gravatar.com/avatar/{:x}?s=64", md5::compute(email.to_lowercase())))
+                                            }
+                                        }
                                     }
                                     @let mut message = commit.message().unwrap().split("\n---") {
                                         message (message.next().unwrap())
