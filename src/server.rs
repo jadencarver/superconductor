@@ -65,6 +65,7 @@ pub fn start() {
                                         message (message.next().unwrap())
                                     }
                                     changes {
+                                        "something"
                                     }
                                 }
                             }

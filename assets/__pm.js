@@ -22,8 +22,9 @@
     }
   }, true);
   DOM.addEventListener('click', function (event) {
-    if (event.target.parentElement.id === '__pm__commit__changes') {
-      event.target.parentElement.classList.toggle('open');
+    var parentElement = event.target.parentElement;
+    if (parentElement && parentElement.id === '__pm__commit__changes') {
+      parentElement.classList.toggle('open');
       stickToBottom();
     }
   });
@@ -58,8 +59,12 @@
     if (fragment) {
       root = fragment.firstChild;
     } else {
-      root = document.createElement('div.error');
-      root.textContent = "An Error Occurred";
+      root = document.createElement('div');
+      root.style.position = 'absolute'; root.style.textAlign = 'center';
+      root.style.lineHeight = '3em';
+      root.style.left = 0; root.style.right = 0; root.style.bottom = 0;
+      root.style.backgroundColor='#fe6d39'; root.style.color="#FFF";
+      root.textContent = "An error occurred initializing Superconductor";
     }
     if (open) root.classList.add('open');
     DOM.appendChild(root);
@@ -67,11 +72,12 @@
   }
 
   function stickToBottom() {
+    var commit = DOM.querySelector('#__pm__commit');
+    if (!commit) return false;
     var stickToBottomCallback = function () {
       commit.scrollTop = commit.scrollHeight;
       window.requestAnimationFrame(stickToBottomCallback);
     };
-    var commit = DOM.querySelector('#__pm__commit');
     setTimeout(function () { stickToBottomCallback = function () {} }, 250);
     stickToBottomCallback();
   }
