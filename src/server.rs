@@ -12,6 +12,9 @@ use self::git2::Delta;
 
 extern crate md5;
 
+extern crate yaml_rust;
+use self::yaml_rust::YamlLoader;
+
 use project;
 
 pub fn start() {
@@ -63,9 +66,19 @@ pub fn start() {
                                     }
                                     @let mut message = commit.message().unwrap().split("\n---") {
                                         message (message.next().unwrap())
-                                    }
-                                    changes {
-                                        "something"
+                                        @if let Some(yaml) = message.next() {
+                                            @for (objective, values) in YamlLoader::load_from_str(yaml).unwrap()[0].as_hash().unwrap() {
+                                                objective {
+                                                    name (objective.as_str().unwrap_or("None"))
+                                                    @for (name, value) in values.as_hash().unwrap() {
+                                                        property {
+                                                            name (name.as_str().unwrap_or("None"))
+                                                            after (value.as_str().unwrap_or("None"))
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }

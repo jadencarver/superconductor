@@ -98,15 +98,15 @@ pub fn panel_xslt() -> String {
                         xsl:value-of select="message" {}
                     }
                     ul.properties {
-                        xsl:apply-templates select="properties" {}
+                        xsl:apply-templates select="objective/property" {}
                     }
                 }
             }
-            xsl:template match="/state/history/commit/properties" {
+            xsl:template match="/state/history/commit/objective/property" {
                 li {
-                    span.name   { xsl:value-of select="name" {} }
-                    span.before { xsl:value-of select="before" {} }
-                    span.after  { xsl:value-of select="after" {} }
+                    span.name      { xsl:value-of select="name" {} }
+                    span.before    { xsl:value-of select="before" {} }
+                    span.after     { xsl:value-of select="after" {} }
                 }
             }
             xsl:template match="/state/changes/change" {
