@@ -97,8 +97,16 @@ pub fn panel_xslt() -> String {
                         }
                         xsl:value-of select="message" {}
                     }
+                    dl.objectives {
+                        xsl:apply-templates select="objective" {}
+                    }
+                }
+            }
+            xsl:template match="/state/history/commit/objective" {
+                dt { xsl:value-of select="name" {} }
+                dd {
                     ul.properties {
-                        xsl:apply-templates select="objective/property" {}
+                        xsl:apply-templates select="property" {}
                     }
                 }
             }

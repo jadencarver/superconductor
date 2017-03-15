@@ -95,16 +95,21 @@ $color5: #a0d8ec;
         margin: 0.5em;
         float: right;
       }
-      ul.properties {
+      dl.objectives {
+        margin-top: 0.5em;
+        margin-left: 7em;
         font-size: 0.8em;
-        list-style-type: none;
         line-height: 1.5em;
-        margin-left: 4em;
-        li {
-          margin: 0.25em 4em; 
-          .name { float: left; width: 9em; }
-          .name::after   { content: ':';   display: inline; }
-          .before::after { content: ' → '; display: inline; }
+        dt { float: left; font-weight: bold; width: 8em; }
+        ul.properties {
+          list-style-type: none;
+          li {
+            margin: 0.25em 1em;
+            line-height: 1.6em;
+            .name { float: left; width: 5em; }
+            .name::after   { content: ':';   display: inline; }
+            .before::after { content: ' → '; display: inline; }
+          }
         }
       }
       &.continuous:not(:nth-child(9n+1)) {
@@ -215,9 +220,10 @@ $color5: #a0d8ec;
     list-style-type: none;
     padding: 0;
     float: left;
-    width: 120pt;
+    width: 115pt;
     overflow-y: auto;
     height: 100%;
+    line-height: 2em;
   }
   ul.tiles header {
     font-weight: bold;
@@ -229,9 +235,20 @@ $color5: #a0d8ec;
     position: -webkit-sticky;
     top: 0;
   }
+  ul.tiles.droppable::after {
+    content: '▿';
+    width: 100pt;
+    height: 100pt;
+    font-size: 100pt;
+    line-height: 100pt;
+    border-radius: 5pt;
+    text-align: center;
+    display: block;
+    opacity: 0.5;
+    background-color: $color3;
+  }
   ul.tiles li {
     cursor: pointer;
-    line-height: 2em;
     width: 100pt;
     height: 100pt;
     background-color: #F5F5F5;

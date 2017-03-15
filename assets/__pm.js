@@ -28,6 +28,25 @@
       stickToBottom();
     }
   });
+  DOM.addEventListener('dragenter', function (event) {
+    var isTile = event.target.classList.contains('tiles');
+    var isAlreadyDroppable = event.target.classList.contains('droppable');
+    if (isTile && !isAlreadyDroppable) {
+      event.target.classList.add('droppable');
+      event.target.setAttribute('data-scroll', event.target.scrollTop);
+      event.target.scrollTop = event.target.scrollHeight;
+      event.preventDefault();
+    }
+  });
+  DOM.addEventListener('dragleave', function (event) {
+    var isTile = event.target.classList.contains('tiles');
+    var isAlreadyDroppable = event.target.classList.contains('droppable');
+    if (isTile && isAlreadyDroppable) {
+      event.target.scrollTop = event.target.getAttribute('data-scroll');
+      event.target.classList.remove('droppable');
+      event.preventDefault();
+    }
+  });
 
   //////////////////////////////////////////////////////////////////////////////////////////////////
 
