@@ -33,7 +33,7 @@ pub fn start() {
                 }
             }
 
-            let repo = Repository::open("/Users/jadencarver/dev/superconductor").unwrap();
+            let repo = Repository::discover(".").unwrap();
             let mut revwalk = repo.revwalk().unwrap();
             revwalk.set_sorting(git2::SORT_REVERSE);
             revwalk.push_head();
@@ -102,6 +102,27 @@ pub fn start() {
                 }
             }.into_string());
             client.send_message(&message).unwrap();
+
+            let (mut sender, mut receiver) = client.split();
+            for message in receiver.incoming_messages() {
+                let message: Message = message.unwrap();
+				match message.opcode {
+					Type::Close => {
+						let message = Message::close();
+						sender.send_message(&message).unwrap();
+						println!("Client disconnected");
+						return;
+					},
+					Type::Ping => {
+						let message = Message::pong(message.payload);
+						sender.send_message(&message).unwrap();
+					}
+					_ => {
+                        println!("{}", String::from_utf8_lossy(&message.payload.into_owned()));
+                    }
+				}
+            }
+
         }
     });
 }

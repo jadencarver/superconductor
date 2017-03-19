@@ -1,0 +1,50 @@
+@import 'colors';
+
+#__pm__panel {
+  ul.tiles {
+    margin: 0 5pt;
+    font-size: 0.8em;
+    list-style-type: none;
+    padding: 0;
+    float: left;
+    width: 115pt;
+    overflow-y: auto;
+    height: 100%;
+    line-height: 2em;
+  }
+  ul.tiles header {
+    font-weight: bold;
+    border-bottom: solid $color2 1pt;
+    margin: 0 0 5pt 0;
+    width: 102pt;
+    background-color: $color0;
+    position: sticky;
+    position: -webkit-sticky;
+    top: 0;
+  }
+  ul.tiles li {
+    padding-bottom: 1em;
+    > div {
+      cursor: pointer;
+      width: 100pt;
+      height: 100pt;
+      background-color: #F5F5F5;
+      box-shadow: 2pt 2pt 2pt rgba(128,128,128,0.5);
+      border: solid 1px $color3;
+      padding: 0 5pt;
+      margin: 0i
+    }
+  }
+  .droppable::after {
+    content: '▿';
+    width: 100pt;
+    height: 100pt;
+    font-size: 100pt;
+    line-height: 100pt;
+    border-radius: 5pt;
+    text-align: center;
+    display: block;
+    opacity: 0.5;
+    background-color: $color3;
+  }
+}

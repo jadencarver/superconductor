@@ -1,4 +1,4 @@
-ruby '2.3.1'
+source 'https://rubygems.org'
 
-source "http://rubygems.org"
-gem 'rack'
+# Specify your gem's dependencies in superconductor-gem.gemspec
+gemspec

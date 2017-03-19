@@ -1,0 +1,113 @@
+@import 'colors';
+
+#__pm__panel {
+
+  #__pm__new_commit {
+    position: relative;
+    input[type="submit"] {
+      position: absolute;
+      right: 0;
+      top: 0;
+    }
+  }
+
+  #__pm__commit__changes {
+    ul {
+      list-style-type: none;
+      line-height: 1.5em;
+      height: calc(100% - 4.5em);
+      overflow: hidden;
+      li button {
+        float: right;
+      }
+    }
+  }
+
+  #__pm__commit {
+    background-color: $color0;
+    position: absolute;
+    top: 0;
+    right: 0pt;
+    bottom: 0;
+    border-left: solid 1px #A3A3A3;
+    padding: 5pt;
+    width: 33%;
+    min-width: 300pt;
+    overflow-y: scroll;
+    z-index: 1;
+    input[type="submit"] {
+      float: right;
+    }
+    textarea {
+      transition: height 250ms ease-in-out;
+      &:focus { height: calc(50% - 2.5em); }
+    }
+  }
+
+  ul#__pm__commits {
+    list-style-type: none;
+    padding: 0;
+    > li {
+      margin-bottom: 0.5em;
+      padding: 0;
+      line-height: 1.4em;
+      clear: left;
+      > * {
+        margin: 0 0.25em 0 5em;
+      }
+      img {
+        float: left;
+        width: 4em;
+        height: 4em;
+        max-width: 4em;
+        margin: 0.25em;
+        border: solid 1px $color4;
+        border-radius: 2pt;
+      }
+      &:first-child blockquote {
+        border-top: none;
+        padding-top: 0;
+      }
+      blockquote {
+        border-top: dotted $color2 1px;
+        padding-top: 0.5em;
+        .user__name {
+          margin-right: 0.5em;
+          font-weight: bold;
+          font-size: 0.9em;
+          text-decoration: none;
+          color: $color3;
+        }
+      }
+      button.attachments {
+        margin: 0.5em;
+        float: right;
+      }
+      dl.objectives {
+        margin-top: 0.5em;
+        margin-left: 7em;
+        font-size: 0.8em;
+        line-height: 1.5em;
+        dt { float: left; font-weight: bold; width: 8em; }
+        ul.properties {
+          list-style-type: none;
+          li {
+            margin: 0.25em 1em;
+            line-height: 1.6em;
+            .name { float: left; width: 5em; }
+            .name::after   { content: ':';   display: inline; }
+            .before::after { content: ' → '; display: inline; }
+          }
+        }
+      }
+      &.continuous:not(:nth-child(9n+1)) {
+        clear: none;
+        img { display: none; }
+        blockquote {
+          .user__name { display: none; }
+        }
+      }
+    }
+    &::after { content: ''; display: block; clear: both; }
+  }
+}

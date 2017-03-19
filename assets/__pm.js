@@ -22,33 +22,58 @@
     }
   }, true);
   DOM.addEventListener('click', function (event) {
-    var parentElement = event.target.parentElement;
-    if (parentElement && parentElement.id === '__pm__commit__changes') {
-      parentElement.classList.toggle('open');
-      stickToBottom();
-    }
-  });
-  DOM.addEventListener('dragenter', function (event) {
-    var isTile = event.target.classList.contains('tiles');
-    var isAlreadyDroppable = event.target.classList.contains('droppable');
-    if (isTile && !isAlreadyDroppable) {
-      event.target.classList.add('droppable');
-      event.target.setAttribute('data-scroll', event.target.scrollTop);
-      event.target.scrollTop = event.target.scrollHeight;
+    if (event.target.type === "submit") {
+      sendForm(event.target.form);
       event.preventDefault();
-    }
-  });
-  DOM.addEventListener('dragleave', function (event) {
-    var isTile = event.target.classList.contains('tiles');
-    var isAlreadyDroppable = event.target.classList.contains('droppable');
-    if (isTile && isAlreadyDroppable) {
-      event.target.scrollTop = event.target.getAttribute('data-scroll');
-      event.target.classList.remove('droppable');
-      event.preventDefault();
+    } else {
+      var parentElement = event.target.parentElement;
+      if (parentElement && parentElement.id === '__pm__commit__changes') {
+        parentElement.classList.toggle('open');
+        stickToBottom();
+      }
     }
   });
 
+  var dragging;
+  DOM.addEventListener('dragstart', function (event) {
+    dragging = event.target;
+    var dropTargets = DOM.querySelectorAll('.tiles > li');
+    for (dropTarget of dropTargets) {
+      if (dropTarget === event.target) continue
+      dropTarget.addEventListener('dragenter', dragEnter);
+      dropTarget.addEventListener('dragleave', dragLeave);
+      dropTarget.addEventListener('dragover', isDropTarget);
+      dropTarget.addEventListener('drop', isDropTarget);
+    };
+  });
+  DOM.addEventListener('dragend', function (event) {
+    var dropTargets = DOM.querySelectorAll('.tiles > li');
+    for (dropTarget of dropTargets) {
+      if (dropTarget === event.target) continue
+      dropTarget.removeEventListener('dragenter', dragEnter);
+      dropTarget.removeEventListener('dragleave', dragLeave);
+      dropTarget.removeEventListener('dragover', isDropTarget);
+      dropTarget.removeEventListener('drop', isDropTarget);
+    };
+  });
+
   //////////////////////////////////////////////////////////////////////////////////////////////////
+  
+  function dragEnter(event) {
+    if (dragging !== this) {
+      this.classList.add('droppable');
+      event.preventDefault;
+    }
+  }
+  function dragLeave(event) {
+    this.classList.remove('droppable');
+    event.preventDefault;
+  }
+
+  function isDropTarget(event) {
+    event.preventDefault();
+  };
+
 
   function loadProcessor() {
     var processor = new XSLTProcessor();
@@ -68,6 +93,21 @@
     }
     return socket;
   }
+
+  function sendForm(form) {
+    var serializer = new XMLSerializer();
+    var request = document.implementation.createDocument(null, form.name);
+    var inputs = form.elements;
+    for (var i = 0; i < inputs.length; i++) {
+      if (inputs[i].name) {
+        var element = request.createElement(inputs[i].name)
+        element.textContent = inputs[i].value;
+        request.children[0].appendChild(element);
+      }
+    }
+    socket.send(serializer.serializeToString(request));
+  }
+
 
   function setState(state) {
     var open, fragment = processor.transformToFragment(state, document);

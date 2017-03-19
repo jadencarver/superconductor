@@ -3,3 +3,13 @@
 *.swp
 *.swo
 /.sass-cache
+/.bundle/
+/.yardoc
+/Gemfile.lock
+/_yardoc/
+/coverage/
+/doc/
+/pkg/
+/spec/reports/
+/tmp/
+superconductor-*.gem

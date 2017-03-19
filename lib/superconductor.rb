@@ -6,7 +6,7 @@ module Superconductor
   autoload :Documentation, 'documentation'
 
   extend Fiddle::Importer
-  dlload "./target/debug/libsuperconductor.dylib"
+  dlload File.expand_path('../../target/debug/libsuperconductor.dylib', __FILE__)
   extern "char* panel_js()"
   extern "char* panel_xslt()"
   extern "void start()"

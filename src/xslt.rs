@@ -2,7 +2,7 @@ use std::process::Command;
 use XML;
 
 pub fn panel_xslt() -> String {
-    let scss = Command::new("/usr/local/bin/sassc").arg("assets/__pm.scss").output().unwrap();
+    let scss = Command::new("/usr/local/bin/sassc").arg("/Users/jadencarver/dev/superconductor/assets/__pm.scss").output().unwrap();
     let css = String::from_utf8(scss.stdout).unwrap();
     
     let markup = html! {
@@ -11,7 +11,7 @@ pub fn panel_xslt() -> String {
             xsl:template match="/" {
                 div#__pm__panel {
                     style type="text/css" (css)
-                    form#__pm__commit method="post" {
+                    form#__pm__commit method="post" name="commit" {
                         ul#__pm__commits {
                             xsl:apply-templates select="/state/history/commit" {}
                         }
@@ -31,20 +31,34 @@ pub fn panel_xslt() -> String {
                     ul.tiles {
                         header "Sprint"
                         li draggable="true" {
-                            strong "BLBA-1234"
-                            p "Some upcoming issue"
+                            div {
+                                strong "BLBA-1234"
+                                p "Some upcoming issue"
+                            }
                         }
                         li draggable="true" {
-                            strong "BLBA-1235"
+                            div {
+                                strong "BLBA-1234"
+                                p "Some upcoming issue"
+                            }
                         }
                         li draggable="true" {
-                            strong "BLBA-1236"
+                            div {
+                                strong "BLBA-1234"
+                                p "Some upcoming issue"
+                            }
                         }
                         li draggable="true" {
-                            strong "BLBA-1237"
+                            div {
+                                strong "BLBA-1234"
+                                p "Some upcoming issue"
+                            }
                         }
                         li draggable="true" {
-                            strong "BLBA-1238"
+                            div {
+                                strong "BLBA-1234"
+                                p "Some upcoming issue"
+                            }
                         }
                     }
                     ul.tiles {
@@ -52,16 +66,20 @@ pub fn panel_xslt() -> String {
                             "In Progress"
                         }
                         li draggable="true" {
-                            strong {
-                                xsl:value-of select="/state/objectives" {}
+                            div {
+                                strong {
+                                    xsl:value-of select="/state/objectives" {}
+                                }
                             }
                         }
                     }
                     ul.tiles {
                         header "In Review"
                         li draggable="true" {
-                            strong {
-                                "Some issue"
+                            div {
+                                strong {
+                                    "Some issue"
+                                }
                             }
                         }
                     }
@@ -71,8 +89,10 @@ pub fn panel_xslt() -> String {
                     ul.tiles {
                         header "Done"
                         li draggable="true" {
-                            strong {
-                                "Some other issue"
+                            div {
+                                strong {
+                                    "Some other issue"
+                                }
                             }
                         }
                     }
@@ -83,7 +103,7 @@ pub fn panel_xslt() -> String {
                     xsl:if test="./preceding-sibling::commit[1]/user/email = user/email" {
                         xsl:attribute name="class" "continuous"
                     }
-                    img src="{user/image}" {}
+                    img src="{user/image}" alt="{user/name} <{user/email}>" {}
                     xsl:if test="changes" {
                         button.button--medium.attachments {
                             svg id="i-paperclip" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="20" height="20" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" {

@@ -1,0 +1,19 @@
+fieldset.details {
+  border: none;
+  > * { max-height: 0; transition: max-height 250ms ease-in-out; }
+  legend {
+    cursor: pointer;
+    &::before {
+      transition: transform 250ms ease-in-out;
+      display: inline-block;
+      content: '\25B6';
+      margin-right: 0.5em;
+    }
+  }
+  &.open {
+    > * { max-height: 100%; }
+    legend::before {
+      transform: rotate(90deg);
+    }
+  }
+}
