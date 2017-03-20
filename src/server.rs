@@ -86,10 +86,6 @@ pub fn start() {
 
                             println!("removed: {:?}", to_remove);
                             repo.reset_default(Some(&head), to_remove.iter());
-                            //for change in to_remove {
-                            //    let path = Path::new(&change);
-                            //    index.remove(path, 1);
-                            //}
                             for change in commit.include {
                                 let path = Path::new(&change);
                                 index.add_path(path);
