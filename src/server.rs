@@ -55,7 +55,7 @@ pub fn start() {
 
                 let (mut sender, mut receiver) = client.split();
                 for message in receiver.incoming_messages() {
-                    let message: Message = message.unwrap();
+                    let message: Message = message.unwrap_or(Message::close());
                     match message.opcode {
                         Type::Close => {
                             let message = Message::close();
@@ -84,7 +84,6 @@ pub fn start() {
                                 acc
                             });
 
-                            println!("removed: {:?}", to_remove);
                             repo.reset_default(Some(&head), to_remove.iter());
                             for change in commit.include {
                                 let path = Path::new(&change);
