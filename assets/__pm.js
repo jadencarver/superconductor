@@ -17,7 +17,7 @@
   DOM.addEventListener('focus', function (event) {
     if (event.target.id === '__pm__commit__message') {
       var changes = DOM.querySelector('#__pm__commit__changes');
-      changes.classList.remove('open');
+      if (changes) changes.classList.remove('open');
       stickToBottom();
     }
   }, true);
