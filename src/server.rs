@@ -14,6 +14,7 @@ use self::git2::Reference;
 use self::git2::Statuses;
 use self::git2::StatusOptions;
 use self::git2::Delta;
+use self::git2::ObjectType;
 
 extern crate yaml_rust;
 use self::yaml_rust::YamlLoader;
@@ -71,8 +72,10 @@ pub fn start() {
                             let commit: Commit = xml::from_str(&payload).unwrap();
                             println!("{:?}", commit);
                             let repo = Repository::discover(".").unwrap();
+                            let head = repo.head().unwrap().peel(ObjectType::Commit).unwrap();
                             let mut index = repo.index().unwrap();
-                            let removed = index.iter().fold(vec![], |mut acc, entry| {
+
+                            let to_remove = index.iter().fold(vec![], |mut acc, entry| {
                                 let entry_path = String::from_utf8_lossy(entry.path.as_ref());
                                 match commit.include.iter().find(|i| i.as_ref() == entry_path) {
                                     None => acc.push(entry_path.into_owned()),
@@ -80,11 +83,13 @@ pub fn start() {
                                 };
                                 acc
                             });
-                            println!("removed: {:?}", removed);
-                            for change in removed {
-                                let path = Path::new(&change);
-                                index.remove_path(path);
-                            }
+
+                            println!("removed: {:?}", to_remove);
+                            repo.reset_default(Some(&head), to_remove.iter());
+                            //for change in to_remove {
+                            //    let path = Path::new(&change);
+                            //    index.remove(path, 1);
+                            //}
                             for change in commit.include {
                                 let path = Path::new(&change);
                                 index.add_path(path);
