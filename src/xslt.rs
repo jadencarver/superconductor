@@ -13,11 +13,11 @@ pub fn panel_xslt() -> String {
                     style type="text/css" (css)
                     form#__pm__commit method="post" name="commit" {
                         ul#__pm__commits {
-                            xsl:apply-templates select="/state/history/commit" {}
+                            xsl:apply-templates select="/state/log/commit" {}
                         }
                         textarea id="__pm__commit__message" name="message" placeholder="Enter your message" {}
                         div#__pm__new_commit {
-                            input type="submit" value="Save Update" {}
+                            input type="submit" name="save-update" value="Save Update" {}
                             xsl:if test="/state/changes/change" {
                                 fieldset#__pm__commit__changes.details {
                                     legend { "Include Changes" }
@@ -98,7 +98,7 @@ pub fn panel_xslt() -> String {
                     }
                 }
             }
-            xsl:template match="/state/history/commit" {
+            xsl:template match="/state/log/commit" {
                 li {
                     xsl:if test="./preceding-sibling::commit[1]/user/email = user/email" {
                         xsl:attribute name="class" "continuous"
@@ -122,7 +122,7 @@ pub fn panel_xslt() -> String {
                     }
                 }
             }
-            xsl:template match="/state/history/commit/objective" {
+            xsl:template match="/state/log/commit/objective" {
                 dt { xsl:value-of select="name" {} }
                 dd {
                     ul.properties {
@@ -130,7 +130,7 @@ pub fn panel_xslt() -> String {
                     }
                 }
             }
-            xsl:template match="/state/history/commit/objective/property" {
+            xsl:template match="/state/log/commit/objective/property" {
                 li {
                     span.name      { xsl:value-of select="name" {} }
                     span.before    { xsl:value-of select="before" {} }
@@ -140,8 +140,12 @@ pub fn panel_xslt() -> String {
             xsl:template match="/state/changes/change" {
                 li {
                     xsl:element name="input" {
+                        xsl:attribute name="name" { "include" }
                         xsl:attribute name="id" {
                             xsl:value-of select="concat('__pm__changes_', path)" {}
+                        }
+                        xsl:attribute name="value" {
+                            xsl:value-of select="path" {}
                         }
                         xsl:attribute name="type" "checkbox"
                         xsl:if test="included='true'" {

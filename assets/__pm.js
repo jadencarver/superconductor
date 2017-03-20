@@ -21,9 +21,10 @@
       stickToBottom();
     }
   }, true);
+
   DOM.addEventListener('click', function (event) {
     if (event.target.type === "submit") {
-      sendForm(event.target.form);
+      sendForm(event.target.form, event);
       event.preventDefault();
     } else {
       var parentElement = event.target.parentElement;
@@ -34,12 +35,16 @@
     }
   });
 
+  DOM.addEventListener('change', function (event) {
+    sendForm(event.target.form);
+  });
+
   var dragging;
   DOM.addEventListener('dragstart', function (event) {
     dragging = event.target;
     var dropTargets = DOM.querySelectorAll('.tiles > li');
     for (dropTarget of dropTargets) {
-      if (dropTarget === event.target) continue
+      if (dropTarget === event.target) continue;
       dropTarget.addEventListener('dragenter', dragEnter);
       dropTarget.addEventListener('dragleave', dragLeave);
       dropTarget.addEventListener('dragover', isDropTarget);
@@ -49,7 +54,7 @@
   DOM.addEventListener('dragend', function (event) {
     var dropTargets = DOM.querySelectorAll('.tiles > li');
     for (dropTarget of dropTargets) {
-      if (dropTarget === event.target) continue
+      if (dropTarget === event.target) continue;
       dropTarget.removeEventListener('dragenter', dragEnter);
       dropTarget.removeEventListener('dragleave', dragLeave);
       dropTarget.removeEventListener('dragover', isDropTarget);
@@ -94,15 +99,27 @@
     return socket;
   }
 
-  function sendForm(form) {
+  function sendForm(form, event) {
     var serializer = new XMLSerializer();
     var request = document.implementation.createDocument(null, form.name);
+    var message = request.children[0];
     var inputs = form.elements;
     for (var i = 0; i < inputs.length; i++) {
-      if (inputs[i].name) {
-        var element = request.createElement(inputs[i].name)
-        element.textContent = inputs[i].value;
-        request.children[0].appendChild(element);
+      var input = inputs[i];
+      if (input.name) {
+        var element = request.createElement(input.name)
+        element.textContent = input.value;
+        if (input.tagName === 'INPUT' && input.type.toUpperCase() === 'CHECKBOX') {
+          if (input.checked) {
+            message.appendChild(element);
+          }
+        } else if (input.tagName === 'INPUT' && input.type.toUpperCase() === 'SUBMIT') {
+          if (event && input == event.target) {
+            message.appendChild(element);
+          }
+        } else {
+          message.appendChild(element);
+        }
       }
     }
     socket.send(serializer.serializeToString(request));

@@ -1,8 +1,13 @@
 #![feature(plugin)]
 #![plugin(maud_macros)]
+
 extern crate maud;
 extern crate websocket;
 extern crate libc;
+
+#[macro_use]
+extern crate serde_derive;
+extern crate serde_xml;
 
 use libc::{c_char};
 use std::ffi::CString;
