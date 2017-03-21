@@ -15,8 +15,11 @@ button, input[type="submit"], .button {
   margin: 0.25em 0;
   padding: 0 1em;
   font-size: 1em;
+  &:focus {
+    outline: -webkit-focus-ring-color auto 5px;
+  }
   &:active {
-    color: #B8B7B7;
+    color: $color4;
   }
   &.button--tiny {
     font-size: 0.75em;

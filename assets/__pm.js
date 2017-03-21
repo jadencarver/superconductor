@@ -2,7 +2,12 @@
   var document = window.document;
   var host = document.createElement('div');
   var root = document.createElement('div');
-  var DOM = host.attachShadow({mode: 'open'});
+  var DOM;
+  if (host.attachShadow) {
+    DOM = host.attachShadow({mode: 'open'});
+  } else {
+    DOM = host;
+  }
   DOM.appendChild(root);
   document.body.appendChild(host);
 
@@ -36,8 +41,14 @@
   });
 
   DOM.addEventListener('change', function (event) {
-    sendForm(event.target.form);
+    sendForm(event.target.form, event);
   });
+
+  //DOM.addEventListener('keypress', function (event) {
+  //  if (event.target.classList.contains('details')) {
+  //    event.target.classList.toggle('open');
+  //  }
+  //});
 
   var dragging;
   DOM.addEventListener('dragstart', function (event) {
@@ -104,6 +115,11 @@
     var request = document.implementation.createDocument(null, form.name);
     var message = request.children[0];
     var inputs = form.elements;
+    if (event) {
+      var focus = request.createElement('focus');
+      focus.textContent = event.target.id;
+      message.appendChild(focus);
+    }
     for (var i = 0; i < inputs.length; i++) {
       var input = inputs[i];
       if (input.name) {
@@ -114,7 +130,8 @@
             message.appendChild(element);
           }
         } else if (input.tagName === 'INPUT' && input.type.toUpperCase() === 'SUBMIT') {
-          if (event && input == event.target) {
+          if (event && input === event.target) {
+            element.textContent = event.type;
             message.appendChild(element);
           }
         } else {
@@ -122,6 +139,7 @@
         }
       }
     }
+    console.log(request);
     socket.send(serializer.serializeToString(request));
   }
 
@@ -136,15 +154,36 @@
       root = fragment.firstChild;
     } else {
       root = document.createElement('div');
-      root.style.position = 'absolute'; root.style.textAlign = 'center';
-      root.style.lineHeight = '3em';
+      root.style.position = 'fixed';
       root.style.left = 0; root.style.right = 0; root.style.bottom = 0;
+      root.style.textAlign = 'center'; root.style.lineHeight = '3em';
       root.style.backgroundColor='#fe6d39'; root.style.color="#FFF";
       root.textContent = "An error occurred initializing Superconductor";
     }
-    if (open) root.classList.add('open');
     DOM.appendChild(root);
+    if (open) {
+      root.classList.add('open');
+      var focus = state.querySelector('focus');
+      if (focus) var focusId = focus.textContent;
+      if (focusId) var focusElement = DOM.getElementById(focusId);
+      if (focusElement) {
+        var detailsElement = closest(focusElement, function (e) {
+          return e.classList.contains('details');
+        });
+        if (detailsElement) detailsElement.classList.add('open');
+        focusElement.classList.add('no-transition');
+        focusElement.focus();
+        focusElement.classList.remove('no-transition');
+      }
+    }
     stickToBottom();
+  }
+
+  function closest(element, filter) {
+    while (element) {
+      if (filter(element)) return element;
+      else element = element.parentElement;
+    }
   }
 
   function stickToBottom() {

@@ -15,12 +15,12 @@ pub fn panel_xslt() -> String {
                         ul#__pm__commits {
                             xsl:apply-templates select="/state/log/commit" {}
                         }
-                        textarea id="__pm__commit__message" name="message" placeholder="Enter your message" {}
+                        textarea id="__pm__commit__message" tabindex="1" name="message" placeholder="Enter your message" {}
                         div#__pm__new_commit {
-                            input type="submit" name="save-update" value="Save Update" {}
+                            input type="submit" tabindex="3" name="save_update" value="Save Update" {}
                             xsl:if test="/state/changes/change" {
                                 fieldset#__pm__commit__changes.details {
-                                    legend { "Include Changes" }
+                                    legend tabindex="2" role="button" { "Include Changes" }
                                     ul {
                                         xsl:apply-templates select="/state/changes/change" {}
                                     }
@@ -147,6 +147,7 @@ pub fn panel_xslt() -> String {
                         xsl:attribute name="value" {
                             xsl:value-of select="path" {}
                         }
+                        xsl:attribute name="tabindex" "0"
                         xsl:attribute name="type" "checkbox"
                         xsl:if test="included='true'" {
                             xsl:attribute name="checked" {}

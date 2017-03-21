@@ -23,10 +23,12 @@ use project;
 
 use serde_xml as xml;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 struct Commit {
+    focus: String,
     message: String,
-    include: Vec<String>
+    include: Vec<String>,
+    save_update: Option<String>
 }
 
 impl Commit {
@@ -50,7 +52,7 @@ pub fn start() {
                 }
 
                 let mut client = response.send().unwrap();
-                let message = Message::text(generate_payload());
+                let message = Message::text(generate_payload(None));
                 client.send_message(&message).unwrap();
 
                 let (mut sender, mut receiver) = client.split();
@@ -69,6 +71,7 @@ pub fn start() {
                         },
                         _ => {
                             let payload = String::from_utf8_lossy(message.payload.as_ref());
+                            println!("{:?}", payload);
                             let commit: Commit = xml::from_str(&payload).unwrap();
                             println!("{:?}", commit);
                             let repo = Repository::discover(".").unwrap();
@@ -85,12 +88,12 @@ pub fn start() {
                             });
 
                             repo.reset_default(Some(&head), to_remove.iter());
-                            for change in commit.include {
+                            for change in commit.clone().include {
                                 let path = Path::new(&change);
                                 index.add_path(path);
                             }
                             index.write().unwrap();
-                            let message = Message::text(generate_payload());
+                            let message = Message::text(generate_payload(Some(commit)));
                             sender.send_message(&message).unwrap();
                         }
                     }
@@ -100,7 +103,7 @@ pub fn start() {
     });
 }
 
-fn generate_payload() -> String {
+fn generate_payload(previous_commit: Option<Commit>) -> String {
     let current = project::current();
     let repo = Repository::discover(".").unwrap();
     let mut revwalk = repo.revwalk().unwrap();
@@ -111,9 +114,12 @@ fn generate_payload() -> String {
 
     let payload = html! {
         state {
+            @if let Some(commit) = previous_commit {
+                focus (commit.focus)
+            }
             user {
                 name  (current.user.name)
-                    email (current.user.email)
+                email (current.user.email)
             }
             task {
                 id (current.task.id)

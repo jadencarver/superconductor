@@ -12,6 +12,11 @@
     margin: 0;
     padding: 0;
   }
+
+  .no-transition {
+    transition: none !important;
+  }
+
   font-family: 'Helvetica Neue', 'Gill Sans', 'Lucida Grande', sans-serif;
   font-size: 10pt;
   font-weight: 400;
@@ -42,6 +47,7 @@
   }
 
   textarea {
+    font-family: inherit;
     height: 2em;
     font-size: 1em;
     line-height: 1.4em;
@@ -51,6 +57,9 @@
     overflow: none;
     padding: 0.25em;
     width: 100%;
+    &:focus {
+      outline: $color5 auto 5px;
+    }
   }
 
   header {
