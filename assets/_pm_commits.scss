@@ -4,6 +4,7 @@
 
   #__pm__new_commit {
     position: relative;
+    min-height: 2em;
     input[type='submit'][name='save_update'] {
       position: absolute;
       right: 0;
