@@ -4,7 +4,7 @@
 
   #__pm__new_commit {
     position: relative;
-    button[name='save-update'] {
+    input[type='submit'][name='save_update'] {
       position: absolute;
       right: 0;
       top: 0;
@@ -15,10 +15,16 @@
     ul {
       list-style-type: none;
       line-height: 1.5em;
+      margin-bottom: 1.5em;
       height: calc(100% - 4.5em);
       overflow: hidden;
       li button {
         float: right;
+        clear: right;
+      }
+      label[for='__pm__changes_all'] {
+        color: #A3A3A3;
+        line-height: 2.5em;
       }
     }
   }

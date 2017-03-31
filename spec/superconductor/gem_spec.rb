@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'superconductor'
 
 describe Superconductor::Gem do
   it 'has a version number' do

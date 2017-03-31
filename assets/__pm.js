@@ -34,7 +34,13 @@
     } else {
       var parentElement = event.target.parentElement;
       if (parentElement && parentElement.id === '__pm__commit__changes') {
-        parentElement.classList.toggle('open');
+        var classList = parentElement.classList;
+        if (classList.contains('open')) {
+            classList.remove('open');
+            DOM.getElementById('__pm__commit__message').focus();
+        } else {
+            classList.add('open');
+        }
         stickToBottom();
       }
     }
@@ -157,7 +163,7 @@
       root.style.position = 'fixed';
       root.style.left = 0; root.style.right = 0; root.style.bottom = 0;
       root.style.textAlign = 'center'; root.style.lineHeight = '3em';
-      root.style.backgroundColor='#fe6d39'; root.style.color="#FFF";
+      root.style.backgroundColor='#fe6d39'; root.style.color="#fff";
       root.textContent = "An error occurred initializing Superconductor";
     }
     DOM.appendChild(root);

@@ -3,6 +3,9 @@ require 'rack/request'
 require 'rack/response'
 require 'superconductor'
 
+# Superconductor Documentation Service
+# 
+#
 class Superconductor::Documentation
   include Rack::Utils
 

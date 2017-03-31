@@ -15,7 +15,9 @@ pub fn panel_xslt() -> String {
                         ul#__pm__commits {
                             xsl:apply-templates select="/state/log/commit" {}
                         }
-                        textarea id="__pm__commit__message" tabindex="1" name="message" placeholder="Enter your message" {}
+                        textarea id="__pm__commit__message" tabindex="1" name="message" placeholder="Enter your message" {
+                            xsl:value-of select="/state/message" {}
+                        }
                         div#__pm__new_commit {
                             input type="submit" tabindex="3" name="save_update" value="Save Update" {}
                             xsl:if test="/state/changes/change" {
@@ -142,7 +144,7 @@ pub fn panel_xslt() -> String {
                     xsl:element name="input" {
                         xsl:attribute name="name" { "include" }
                         xsl:attribute name="id" {
-                            xsl:value-of select="concat('__pm__changes_', path)" {}
+                            xsl:value-of select="concat('__pm__changes_/', path)" {}
                         }
                         xsl:attribute name="value" {
                             xsl:value-of select="path" {}
@@ -156,7 +158,7 @@ pub fn panel_xslt() -> String {
                             xsl:attribute name="class" { "delete" }
                         }
                     }
-                    label for="__pm__changes_{path}" {
+                    label for="__pm__changes_/{path}" {
                         xsl:value-of select="path" {}
                     }
                     button.button--tiny { " +10 -10" }
