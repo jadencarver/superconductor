@@ -19,7 +19,7 @@ pub fn panel_xslt() -> String {
                             xsl:value-of select="/state/message" {}
                         }
                         div#__pm__new_commit {
-                            input type="submit" tabindex="3" name="save_update" value="Save Update" {}
+                            input type="submit" tabindex="4" name="save_update" value="Save Update" {}
                             xsl:if test="/state/changes/change" {
                                 fieldset#__pm__commit__changes.details {
                                     legend tabindex="2" role="button" { "Include Changes" }
@@ -140,7 +140,7 @@ pub fn panel_xslt() -> String {
                 }
             }
             xsl:template match="/state/changes/change" {
-                li {
+                li tabindex="3" id="{concat('__pm__changes__checkbox/', path)}" {
                     xsl:element name="input" {
                         xsl:attribute name="name" { "include" }
                         xsl:attribute name="id" {
@@ -149,7 +149,7 @@ pub fn panel_xslt() -> String {
                         xsl:attribute name="value" {
                             xsl:value-of select="path" {}
                         }
-                        xsl:attribute name="tabindex" "0"
+                        xsl:attribute name="tabindex" "-1"
                         xsl:attribute name="type" "checkbox"
                         xsl:if test="included='true'" {
                             xsl:attribute name="checked" {}

@@ -5,9 +5,8 @@ use websocket::{Server, Message, Sender, Receiver};
 use websocket::message::Type;
 use websocket::header::WebSocketProtocol;
 
-extern crate git2;
-use self::git2::Repository;
-use self::git2::ObjectType;
+use git2::Repository;
+use git2::ObjectType;
 
 use payload;
 use Commit;
@@ -52,8 +51,9 @@ pub fn start() {
                         _ => {
                             let payload = String::from_utf8_lossy(message.payload.as_ref());
                             println!("{:?}", payload);
-                            let commit: Commit = xml::from_str(&payload).unwrap();
+                            let mut commit: Commit = xml::from_str(&payload).unwrap();
                             println!("{:?}", commit);
+
                             let repo = Repository::discover(".").unwrap();
                             let head = repo.head().unwrap().peel(ObjectType::Commit).unwrap();
                             let mut index = repo.index().unwrap();
@@ -70,11 +70,21 @@ pub fn start() {
                             repo.reset_default(Some(&head), to_remove.iter()).unwrap();
                             for change in commit.clone().include {
                                 let path = Path::new(&change);
-                                index.add_path(path);
+                                index.add_path(path).unwrap();
                             }
                             index.write().unwrap();
-                            let message = Message::text(payload::generate(Some(commit)));
-                            sender.send_message(&message).unwrap();
+
+                            if let Some(event) = commit.save_update.clone() {
+                                let author = repo.signature().unwrap();
+                                let tree_oid = index.write_tree().unwrap();
+                                let tree = repo.find_tree(tree_oid).unwrap();
+                                repo.commit(Some("HEAD"), &author, &author, &commit.message, &tree, &[&head.as_commit().unwrap()]);
+                                let message = Message::text(payload::generate(None));
+                                sender.send_message(&message).unwrap();
+                            } else {
+                                let message = Message::text(payload::generate(Some(commit)));
+                                sender.send_message(&message).unwrap();
+                            }
                         }
                     }
                 }

@@ -14,6 +14,9 @@ use std::ffi::CString;
 
 pub static XML: &'static str = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
 
+extern crate git2;
+use git2::Repository;
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Commit {
     focus: String,
@@ -23,6 +26,14 @@ pub struct Commit {
 }
 
 impl Commit {
+    pub fn blank() -> Commit {
+        Commit {
+            focus: String::new(),
+            message: String::new(),
+            include: vec![],
+            save_update: None
+        }
+    }
 }
 
 mod project;

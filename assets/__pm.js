@@ -19,6 +19,7 @@
     if (!root) return true;
     if (event.which == 96) { PM.toggle(); }
   });
+
   DOM.addEventListener('focus', function (event) {
     if (event.target.id === '__pm__commit__message') {
       var changes = DOM.querySelector('#__pm__commit__changes');
@@ -50,11 +51,27 @@
     sendForm(event.target.form, event);
   });
 
-  //DOM.addEventListener('keypress', function (event) {
-  //  if (event.target.classList.contains('details')) {
-  //    event.target.classList.toggle('open');
-  //  }
-  //});
+  DOM.addEventListener('keyup', function (event) {
+    var parentElement = event.target.parentElement;
+    var EnterKey = 13, SpaceKey = 32;
+    var isActionable = event.which === EnterKey || event.which === SpaceKey;
+    var isCheckbox = event.target.querySelector('input[type=checkbox]');
+    var isDetails = parentElement && parentElement.classList.contains('details');
+
+    var openDetails = function (details) {
+      details.classList.toggle('open');
+      stickToBottom();
+    };
+    var toggleCheckbox = function (checkbox) {
+      checkbox.checked = !checkbox.checked;
+      sendForm(checkbox.form, event);
+    };
+
+    if (isActionable) {
+      if (isDetails)  openDetails(parentElement);
+      if (isCheckbox) toggleCheckbox(isCheckbox);
+    }
+  });
 
   var dragging;
   DOM.addEventListener('dragstart', function (event) {
