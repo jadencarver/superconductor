@@ -76,6 +76,7 @@ pub fn start() {
 
                             if let Some(event) = commit.save_update.clone() {
                                 let author = repo.signature().unwrap();
+                                index.read(false);
                                 let tree_oid = index.write_tree().unwrap();
                                 let tree = repo.find_tree(tree_oid).unwrap();
                                 repo.commit(Some("HEAD"), &author, &author, &commit.message, &tree, &[&head.as_commit().unwrap()]);
