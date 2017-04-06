@@ -52,10 +52,12 @@ module Superconductor
       response.each do |res|
         body << res
       end
-      panel_js = Superconductor.panel_js
-      panel_js.free = Superconductor[:cleanup]
-      headers.delete('Content-Length')
-      body << panel_js.to_s
+      if headers["Content-Type"] == 'text/html'
+        panel_js = Superconductor.panel_js
+        panel_js.free = Superconductor[:cleanup]
+        headers.delete('Content-Length')
+        body << panel_js.to_s
+      end
       [status, headers, body]
     end
 

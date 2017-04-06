@@ -18,16 +18,16 @@ extern crate git2;
 use git2::Repository;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Commit {
+pub struct State {
     focus: String,
     message: String,
     include: Vec<String>,
     save_update: Option<String>
 }
 
-impl Commit {
-    pub fn blank() -> Commit {
-        Commit {
+impl State {
+    pub fn blank() -> State {
+        State {
             focus: String::new(),
             message: String::new(),
             include: vec![],

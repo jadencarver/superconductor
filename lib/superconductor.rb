@@ -4,6 +4,7 @@ require 'fiddle/import'
 module Superconductor
   autoload :Middleware, 'middleware'
   autoload :Documentation, 'documentation'
+  autoload :VERSION, 'superconductor/version'
 
   extend Fiddle::Importer
   dlload File.expand_path('../../target/debug/libsuperconductor.dylib', __FILE__)

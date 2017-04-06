@@ -1,4 +1,4 @@
-use Commit;
+use State;
 use project;
 
 extern crate git2;
@@ -12,7 +12,7 @@ extern crate md5;
 extern crate yaml_rust;
 use self::yaml_rust::YamlLoader;
 
-pub fn generate(previous_commit: Option<Commit>) -> String {
+pub fn generate(previous_commit: Option<State>) -> String {
     let current = project::current();
     let repo = Repository::discover(".").unwrap();
     let mut revwalk = repo.revwalk().unwrap();

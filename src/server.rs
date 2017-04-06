@@ -9,7 +9,7 @@ use git2::Repository;
 use git2::ObjectType;
 
 use payload;
-use Commit;
+use State;
 
 use serde_xml as xml;
 
@@ -51,8 +51,8 @@ pub fn start() {
                         _ => {
                             let payload = String::from_utf8_lossy(message.payload.as_ref());
                             println!("{:?}", payload);
-                            let mut commit: Commit = xml::from_str(&payload).unwrap();
-                            println!("{:?}", commit);
+                            let mut state: State = xml::from_str(&payload).unwrap();
+                            println!("{:?}", state);
 
                             let repo = Repository::discover(".").unwrap();
                             let head = repo.head().unwrap().peel(ObjectType::Commit).unwrap();
@@ -60,7 +60,7 @@ pub fn start() {
 
                             let to_remove = index.iter().fold(vec![], |mut acc, entry| {
                                 let entry_path = String::from_utf8_lossy(entry.path.as_ref());
-                                match commit.include.iter().find(|i| i.as_ref() == entry_path) {
+                                match state.include.iter().find(|i| i.as_ref() == entry_path) {
                                     None => acc.push(entry_path.into_owned()),
                                     _ => {}
                                 };
@@ -68,22 +68,22 @@ pub fn start() {
                             });
 
                             repo.reset_default(Some(&head), to_remove.iter()).unwrap();
-                            for change in commit.clone().include {
+                            for change in state.clone().include {
                                 let path = Path::new(&change);
                                 index.add_path(path).unwrap();
                             }
                             index.write().unwrap();
 
-                            if let Some(event) = commit.save_update.clone() {
+                            if let Some(event) = state.save_update.clone() {
                                 let author = repo.signature().unwrap();
                                 index.read(false);
                                 let tree_oid = index.write_tree().unwrap();
                                 let tree = repo.find_tree(tree_oid).unwrap();
-                                repo.commit(Some("HEAD"), &author, &author, &commit.message, &tree, &[&head.as_commit().unwrap()]);
+                                repo.commit(Some("HEAD"), &author, &author, &state.message, &tree, &[&head.as_commit().unwrap()]);
                                 let message = Message::text(payload::generate(None));
                                 sender.send_message(&message).unwrap();
                             } else {
-                                let message = Message::text(payload::generate(Some(commit)));
+                                let message = Message::text(payload::generate(Some(state)));
                                 sender.send_message(&message).unwrap();
                             }
                         }

@@ -7,16 +7,6 @@
   @import 'details';
   @import 'buttons';
 
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-
-  .no-transition {
-    transition: none !important;
-  }
-
   font-family: 'Helvetica Neue', 'Gill Sans', 'Lucida Grande', sans-serif;
   font-size: 10pt;
   font-weight: 400;
@@ -37,9 +27,22 @@
   height: 50%;
   transition: all 250ms ease-out;
   transform: scale(1.015);
+  pointer-events: none;
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  .no-transition {
+    transition: none !important;
+  }
+
   &.open {
     transform: scale(1.0);
     opacity: 1.0;
+    pointer-events: auto;
   }
 
   ul {
