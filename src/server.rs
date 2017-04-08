@@ -59,13 +59,21 @@ fn connect(connection: Connection<WebSocketStream, WebSocketStream>) {
 
     let (tx, rx) = channel::<NotifierMessage>();
     let (mut sender, mut receiver) = client.split();
-    thread::spawn(move || start_notifier(rx, sender));
+    let notifier = thread::spawn(move || start_notifier(rx, sender));
     let txc = tx.clone();
-    thread::spawn(move || start_monitor(txc));
+    let monitor = thread::spawn(move || start_monitor(txc));
     for message in receiver.incoming_messages() {
         let message: WebMessage = message.unwrap_or(WebMessage::close());
-        tx.send(NotifierMessage::WebMessage(message));
+        match message.opcode {
+            WebMessageType::Close => {
+                tx.send(NotifierMessage::WebMessage(message));
+                break;
+            },
+            _ => tx.send(NotifierMessage::WebMessage(message))
+        };
     }
+    monitor.join();
+    notifier.join();
 }
 
 fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<WebSocketStream>) {
@@ -76,10 +84,7 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
             NotifierMessage::WebMessage(message) => {
                 match message.opcode {
                     WebMessageType::Close => {
-                        let message = WebMessage::close();
-                        sender.send_message(&message).unwrap();
-                        println!("Client disconnected");
-                        return;
+                        break;
                     },
                     WebMessageType::Ping => {
                         let message = WebMessage::pong(message.payload);
@@ -133,7 +138,7 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
 
 fn start_monitor(tx: Sender<NotifierMessage>) {
     let (ftx, rx) = channel();
-    thread::spawn(move || {
+    let observer = thread::spawn(move || {
         println!("Monitoring");
         let fsevent = fsevent::FsEvent::new(ftx);
         fsevent.append_path(".");
@@ -143,5 +148,6 @@ fn start_monitor(tx: Sender<NotifierMessage>) {
         let event = rx.recv().unwrap();
         tx.send(NotifierMessage::FsEvent(event));
     }
+    observer.join();
 }
 
