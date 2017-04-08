@@ -11,6 +11,9 @@ use git2::ObjectType;
 use payload;
 use State;
 
+extern crate fsevent;
+use std::sync::mpsc::channel;
+
 use serde_xml as xml;
 
 pub fn start() {
@@ -32,21 +35,45 @@ pub fn start() {
 
                 let mut client = response.send().unwrap();
                 let message = Message::text(payload::generate(None));
+                let (tx, rx) = channel();
                 client.send_message(&message).unwrap();
 
+                let monitor = thread::spawn(move || {
+                    println!("Monitoring");
+                    let fsevent = fsevent::FsEvent::new(tx);
+                    fsevent.append_path(".");
+                    fsevent.observe();
+                });
+
                 let (mut sender, mut receiver) = client.split();
+
+                let notifier = thread::spawn(move || {
+                    loop {
+                        let value = rx.recv().unwrap();
+                        println!("{:?}", value);
+                        let message = Message::text(payload::generate(None));
+                        sender.send_message(&message).unwrap();
+                        //let message = Message::text(payload::generate(Some(state)));
+                        //sender.send_message(&message).unwrap();
+                    }
+                });
+
                 for message in receiver.incoming_messages() {
                     let message: Message = message.unwrap_or(Message::close());
                     match message.opcode {
                         Type::Close => {
                             let message = Message::close();
-                            sender.send_message(&message).unwrap();
+                            //sender.send_message(&message).unwrap();
+                            monitor.join();
+                            println!("Monitor stopped");
+                            notifier.join();
+                            println!("Notifier stopped");
                             println!("Client disconnected");
                             return;
                         },
                         Type::Ping => {
                             let message = Message::pong(message.payload);
-                            sender.send_message(&message).unwrap();
+                            //sender.send_message(&message).unwrap();
                         },
                         _ => {
                             let payload = String::from_utf8_lossy(message.payload.as_ref());
@@ -80,11 +107,6 @@ pub fn start() {
                                 let tree_oid = index.write_tree().unwrap();
                                 let tree = repo.find_tree(tree_oid).unwrap();
                                 repo.commit(Some("HEAD"), &author, &author, &state.message, &tree, &[&head.as_commit().unwrap()]);
-                                let message = Message::text(payload::generate(None));
-                                sender.send_message(&message).unwrap();
-                            } else {
-                                let message = Message::text(payload::generate(Some(state)));
-                                sender.send_message(&message).unwrap();
                             }
                         }
                     }

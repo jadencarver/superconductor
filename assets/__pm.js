@@ -30,7 +30,8 @@
 
   DOM.addEventListener('click', function (event) {
     if (event.target.type === "submit") {
-      sendForm(event.target.form, event);
+      var form = DOM.querySelector('#__pm__commit');
+      sendForm(form, event);
       event.preventDefault();
     } else {
       var parentElement = event.target.parentElement;
