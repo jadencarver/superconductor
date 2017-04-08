@@ -77,13 +77,13 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
                 match message.opcode {
                     WebMessageType::Close => {
                         let message = WebMessage::close();
-                        //sender.send_message(&message).unwrap();
+                        sender.send_message(&message).unwrap();
                         println!("Client disconnected");
                         return;
                     },
                     WebMessageType::Ping => {
                         let message = WebMessage::pong(message.payload);
-                        //sender.send_message(&message).unwrap();
+                        sender.send_message(&message).unwrap();
                     },
                     _ => {
                         let payload = String::from_utf8_lossy(message.payload.as_ref());
@@ -145,6 +145,3 @@ fn start_monitor(tx: Sender<NotifierMessage>) {
     }
 }
 
-//for message in receiver.incoming_messages() {
-
-//}
