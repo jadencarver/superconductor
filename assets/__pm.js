@@ -38,7 +38,7 @@
         var classList = parentElement.classList;
         if (classList.contains('open')) {
             classList.remove('open');
-            DOM.getElementById('__pm__commit__message').focus();
+            DOM.querySelector('#__pm__commit__message').focus();
         } else {
             classList.add('open');
         }
@@ -188,7 +188,7 @@
       root.classList.add('open');
       var focus = state.querySelector('focus');
       if (focus) var focusId = focus.textContent;
-      if (focusId) var focusElement = DOM.getElementById(focusId);
+      if (focusId) var focusElement = DOM.querySelector('#'+focusId);
       if (focusElement) {
         var detailsElement = closest(focusElement, function (e) {
           return e.classList.contains('details');

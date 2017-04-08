@@ -40,11 +40,11 @@ pub fn generate(previous_commit: Option<State>) -> String {
                             id (commit.id())
                             user {
                                 @let author = commit.author() {
-                                    name  (author.name().unwrap())
-                                        @let email = author.email().unwrap().trim() {
-                                            email (email)
+                                    name (author.name().unwrap())
+                                    @let email = author.email().unwrap().trim() {
+                                        email (email)
                                             image (format!("https://www.gravatar.com/avatar/{:x}?s=64", md5::compute(email.to_lowercase())))
-                                        }
+                                    }
                                 }
                             }
                             @let mut message = commit.message().unwrap().split("\n---") {
@@ -72,15 +72,17 @@ pub fn generate(previous_commit: Option<State>) -> String {
             }
             changes {
                 @for change in repo.statuses(Some(&mut status_opts)).unwrap().iter() {
-                    change {
-                        path (change.path().unwrap())
-                        included @match change.head_to_index().map(|d| d.status()).unwrap_or(Delta::Unreadable) {
-                            Delta::Modified | Delta::Added | Delta::Deleted => "true",
-                            _ => "false"
-                        }
-                        removal @match change.head_to_index().map(|d| d.status()).unwrap_or(Delta::Unreadable) {
-                            Delta::Deleted => "true",
-                            _ => "false"
+                    @let path = change.path().unwrap() {
+                        change id=(path.replace("/", "_").replace(".", "_")) {
+                            path (path)
+                            included @match change.head_to_index().map(|d| d.status()).unwrap_or(Delta::Unreadable) {
+                                Delta::Modified | Delta::Added | Delta::Deleted => "true",
+                                _ => "false"
+                            }
+                            removal @match change.head_to_index().map(|d| d.status()).unwrap_or(Delta::Unreadable) {
+                                Delta::Deleted => "true",
+                                _ => "false"
+                            }
                         }
                     }
                 }

@@ -140,11 +140,11 @@ pub fn panel_xslt() -> String {
                 }
             }
             xsl:template match="/state/changes/change" {
-                li tabindex="3" id="{concat('__pm__changes__checkbox/', path)}" {
+                li tabindex="3" id="{concat('__pm__changes__checkbox--', @id)}" {
                     xsl:element name="input" {
                         xsl:attribute name="name" { "include" }
                         xsl:attribute name="id" {
-                            xsl:value-of select="concat('__pm__changes_/', path)" {}
+                            xsl:value-of select="concat('__pm__changes--', @id)" {}
                         }
                         xsl:attribute name="value" {
                             xsl:value-of select="path" {}
@@ -158,7 +158,7 @@ pub fn panel_xslt() -> String {
                             xsl:attribute name="class" { "delete" }
                         }
                     }
-                    label for="__pm__changes_/{path}" {
+                    label for="__pm__changes--{@id}" {
                         xsl:value-of select="path" {}
                     }
                     button.button--tiny { " +10 -10" }
