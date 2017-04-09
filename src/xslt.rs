@@ -151,8 +151,10 @@ pub fn panel_xslt() -> String {
                         }
                         xsl:value-of select="message" {}
                     }
-                    dl.tasks {
-                        xsl:apply-templates select="task" {}
+                    xsl:if test="task" {
+                        dl.tasks {
+                            xsl:apply-templates select="task" {}
+                        }
                     }
                 }
             }
