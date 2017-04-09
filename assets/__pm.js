@@ -1,4 +1,8 @@
 (function(window, PM) {
+  var document = window.document;
+  var host = document.createElement('div');
+  var root = document.createElement('div');
+  var DOM;
 
   var timeAgo = function(date) {
     var dateString = date.getAttribute("datetime");
@@ -24,11 +28,11 @@
     else if (years < 2) date.innerHTML = years+" year ago";
     else date.innerHTML = years+' years ago';
   }
+  applyTimeAgo = function() {
+    Array.prototype.forEach.call(root.querySelectorAll('time'), timeAgo)
+  }
+  setInterval(applyTimeAgo, 1000);
 
-  var document = window.document;
-  var host = document.createElement('div');
-  var root = document.createElement('div');
-  var DOM;
   if (host.attachShadow) {
     DOM = host.attachShadow({mode: 'open'});
   } else {
@@ -223,7 +227,7 @@
       root.style.backgroundColor='#fe6d39'; root.style.color="#fff";
       root.textContent = "An error occurred initializing Superconductor";
     }
-    Array.prototype.forEach.call(root.querySelectorAll('time'), timeAgo)
+    applyTimeAgo();
     DOM.appendChild(root);
     if (open) {
       root.classList.add('open');
