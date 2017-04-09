@@ -91,15 +91,14 @@
       }
       time {
         font-size: 0.9em;
-        color: $color4;
-        display: block;
+        color: $color3;
       }
       button.attachments {
         margin: 0.5em;
         float: right;
       }
       dl.tasks {
-        margin: 0.5em 0 1em 5em;
+        margin: 0.5em 0 0.5em 5em;
         dt { font-size: 0.9em; font-weight: bold; }
         ul.properties {
           list-style-type: none;

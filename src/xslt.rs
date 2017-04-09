@@ -153,13 +153,15 @@ pub fn panel_xslt() -> String {
                             xsl:value-of select="user/name" {}
                         }
                         xsl:value-of select="message" {}
-                        time datetime="{localtime}" {
-                            xsl:value-of select="localtime" {}
-                        }
                     }
                     xsl:if test="task" {
                         dl.tasks {
                             xsl:apply-templates select="task" {}
+                        }
+                    }
+                    div {
+                        time datetime="{localtime}" {
+                            xsl:value-of select="localtime" {}
                         }
                     }
                 }
