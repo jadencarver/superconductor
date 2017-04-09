@@ -4,7 +4,7 @@
   var root = document.createElement('div');
   var DOM;
 
-  setInterval(applyTimeAgo, 1000);
+  setInterval(applyTimeAgo, 60000);
 
   if (host.attachShadow) {
     DOM = host.attachShadow({mode: 'open'});
@@ -252,7 +252,7 @@
     var days = Math.round(hours / 24);
     var months = Math.round(days / 30);
     var years = Math.round(days / 365);
-    if (seconds < 60) date.innerHTML = seconds+" seconds ago";
+    if (seconds < 60) date.innerHTML = "less than a minute ago";
     else if (minutes < 2) date.innerHTML = minutes+" minute ago";
     else if (minutes < 60) date.innerHTML = minutes+" minutes ago";
     else if (hours < 2) date.innerHTML = hours+" hour ago";
