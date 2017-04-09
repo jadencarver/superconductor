@@ -56,7 +56,8 @@ pub fn generate(previous_commit: Option<State>) -> String {
                         commit {
                             id (commit.id())
                             @let time = commit.time() {
-                                localtime { (FixedOffset::east(time.offset_minutes()*60).timestamp(time.seconds(), 0).to_rfc3339()) }
+                                timestamp (time.seconds())
+                                localtime (FixedOffset::east(time.offset_minutes()*60).timestamp(time.seconds(), 0).to_rfc3339())
                             }
                             user {
                                 @let author = commit.author() {

@@ -107,12 +107,13 @@
           }
         }
       }
-      &.continuous:not(:nth-child(9n+1)) {
+      &.continuous {
         clear: none;
         img { display: none; }
         blockquote {
           .user__name { display: none; }
         }
+        &:not(:last-child) time { display: none; }
       }
     }
     &::after { content: ''; display: block; clear: both; }

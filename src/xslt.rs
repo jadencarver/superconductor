@@ -137,7 +137,7 @@ pub fn panel_xslt() -> String {
             }
             xsl:template match="/state/log/commit" {
                 li {
-                    xsl:if test="./preceding-sibling::commit[1]/user/email = user/email" {
+                    xsl:if test="./preceding-sibling::commit[1]/user/email=user/email and ./preceding-sibling::commit[1]/timestamp - timestamp > -7200" {
                         xsl:attribute name="class" "continuous"
                     }
                     img src="{user/image}" alt="{user/name} <{user/email}>" {}
