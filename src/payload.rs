@@ -77,7 +77,33 @@ pub fn generate(previous_commit: Option<State>) -> String {
                                             @for (name, value) in values.as_hash().unwrap() {
                                                 property {
                                                     name (name.as_str().unwrap_or("None"))
-                                                    before "Unknown"
+                                                    @for parent in commit.parents() {
+                                                        @let mut propwalk = repo.revwalk().unwrap() {
+                                                            @if let Ok(_) = propwalk.push(parent.id()) {
+                                                                @for proprev in propwalk {
+                                                                    @let propcommit = repo.find_commit(proprev.unwrap()).unwrap() {
+                                                                        @let mut propmessages = propcommit.message().unwrap().split("---\n") {
+                                                                            @if let Some(propmessage) = propmessages.next() {
+                                                                                @if let Some(yaml) = propmessages.next() {
+                                                                                    @for (proptask, propvalues) in YamlLoader::load_from_str(yaml).unwrap()[0].as_hash().unwrap() {
+                                                                                        @if proptask == proptask {
+                                                                                            @for (propname, propvalue) in propvalues.as_hash().unwrap() {
+                                                                                                @if propname == name {
+                                                                                                    @if let Some(propbefore) = propvalue.as_str() {
+                                                                                                        before (propbefore)
+                                                                                                    }
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
                                                     after (value.as_str().unwrap_or("None"))
                                                 }
                                             }
