@@ -62,7 +62,7 @@ pub fn generate(previous_commit: Option<State>) -> String {
                                     }
                                 }
                             }
-                            @let mut message = commit.message().unwrap().split("\n---") {
+                            @let mut message = commit.message().unwrap().split("---\n") {
                                 message (message.next().unwrap())
                                 @if let Some(yaml) = message.next() {
                                     @for (task, values) in YamlLoader::load_from_str(yaml).unwrap()[0].as_hash().unwrap() {

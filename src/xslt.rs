@@ -156,7 +156,7 @@ pub fn panel_xslt() -> String {
                     }
                 }
             }
-            xsl:template match="/state/log/commit/tasks" {
+            xsl:template match="/state/log/commit/task" {
                 dt { xsl:value-of select="name" {} }
                 dd {
                     ul.properties {
@@ -164,11 +164,13 @@ pub fn panel_xslt() -> String {
                     }
                 }
             }
-            xsl:template match="/state/log/commit/objective/property" {
-                li {
+            xsl:template match="/state/log/commit/task/property" {
+                li.token {
                     span.name      { xsl:value-of select="name" {} }
-                    span.before    { xsl:value-of select="before" {} }
-                    span.after     { xsl:value-of select="after" {} }
+                    xsl:if test="before" {
+                        span.before.token-negative    { xsl:value-of select="before" {} }
+                    }
+                    span.after.token--positive     { xsl:value-of select="after" {} }
                 }
             }
             xsl:template match="/state/changes/change" {

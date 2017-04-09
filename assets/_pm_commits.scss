@@ -76,7 +76,7 @@
         padding-top: 0;
       }
       blockquote {
-        border-top: dotted $color2 1px;
+        border-top: dotted $color4 1px;
         padding-top: 0.5em;
         .user__name {
           margin-right: 0.5em;
@@ -91,19 +91,14 @@
         float: right;
       }
       dl.tasks {
-        margin-top: 0.5em;
-        margin-left: 7em;
-        font-size: 0.8em;
-        line-height: 1.5em;
-        dt { float: left; font-weight: bold; width: 8em; }
+        margin: 0.5em 0 1em 5em;
+        dt { float: left; font-size: 0.9em; font-weight: bold; width: 8em; }
         ul.properties {
           list-style-type: none;
           li {
-            margin: 0.25em 1em;
-            line-height: 1.6em;
-            .name { float: left; width: 5em; }
-            .name::after   { content: ':';   display: inline; }
-            .before::after { content: ' → '; display: inline; }
+            .name { width: 5em; }
+            .name::after   { display: inline; content: ':';   }
+            .before::after { display: inline; content: ' → '; }
           }
         }
       }

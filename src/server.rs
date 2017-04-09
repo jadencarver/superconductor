@@ -93,6 +93,7 @@ fn start_monitor(tx: Sender<NotifierMessage>) {
 
 
 fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<WebSocketStream>) {
+    let mut last_state: Option<State> = None;
     loop {
         let value = rx.recv().unwrap();
         match value {
@@ -108,7 +109,8 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
                     _ => {
                         let payload = String::from_utf8_lossy(message.payload.as_ref());
                         println!("{:?}", payload);
-                        let mut state: State = xml::from_str(&payload).unwrap();
+                        let state: State = xml::from_str(&payload).unwrap();
+                        last_state = Some(state.clone());
                         println!("{:?}", state);
 
                         let repo = Repository::discover(".").unwrap();
@@ -146,7 +148,11 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
                     }
                 }
             },
-            NotifierMessage::FsEvent(event) => {}
+            NotifierMessage::FsEvent(event) => {
+                let repo = Repository::discover(".").unwrap();
+                let message = WebMessage::text(payload::generate(last_state.clone()));
+                sender.send_message(&message).unwrap();
+            }
         }
     }
 }
