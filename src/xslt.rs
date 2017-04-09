@@ -22,7 +22,29 @@ pub fn panel_xslt() -> String {
                             input type="submit" tabindex="4" name="save_update" value="Save Update" {}
                             xsl:if test="/state/changes/change" {
                                 fieldset#__pm__commit__changes.details {
-                                    legend tabindex="2" role="button" { "Include Changes" }
+                                    legend tabindex="2" role="button" {
+                                        "Include Changes"
+                                        span#__pm__commit__changes__statistics.token {
+                                            xsl:if test="/state/changes/statistics/files != 0" {
+                                                span {
+                                                    xsl:value-of select="format-number(/state/changes/statistics/files, '#,###.##')" {}
+                                                    " files"
+                                                }
+                                            }
+                                            xsl:if test="/state/changes/statistics/insertions != 0" {
+                                                span.token--positive {
+                                                    "+"
+                                                    xsl:value-of select="format-number(/state/changes/statistics/insertions, '#,###.##')" {}
+                                                }
+                                            }
+                                            xsl:if test="/state/changes/statistics/deletions != 0" {
+                                                span.token--negative {
+                                                    "-"
+                                                    xsl:value-of select="format-number(/state/changes/statistics/deletions, '#,###.##')" {}
+                                                }
+                                            }
+                                        }
+                                    }
                                     ul {
                                         xsl:apply-templates select="/state/changes/change" {}
                                     }
@@ -30,71 +52,81 @@ pub fn panel_xslt() -> String {
                             }
                         }
                     }
-                    ul.tiles {
-                        header "Sprint"
-                        li draggable="true" {
-                            div {
-                                strong "BLBA-1234"
-                                p "Some upcoming issue"
-                            }
+                    xsl:choose {
+                        xsl:when test="/state/diffs/diff" {
+                            xsl:apply-templates select="/state/diffs/diff" {}
                         }
-                        li draggable="true" {
-                            div {
-                                strong "BLBA-1234"
-                                p "Some upcoming issue"
-                            }
+                        xsl:otherwise {
+                            xsl:apply-templates select="/state/tasks" {}
                         }
-                        li draggable="true" {
-                            div {
-                                strong "BLBA-1234"
-                                p "Some upcoming issue"
-                            }
+                    }
+                }
+            }
+            xsl:template match="/state/tasks" {
+                ul.tiles {
+                    header "Sprint"
+                    li draggable="true" {
+                        div {
+                            strong "BLBA-1234"
+                            p "Some upcoming issue"
                         }
-                        li draggable="true" {
-                            div {
-                                strong "BLBA-1234"
-                                p "Some upcoming issue"
-                            }
+                    }
+                    li draggable="true" {
+                        div {
+                            strong "BLBA-1234"
+                            p "Some upcoming issue"
                         }
-                        li draggable="true" {
-                            div {
-                                strong "BLBA-1234"
-                                p "Some upcoming issue"
+                    }
+                    li draggable="true" {
+                        div {
+                            strong "BLBA-1234"
+                            p "Some upcoming issue"
+                        }
+                    }
+                    li draggable="true" {
+                        div {
+                            strong "BLBA-1234"
+                            p "Some upcoming issue"
+                        }
+                    }
+                    li draggable="true" {
+                        div {
+                            strong "BLBA-1234"
+                            p "Some upcoming issue"
+                        }
+                    }
+                }
+                ul.tiles {
+                    header {
+                        "In Progress"
+                    }
+                    li draggable="true" {
+                        div {
+                            strong {
+                                xsl:value-of select="/state/task" {}
                             }
                         }
                     }
-                    ul.tiles {
-                        header {
-                            "In Progress"
-                        }
-                        li draggable="true" {
-                            div {
-                                strong {
-                                    xsl:value-of select="/state/objectives" {}
-                                }
+                }
+                ul.tiles {
+                    header "In Review"
+                    li draggable="true" {
+                        div {
+                            strong {
+                                "Some issue"
                             }
                         }
                     }
-                    ul.tiles {
-                        header "In Review"
-                        li draggable="true" {
-                            div {
-                                strong {
-                                    "Some issue"
-                                }
-                            }
-                        }
-                    }
-                    ul.tiles {
-                        header "Blocked"
-                    }
-                    ul.tiles {
-                        header "Done"
-                        li draggable="true" {
-                            div {
-                                strong {
-                                    "Some other issue"
-                                }
+                }
+                ul.tiles {
+                    header "Blocked"
+                }
+                ul.tiles {
+                    header "Done"
+                    li draggable="true" {
+                        div {
+                            strong {
+                                "Some other issue"
                             }
                         }
                     }
@@ -119,12 +151,12 @@ pub fn panel_xslt() -> String {
                         }
                         xsl:value-of select="message" {}
                     }
-                    dl.objectives {
-                        xsl:apply-templates select="objective" {}
+                    dl.tasks {
+                        xsl:apply-templates select="task" {}
                     }
                 }
             }
-            xsl:template match="/state/log/commit/objective" {
+            xsl:template match="/state/log/commit/tasks" {
                 dt { xsl:value-of select="name" {} }
                 dd {
                     ul.properties {
@@ -161,7 +193,7 @@ pub fn panel_xslt() -> String {
                     label for="__pm__changes--{@id}" {
                         xsl:value-of select="path" {}
                     }
-                    button.button--tiny { " +10 -10" }
+                    button.button--tiny name="diff" value="{path}" { " +10 -10" }
                 }
             }
         }

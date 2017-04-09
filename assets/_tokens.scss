@@ -1,0 +1,26 @@
+@import 'colors';
+
+$r: 0.4em;
+.token {
+    > span {
+        color: white;
+        background-color: $color3;
+        font-size: 0.8em;
+        line-height: 1em;
+        padding: 0.2em 0.4em;
+    }
+    > span:first-child {
+        margin-left: 1em;
+        border-radius: $r 0 0 $r;
+    }
+    > span:last-child {
+        margin-right: 1em;
+        border-radius: 0 $r $r 0;
+    }
+    .token--positive {
+        background-color: $color2;
+    }
+    .token--negative {
+        background-color: $color1;
+    }
+}

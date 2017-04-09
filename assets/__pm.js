@@ -138,30 +138,44 @@
     var serializer = new XMLSerializer();
     var request = document.implementation.createDocument(null, form.name);
     var message = request.children[0];
-    var inputs = form.elements;
+    var elements = form.elements;
+    var filter = Array.prototype.filter.bind(elements);
+    var reduce = Array.prototype.reduce.bind(elements);
+    elements = filter(function (element) { return element.name !== ""; });
+    elements = reduce(function(builder, element) {
+        var name = element.name;
+        builder[name] = builder[name] || [];
+        builder[name].push(element);
+        return builder;
+    }, {});
+
     if (event) {
       var focus = request.createElement('focus');
       focus.textContent = event.target.id;
       message.appendChild(focus);
     }
-    for (var i = 0; i < inputs.length; i++) {
-      var input = inputs[i];
-      if (input.name) {
-        var element = request.createElement(input.name)
-        element.textContent = input.value;
-        if (input.tagName === 'INPUT' && input.type.toUpperCase() === 'CHECKBOX') {
-          if (input.checked) {
-            message.appendChild(element);
-          }
-        } else if (input.tagName === 'INPUT' && input.type.toUpperCase() === 'SUBMIT') {
-          if (event && input === event.target) {
-            element.textContent = event.type;
-            message.appendChild(element);
-          }
-        } else {
-          message.appendChild(element);
+    for(name in elements) {
+        var inputs = elements[name];
+        for (var i = 0; i < inputs.length; i++) {
+            var input = inputs[i];
+            if (input.name) {
+                var element = request.createElement(input.name)
+                element.textContent = input.value;
+                if (input.tagName === 'INPUT' && input.type.toUpperCase() === 'CHECKBOX') {
+                    if (input.checked) {
+                        message.appendChild(element);
+                    }
+                } else if (input.tagName === 'BUTTON' || input.tagName === 'INPUT' && input.type.toUpperCase() === 'SUBMIT') {
+                    if (event && input === event.target) {
+                        if (input.value) element.textContent = input.value;
+                        else element.textContent = event.type;
+                        message.appendChild(element);
+                    }
+                } else {
+                    message.appendChild(element);
+                }
+            }
         }
-      }
     }
     console.log(request);
     socket.send(serializer.serializeToString(request));
@@ -233,5 +247,5 @@
     root.classList.add('open');
   };
 
-  PM.open();
+  //PM.open();
 })(window, PM);

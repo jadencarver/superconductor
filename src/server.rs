@@ -76,10 +76,25 @@ fn connect(connection: Connection<WebSocketStream, WebSocketStream>) {
     notifier.join();
 }
 
+fn start_monitor(tx: Sender<NotifierMessage>) {
+    let (ftx, rx) = channel();
+    let observer = thread::spawn(move || {
+        println!("Monitoring");
+        let fsevent = fsevent::FsEvent::new(ftx);
+        fsevent.append_path(".");
+        fsevent.observe();
+    });
+    loop {
+        let event = rx.recv().unwrap();
+        tx.send(NotifierMessage::FsEvent(event));
+    }
+    observer.join();
+}
+
+
 fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<WebSocketStream>) {
     loop {
         let value = rx.recv().unwrap();
-        println!("{:?}", value);
         match value {
             NotifierMessage::WebMessage(message) => {
                 match message.opcode {
@@ -135,19 +150,3 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
         }
     }
 }
-
-fn start_monitor(tx: Sender<NotifierMessage>) {
-    let (ftx, rx) = channel();
-    let observer = thread::spawn(move || {
-        println!("Monitoring");
-        let fsevent = fsevent::FsEvent::new(ftx);
-        fsevent.append_path(".");
-        fsevent.observe();
-    });
-    loop {
-        let event = rx.recv().unwrap();
-        tx.send(NotifierMessage::FsEvent(event));
-    }
-    observer.join();
-}
-

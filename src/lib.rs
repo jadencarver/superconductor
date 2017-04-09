@@ -22,6 +22,7 @@ pub struct State {
     focus: String,
     message: String,
     include: Vec<String>,
+    diff: Vec<String>,
     save_update: Option<String>
 }
 
@@ -31,6 +32,7 @@ impl State {
             focus: String::new(),
             message: String::new(),
             include: vec![],
+            diff: vec![],
             save_update: None
         }
     }
