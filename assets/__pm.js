@@ -53,8 +53,9 @@
   });
 
   DOM.addEventListener('change', function (event) {
+    var debounceRoot = root;
     setTimeout(function() {
-      sendForm(event.target.form, event);
+      if (root === debounceRoot) sendForm(event.target.form, event);
     }, event.target.tagName === "TEXTAREA" ? 250 : 0);
   });
 
