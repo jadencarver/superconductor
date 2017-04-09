@@ -174,11 +174,11 @@ pub fn panel_xslt() -> String {
             }
             xsl:template match="/state/log/commit/task/property" {
                 li.token {
-                    span.name      { xsl:value-of select="name" {} }
+                    span.name { xsl:value-of select="name" {} }
                     xsl:if test="before" {
-                        span.before.token-negative    { xsl:value-of select="before" {} }
+                        span.before.token--negative { xsl:value-of select="before" {} }
                     }
-                    span.after.token--positive     { xsl:value-of select="after" {} }
+                    span.after.token--positive { xsl:value-of select="after" {} }
                 }
             }
             xsl:template match="/state/changes/change" {

@@ -16,11 +16,21 @@
     font-weight: bold;
     border-bottom: solid $color4 1pt;
     margin: 0 0 5pt 0;
-    width: 102pt;
+    width: 100pt;
     background-color: $color0;
     position: sticky;
     position: -webkit-sticky;
-    top: 0;
+    top: 0px;
+    &:after {
+      content: '';
+      width: 15pt;
+      height: 100%;
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 100%;
+      background-color: $color0;
+    }
   }
   ul.tiles li {
     padding-bottom: 1em;

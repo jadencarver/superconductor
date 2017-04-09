@@ -77,6 +77,7 @@ pub fn generate(previous_commit: Option<State>) -> String {
                                             @for (name, value) in values.as_hash().unwrap() {
                                                 property {
                                                     name (name.as_str().unwrap_or("None"))
+                                                    before "Unknown"
                                                     after (value.as_str().unwrap_or("None"))
                                                 }
                                             }
