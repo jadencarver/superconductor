@@ -28,6 +28,9 @@
         line-height: 2.5em;
       }
     }
+    #__pm__commit__changes__statistics {
+      margin-left: 1em;
+    }
   }
 
   #__pm__commit {
@@ -97,13 +100,17 @@
       }
       dl.tasks {
         margin: 0.5em 0 1em 5em;
-        dt { float: left; font-size: 0.9em; font-weight: bold; width: 8em; }
+        dt { font-size: 0.9em; font-weight: bold; }
         ul.properties {
           list-style-type: none;
+          padding: 0;
           li {
             .name { width: 5em; }
             .name::after   { display: inline; content: ':';   }
-            .before::after { display: inline; content: ' → '; }
+            .before { position: relative; }
+            .before { padding-right: 1em; }
+            .before::after { display: inline; line-height: 1em; font-size: 1.5em; position: absolute; right: -0.5em; content: '⇒'; }
+            .before + .after { padding-left: 1.25em; }
           }
         }
       }

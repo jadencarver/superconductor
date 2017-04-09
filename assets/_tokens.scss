@@ -7,18 +7,16 @@ $r: 0.4em;
         background-color: $color3;
         font-size: 0.85em;
         line-height: 1em;
-        padding: 0.2em 0.75em;
+        padding: 0.2em 0.5em;
         text-shadow: 0 0 1pt darken($color3, 50%);
         border: solid $color4 1pt;
         border-width: 1pt 0;
     }
     > span:first-child {
-        margin-left: 1em;
         border-radius: $r 0 0 $r;
         border-width: 1pt 0 1pt 1pt;
     }
     > span:last-child {
-        margin-right: 1em;
         border-radius: 0 $r $r 0;
         border-width: 1pt 1pt 1pt 0;
     }
@@ -30,4 +28,10 @@ $r: 0.4em;
         background-color: $color1;
         text-shadow: 0 0 1pt darken($color1, 50%);
     }
+    .token--neutral {
+        background-color: $color4;
+        text-shadow: 0 0 1pt darken($color4, 50%);
+        color: darken(white, 25%);
+    }
+
 }

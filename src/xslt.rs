@@ -176,7 +176,7 @@ pub fn panel_xslt() -> String {
                 li.token {
                     span.name { xsl:value-of select="name" {} }
                     xsl:if test="before" {
-                        span.before.token--negative { xsl:value-of select="before" {} }
+                        span.before.token--neutral { xsl:value-of select="before" {} }
                     }
                     span.after.token--positive { xsl:value-of select="after" {} }
                 }
