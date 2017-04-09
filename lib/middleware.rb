@@ -1,10 +1,11 @@
 module Superconductor
   class Middleware
 
+    Superconductor.start();
+
     def initialize(app)
       @app = app
       @assets = Dir[File.expand_path('../../assets/*', __FILE__)].map { |d| File.basename(d) }
-      Superconductor.start();
     end
 
     def call(env)
