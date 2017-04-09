@@ -4,33 +4,6 @@
   var root = document.createElement('div');
   var DOM;
 
-  var timeAgo = function(date) {
-    var dateString = date.getAttribute("datetime");
-    var timestamp = new Date(dateString).getTime();
-    var now = new Date().getTime();
-    var distance = timestamp - now;
-    var seconds = Math.round(Math.abs(distance) / 1000);
-    var minutes = Math.round(seconds / 60);
-    var hours = Math.round(minutes / 60);
-    var days = Math.round(hours / 24);
-    var months = Math.round(days / 30);
-    var years = Math.round(days / 365);
-    if (seconds < 5) date.innerHTML = 'just now'
-    else if (seconds < 60) date.innerHTML = seconds+" seconds ago";
-    else if (minutes < 2) date.innerHTML = minutes+" minute ago";
-    else if (minutes < 60) date.innerHTML = minutes+" minutes ago";
-    else if (hours < 2) date.innerHTML = hours+" hour ago";
-    else if (hours < 24) date.innerHTML = hours+" hours ago";
-    else if (days < 2) date.innerHTML = days+" day ago";
-    else if (days < 30) date.innerHTML = days+" days ago";
-    else if (months < 2) date.innerHTML = months+" month ago";
-    else if (months < 12) date.innerHTML = months+" months ago";
-    else if (years < 2) date.innerHTML = years+" year ago";
-    else date.innerHTML = years+' years ago';
-  }
-  applyTimeAgo = function() {
-    Array.prototype.forEach.call(root.querySelectorAll('time'), timeAgo)
-  }
   setInterval(applyTimeAgo, 1000);
 
   if (host.attachShadow) {
@@ -263,6 +236,36 @@
     };
     setTimeout(function () { stickToBottomCallback = function () {} }, 250);
     stickToBottomCallback();
+  }
+
+
+  function timeAgo(date) {
+    var dateString = date.getAttribute("datetime");
+    var timestamp = new Date(dateString).getTime();
+    var now = new Date().getTime();
+    var distance = timestamp - now;
+    var seconds = Math.round(Math.abs(distance) / 1000);
+    var minutes = Math.round(seconds / 60);
+    var hours = Math.round(minutes / 60);
+    var days = Math.round(hours / 24);
+    var months = Math.round(days / 30);
+    var years = Math.round(days / 365);
+    if (seconds < 5) date.innerHTML = 'just now'
+    else if (seconds < 60) date.innerHTML = seconds+" seconds ago";
+    else if (minutes < 2) date.innerHTML = minutes+" minute ago";
+    else if (minutes < 60) date.innerHTML = minutes+" minutes ago";
+    else if (hours < 2) date.innerHTML = hours+" hour ago";
+    else if (hours < 24) date.innerHTML = hours+" hours ago";
+    else if (days < 2) date.innerHTML = days+" day ago";
+    else if (days < 30) date.innerHTML = days+" days ago";
+    else if (months < 2) date.innerHTML = months+" month ago";
+    else if (months < 12) date.innerHTML = months+" months ago";
+    else if (years < 2) date.innerHTML = years+" year ago";
+    else date.innerHTML = years+' years ago';
+  }
+
+  function applyTimeAgo() {
+    Array.prototype.forEach.call(root.querySelectorAll('time'), timeAgo)
   }
 
   PM.toggle = function () {
