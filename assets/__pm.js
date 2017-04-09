@@ -33,6 +33,7 @@
 
   DOM.addEventListener('click', function (event) {
     if (event.target.type === "submit") {
+      console.log('click');
       var form = DOM.querySelector('#__pm__commit');
       sendForm(form, event);
       event.preventDefault();
@@ -52,7 +53,9 @@
   });
 
   DOM.addEventListener('change', function (event) {
-    sendForm(event.target.form, event);
+    setTimeout(function() {
+      sendForm(event.target.form, event);
+    }, event.target.tagName === "TEXTAREA" ? 250 : 0);
   });
 
   DOM.addEventListener('keyup', function (event) {
@@ -117,7 +120,6 @@
     event.preventDefault();
   };
 
-
   function loadProcessor() {
     var processor = new XSLTProcessor();
     var processorRequest = new XMLHttpRequest();
@@ -153,7 +155,7 @@
 
     if (event) {
       var focus = request.createElement('focus');
-      focus.textContent = event.target.id;
+      focus.textContent = document.activeElement.id;
       message.appendChild(focus);
     }
     for(name in elements) {
@@ -182,7 +184,6 @@
     console.log(request);
     socket.send(serializer.serializeToString(request));
   }
-
 
   function setState(state) {
     var open, fragment = processor.transformToFragment(state, document);

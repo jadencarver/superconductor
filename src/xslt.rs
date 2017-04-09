@@ -22,7 +22,7 @@ pub fn panel_xslt() -> String {
                             input type="submit" tabindex="4" name="save_update" value="Save Update" {}
                             xsl:if test="/state/changes/change" {
                                 fieldset#__pm__commit__changes.details {
-                                    legend tabindex="2" role="button" {
+                                    legend#__pm__commit__changes_legend tabindex="2" role="button" {
                                         "Include Changes"
                                         span#__pm__commit__changes__statistics.token {
                                             xsl:if test="/state/changes/statistics/files != 0" {
