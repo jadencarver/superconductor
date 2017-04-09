@@ -110,7 +110,6 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
                         let payload = String::from_utf8_lossy(message.payload.as_ref());
                         println!("{:?}", payload);
                         let state: State = xml::from_str(&payload).unwrap();
-                        last_state = Some(state.clone());
                         println!("{:?}", state);
 
                         let repo = Repository::discover(".").unwrap();
@@ -141,10 +140,12 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
                             repo.commit(Some("HEAD"), &author, &author, &state.message, &tree, &[&head.as_commit().unwrap()]);
                             let message = WebMessage::text(payload::generate(None));
                             sender.send_message(&message).unwrap();
+                            last_state = None;
                         } else {
-                            let message = WebMessage::text(payload::generate(Some(state)));
-                            sender.send_message(&message).unwrap();
+                            last_state = Some(state);
                         }
+                        let message = WebMessage::text(payload::generate(last_state.clone()));
+                        sender.send_message(&message).unwrap();
                     }
                 }
             },
