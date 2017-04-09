@@ -9,6 +9,8 @@ use self::git2::Delta;
 use git2::ObjectType;
 
 extern crate md5;
+extern crate chrono;
+use self::chrono::{TimeZone, FixedOffset};
 
 extern crate yaml_rust;
 use self::yaml_rust::YamlLoader;
@@ -53,12 +55,15 @@ pub fn generate(previous_commit: Option<State>) -> String {
                     @let commit = repo.find_commit(rev.unwrap()).unwrap() {
                         commit {
                             id (commit.id())
+                            @let time = commit.time() {
+                                localtime { (FixedOffset::east(time.offset_minutes()*60).timestamp(time.seconds(), 0).to_rfc3339()) }
+                            }
                             user {
                                 @let author = commit.author() {
                                     name (author.name().unwrap())
                                     @let email = author.email().unwrap().trim() {
                                         email (email)
-                                            image (format!("https://www.gravatar.com/avatar/{:x}?s=64", md5::compute(email.to_lowercase())))
+                                        image (format!("https://www.gravatar.com/avatar/{:x}?s=64", md5::compute(email.to_lowercase())))
                                     }
                                 }
                             }

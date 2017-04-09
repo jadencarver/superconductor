@@ -28,7 +28,10 @@ pub fn panel_xslt() -> String {
                                             xsl:if test="/state/changes/statistics/files != 0" {
                                                 span {
                                                     xsl:value-of select="format-number(/state/changes/statistics/files, '#,###.##')" {}
-                                                    " files"
+                                                    " file"
+                                                    xsl:if test="/state/changes/statistics/files != 1" {
+                                                        "s"
+                                                    }
                                                 }
                                             }
                                             xsl:if test="/state/changes/statistics/insertions != 0" {
@@ -150,6 +153,9 @@ pub fn panel_xslt() -> String {
                             xsl:value-of select="user/name" {}
                         }
                         xsl:value-of select="message" {}
+                        time datetime="{localtime}" {
+                            xsl:value-of select="localtime" {}
+                        }
                     }
                     xsl:if test="task" {
                         dl.tasks {

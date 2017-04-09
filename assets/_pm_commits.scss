@@ -86,6 +86,11 @@
           color: $color3;
         }
       }
+      time {
+        font-size: 0.9em;
+        color: $color4;
+        display: block;
+      }
       button.attachments {
         margin: 0.5em;
         float: right;

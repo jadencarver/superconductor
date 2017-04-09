@@ -15,6 +15,7 @@ websocket = { version = "*", default-features = false }
 yaml-rust = "*"
 md5 = "*"
 fsevent = "*"
+chrono = "*"
 
 serde = "0.8"
 serde_derive = "0.8"

@@ -1,4 +1,24 @@
 (function(window, PM) {
+
+  var timeAgo = function(date) {
+    var dateString = date.getAttribute("datetime");
+    var timestamp = new Date(dateString).getTime();
+    var now = new Date().getTime();
+    var distance = timestamp - now;
+    var seconds = Math.abs(distance) / 1000;
+    var minutes = Math.round(seconds / 60);
+    var hours = Math.round(minutes / 60);
+    var days = Math.round(hours / 24);
+    var months = Math.round(days / 30);
+    var years = Math.round(days / 365);
+    if (seconds < 5) date.innerHTML = 'just now'
+    else if (seconds < 60) date.innerHTML = seconds+" seconds ago";
+    else if (minutes < 60) date.innerHTML = minutes+" minutes ago";
+    else if (hours < 24) date.innerHTML = hours+" hours ago";
+    else if (days < 30) date.innerHTML = days+" days ago";
+    else if (days < 365) date.innerHTML = months+" months ago";
+  }
+
   var document = window.document;
   var host = document.createElement('div');
   var root = document.createElement('div');
@@ -128,7 +148,6 @@
     var socket = new WebSocket("ws://127.0.0.1:2794", "superconductor");
     socket.onmessage = function (event) {
       var state = parser.parseFromString(event.data, "text/xml");
-      console.log(state);
       setState(state);
     }
     return socket;
@@ -198,6 +217,7 @@
       root.style.backgroundColor='#fe6d39'; root.style.color="#fff";
       root.textContent = "An error occurred initializing Superconductor";
     }
+    Array.prototype.forEach.call(root.querySelectorAll('time'), timeAgo)
     DOM.appendChild(root);
     if (open) {
       root.classList.add('open');
