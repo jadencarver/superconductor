@@ -203,6 +203,7 @@
       root.textContent = "An error occurred initializing Superconductor";
     }
     applyTimeAgo();
+    if (hljs) Array.prototype.forEach.call(root.querySelectorAll('pre code'), hljs.highlightBlock);
     DOM.appendChild(root);
     if (open) {
       root.classList.add('open');

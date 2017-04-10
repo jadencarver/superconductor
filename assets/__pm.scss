@@ -23,7 +23,7 @@
   bottom: 0px;
   left: 0px;
   right: 0px;
-  line-height: 2.5em;
+  line-height: 2em;
   opacity: 0.0;
   height: 50%;
   transition: all 250ms ease-out;
@@ -70,5 +70,33 @@
     margin: 0 10pt;
     font-weight: 400;
   }
-
+  
+  .diff {
+    overflow-y: scroll;
+    max-height: 100%;
+    max-width: 67%;
+    color: $color0;
+    background-color: $color1;
+    ol.lines, pre {
+      width: calc(100% - 3em);
+      font-family: 'Monaco';
+      font-size: 10pt;
+      line-height: 1.5em;
+      font-weight: 100;
+      float: left;
+    }
+    ol.lines {
+      width: 3em;
+      color: $color4;
+      background-color: $color3;
+      padding-left: 5pt;
+    }
+    pre {
+      background: -webkit-linear-gradient(left, $color4, $color4 80em, $color1 5.1em, $color1);
+      background:         linear-gradient(left, $color4, $color4 80em, $color1 5.1em, $color1);
+      code {
+        padding-left: 5pt;
+      }
+    }
+  }
 }

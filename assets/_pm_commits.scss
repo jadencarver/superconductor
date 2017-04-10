@@ -101,6 +101,7 @@
         margin: 0.5em 0 0.5em 5em;
         dt { font-size: 0.9em; font-weight: bold; }
         ul.properties {
+          line-height: 1.75em;
           list-style-type: none;
           padding: 0;
           li {
@@ -108,7 +109,7 @@
             .name::after   { display: inline; content: ':';   }
             .before { position: relative; }
             .before { padding-right: 1em; }
-            .before::after { display: inline; line-height: 1em; font-size: 1.5em; position: absolute; right: -0.5em; content: '⇒'; }
+            .before::after { display: inline; line-height: 1.25em; font-size: 1.5em; position: absolute; right: -0.5em; content: '⇒'; }
             .before + .after { padding-left: 1.25em; }
           }
         }

@@ -58,6 +58,9 @@ pub extern "C" fn panel_js() -> *mut c_char {
     let markup = html! {
         script { "
         if (window === window.top) {
+            var highlight = document.createElement('script');
+            highlight.setAttribute('src', '//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/highlight.min.js');
+            document.body.appendChild(highlight);
             PM = document.createElement('script');
             PM.setAttribute('src', '/__pm.js');
             document.body.appendChild(PM);

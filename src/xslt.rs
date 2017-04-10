@@ -11,9 +11,14 @@ pub fn panel_xslt() -> String {
             xsl:template match="/" {
                 div#__pm__panel {
                     style type="text/css" (css)
+                    style type="text/css" "@import url('//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/styles/agate.min.css');"
                     form#__pm__commit method="post" name="commit" {
                         ul#__pm__commits {
                             xsl:apply-templates select="/state/log/commit" {}
+                        }
+                        dl.properties {
+                            dt "Status"
+                            dd "In Progress"
                         }
                         textarea id="__pm__commit__message" tabindex="1" name="message" placeholder="Enter your message" {
                             xsl:value-of select="/state/message" {}
@@ -62,6 +67,33 @@ pub fn panel_xslt() -> String {
                         xsl:otherwise {
                             xsl:apply-templates select="/state/tasks" {}
                         }
+                    }
+                }
+            }
+            xsl:template match="/state/diffs/diff" {
+                div.diff {
+                    ol.lines {
+                        xsl:call-template name="diff-lines" {
+                            xsl:with-param name="limit" select="lines" {}
+                        }
+                    }
+                    pre {
+                        code {
+                            xsl:value-of select="content" {}
+                        }
+                    }
+                }
+            }
+            xsl:template name="diff-lines" {
+                xsl:param name="limit" select="1" {}
+                xsl:param name="count" select="1" {}
+                xsl:if test="$count <= $limit" {
+                    li {
+                        xsl:value-of select="$count" {}
+                    }
+                    xsl:call-template name="diff-lines" {
+                        xsl:with-param name="limit" select="$limit" {}
+                        xsl:with-param name="count" select="$count + 1" {}
                     }
                 }
             }

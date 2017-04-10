@@ -5,7 +5,7 @@ module Superconductor
 
     def initialize(app)
       @app = app
-      @assets = Dir[File.expand_path('../../assets/*', __FILE__)].map { |d| File.basename(d) }
+      @assets = Dir[File.expand_path('../../assets/**/*.{js,css}', __FILE__)].map { |d| d[Dir.pwd.length+8..-1] }
     end
 
     def call(env)

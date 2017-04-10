@@ -13,7 +13,7 @@ extern crate chrono;
 use self::chrono::{TimeZone, FixedOffset};
 
 extern crate yaml_rust;
-use self::yaml_rust::YamlLoader;
+use self::yaml_rust::{Yaml, YamlLoader};
 
 pub fn generate(previous_commit: Option<State>) -> String {
     let current = project::current();
@@ -76,7 +76,7 @@ pub fn generate(previous_commit: Option<State>) -> String {
                                             name (task.as_str().unwrap_or("None"))
                                             @for (name, value) in values.as_hash().unwrap() {
                                                 property {
-                                                    name (name.as_str().unwrap_or("None"))
+                                                    name (name.as_str().unwrap_or("[]"))
                                                     @for parent in commit.parents() {
                                                         @let mut propwalk = repo.revwalk().unwrap() {
                                                             @if let Ok(_) = propwalk.push(parent.id()) {
@@ -104,7 +104,14 @@ pub fn generate(previous_commit: Option<State>) -> String {
                                                             }
                                                         }
                                                     }
-                                                    after (value.as_str().unwrap_or("None"))
+                                                    after {
+                                                        @match value {
+                                                            &Yaml::Integer(int) => (int),
+                                                            &Yaml::String(ref string) => (string),
+                                                            &Yaml::Boolean(b) => (b),
+                                                            _ => ("[unknown]")
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
@@ -146,8 +153,15 @@ pub fn generate(previous_commit: Option<State>) -> String {
             }
             diffs {
                 @if let Some(commit) = previous_commit.clone() {
-                    @for path in commit.diff.iter() {
-                        diff { "I_AM_DIFF" }
+                    @for delta in changes.deltas() {
+                        diff {
+                            @if let Ok(blob) = repo.find_blob(delta.new_file().id()) {
+                                @let content = String::from_utf8_lossy(blob.content()) {
+                                    content (content)
+                                    lines (content.lines().count())
+                                }
+                            }
+                        }
                     }
                 }
             }
