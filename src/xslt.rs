@@ -16,9 +16,12 @@ pub fn panel_xslt() -> String {
                         ul#__pm__commits {
                             xsl:apply-templates select="/state/log/commit" {}
                         }
+                        hr {}
                         dl.properties {
                             dt "Status"
                             dd "In Progress"
+                            dt "Estimate"
+                            dd "5"
                         }
                         textarea id="__pm__commit__message" tabindex="1" name="message" placeholder="Enter your message" {
                             xsl:value-of select="/state/message" {}

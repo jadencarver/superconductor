@@ -50,6 +50,11 @@
     padding-left: 5pt;
   }
 
+  hr {
+    border: solid $color4 0;
+    border-bottom-width: 1px;
+  }
+
   textarea {
     font-family: inherit;
     height: 2em;

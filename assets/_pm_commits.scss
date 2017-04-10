@@ -2,9 +2,23 @@
 
 #__pm__panel {
 
+  dl.properties {
+    line-height: 2em;
+    margin: 1em;
+    min-height: calc(100% - 5em);
+    position: sticky;
+    top: 0;
+    z-index: -1;
+    dt {
+      float: left;
+      min-width: 8em;
+    }
+  }
+
   #__pm__new_commit {
     position: relative;
     min-height: 2.5em;
+    background-color: $color0;
     input[type='submit'][name='save_update'] {
       position: absolute;
       right: 0;
