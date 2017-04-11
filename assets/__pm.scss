@@ -51,23 +51,70 @@
   }
 
   hr {
-    border: solid $color4 0;
+    border: dotted $color4 0;
     border-bottom-width: 1px;
   }
 
-  textarea {
+  $grey: darken($white, 25%);
+  textarea, input[type=text], .select {
     font-family: inherit;
-    height: 2em;
+    display: block;
     font-size: 1em;
-    line-height: 1.4em;
-    resize: none;
-    overflow: hidden;
-    vertical-align: middle;
-    overflow: none;
-    padding: 0.25em;
+    border: solid $grey 1px;
+    line-height: 2em;
+    padding: 0 0.5em;
     width: 100%;
+
     &:focus {
-      outline: $color5 auto 0.1em;
+      box-shadow: 0 0 0.1em $color2;
+    }
+  }
+
+  textarea {
+    line-height: 1.25em;
+    resize: none;
+    padding: 0.5em 0.5em;
+    height: 5em;
+  }
+
+  .select {
+    position: relative;
+
+    > input {
+      position: absolute;
+      border: 0;
+      margin: 0 4em 0 -0.5em;
+      width: calc(100% - 2.1em);
+      height: calc(2em - 2px);
+      z-index: 1;
+    }
+
+    > select {
+      opacity: 0;
+      width: 100%;
+      height: 2.5em;
+      position: absolute;
+      left: 0.5em;
+      top: 0.5em;
+      z-index: 0;
+
+      > option[disabled] {
+        color: $grey;
+      }
+    }
+
+    &:focus {
+      box-shadow: 0 0 0.1em $color2;
+    }
+
+    &::before {
+      position: absolute;
+      line-height: 2em;
+      right: 0;
+      border-left: solid $grey 1px;
+      content: '\025BE';
+      width: 2em;
+      text-align: center;
     }
   }
 
@@ -82,6 +129,7 @@
     max-width: 67%;
     color: $color0;
     background-color: $color1;
+
     ol.lines, pre {
       width: calc(100% - 3em);
       font-family: 'Monaco';
@@ -90,15 +138,18 @@
       font-weight: 100;
       float: left;
     }
+
     ol.lines {
       width: 3em;
       color: $color4;
       background-color: $color3;
       padding-left: 5pt;
     }
+
     pre {
       background: -webkit-linear-gradient(left, $color4, $color4 80em, $color1 5.1em, $color1);
       background:         linear-gradient(left, $color4, $color4 80em, $color1 5.1em, $color1);
+
       code {
         padding-left: 5pt;
       }
