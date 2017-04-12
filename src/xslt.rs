@@ -18,7 +18,9 @@ pub fn panel_xslt() -> String {
                         }
                         hr {}
                         dl.properties {
-                            xsl:apply-templates select="/state/properties/property" {}
+                            xsl:apply-templates select="/state/properties/property" {
+                                xsl:with-param name="value" "5"
+                            }
                         }
                         textarea id="__pm__commit__message" tabindex="1" name="message" placeholder="Add a Comment" {
                             xsl:value-of select="/state/message" {}
@@ -76,13 +78,9 @@ pub fn panel_xslt() -> String {
                         xsl:when test="name = 'Status'" {
                             dt { label for="__pm__commit__properties--status" "Status" }
                             dd.select tabindex="1" {
-                                "In Progress"
+                                xsl:value-of select="value" {}
                                 select id="__pm__commit__properties--status" name="property" data-name="Status" {
-                                    option value="Sprint" "Sprint"
-                                    option value="In Progress" "In Progress"
-                                    option value="In Review" "In Review"
-                                    option value="Blocked" "Blocked"
-                                    option value="Done" "Done"
+                                    xsl:apply-templates "options/option" {}
                                 }
                             }
                         }
@@ -91,8 +89,7 @@ pub fn panel_xslt() -> String {
                             dd.select {
                                 input type="text" value="Jaden Carver" {}
                                 select name="property" data-name="Developer" {
-                                    option value="Jaden Carver <jaden.carver@gmail.com>" "Jaden Carver"
-                                    option value="Bob Dole <bdole69@gmail.com>" "Bob Dole"
+                                    xsl:apply-templates "options/option" {}
                                 }
                             }
                         }
@@ -111,6 +108,17 @@ pub fn panel_xslt() -> String {
                             }
                         }
                     }
+                }
+            }
+            xsl:template match="/state/properties/property/options/option" {
+                xsl:element name="option" {
+                    xsl:attribute name="value" {
+                        xsl:value-of select="." {}
+                    }
+                    xsl:if test="./parent::options/parent::property/value = ." {
+                        xsl:attribute name="selected" "selected"
+                    }
+                    xsl:value-of select="." {}
                 }
             }
             xsl:template match="/state/diffs/diff" {

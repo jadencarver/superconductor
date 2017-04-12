@@ -128,6 +128,13 @@ pub fn generate(previous_commit: Option<State>) -> String {
                         property {
                             name (property.name)
                             value (property.value)
+                            options {
+                                option "Sprint"
+                                option "In Progress"
+                                option "In Review"
+                                option "Blocked"
+                                option "Done"
+                            }
                         }
                     }
                 }
@@ -137,6 +144,13 @@ pub fn generate(previous_commit: Option<State>) -> String {
                     property {
                         name "Status"
                         value "Done"
+                        options {
+                            option "Sprint"
+                            option "In Progress"
+                            option "In Review"
+                            option "Blocked"
+                            option "Done"
+                        }
                     }
                     property {
                         name "Estimate"
@@ -145,6 +159,10 @@ pub fn generate(previous_commit: Option<State>) -> String {
                     property {
                         name "Developer"
                         value "Jaden Carver <jaden.carver@gmail.com>"
+                        options {
+                            option value="Jaden Carver <jaden.carver@gmail.com>" "Jaden Carver"
+                            option value="Bob Dole <bdole69@gmail.com>" "Bob Dole"
+                        }
                     }
                     property {
                         name "Description"
