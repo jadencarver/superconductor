@@ -17,13 +17,20 @@ pub static XML: &'static str = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
 extern crate git2;
 use git2::Repository;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct State {
     focus: String,
     message: String,
     include: Vec<String>,
+    property: Vec<Property>,
     diff: Vec<String>,
     save_update: Option<String>
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct Property {
+    name: String,
+    value: String
 }
 
 impl State {
@@ -33,6 +40,7 @@ impl State {
             message: String::new(),
             include: vec![],
             diff: vec![],
+            property: vec![],
             save_update: None
         }
     }

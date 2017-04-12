@@ -123,7 +123,34 @@ pub fn generate(previous_commit: Option<State>) -> String {
                 }
             }
             @if let Some(commit) = previous_commit.clone() {
+                properties {
+                    @for property in commit.property {
+                        property {
+                            name (property.name)
+                            value (property.value)
+                        }
+                    }
+                }
                 message (commit.message)
+            } @else {
+                properties {
+                    property {
+                        name "Status"
+                        value "Done"
+                    }
+                    property {
+                        name "Estimate"
+                        value "5"
+                    }
+                    property {
+                        name "Developer"
+                        value "Jaden Carver <jaden.carver@gmail.com>"
+                    }
+                    property {
+                        name "Description"
+                        value ""
+                    }
+                }
             }
             changes {
                 @if let Ok(delta) = changes.stats() {

@@ -11,6 +11,7 @@ $r: 0.4em;
         text-shadow: 0 0 1pt darken($color3, 50%);
         border: solid $color4 1pt;
         border-width: 1pt 0;
+        vertical-align: 15%;
     }
     > span:first-child {
         border-radius: $r 0 0 $r;

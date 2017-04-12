@@ -108,7 +108,7 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
                     },
                     _ => {
                         let payload = String::from_utf8_lossy(message.payload.as_ref());
-                        println!("{:?}", payload);
+                        println!("{}", payload);
                         let state: State = xml::from_str(&payload).unwrap();
                         println!("{:?}", state);
 

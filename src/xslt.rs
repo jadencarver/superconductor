@@ -18,12 +18,9 @@ pub fn panel_xslt() -> String {
                         }
                         hr {}
                         dl.properties {
-                            dt "Status"
-                            dd "In Progress"
-                            dt "Estimate"
-                            dd "5"
+                            xsl:apply-templates select="/state/properties/property" {}
                         }
-                        textarea id="__pm__commit__message" tabindex="1" name="message" placeholder="Enter your message" {
+                        textarea id="__pm__commit__message" tabindex="1" name="message" placeholder="Add a Comment" {
                             xsl:value-of select="/state/message" {}
                         }
                         div#__pm__new_commit {
@@ -69,6 +66,49 @@ pub fn panel_xslt() -> String {
                         }
                         xsl:otherwise {
                             xsl:apply-templates select="/state/tasks" {}
+                        }
+                    }
+                }
+            }
+            xsl:template match="/state/properties/property" {
+                div.property {
+                    xsl:choose {
+                        xsl:when test="name = 'Status'" {
+                            dt { label for="__pm__commit__properties--status" "Status" }
+                            dd.select tabindex="1" {
+                                "In Progress"
+                                select id="__pm__commit__properties--status" name="property" data-name="Status" {
+                                    option value="Sprint" "Sprint"
+                                    option value="In Progress" "In Progress"
+                                    option value="In Review" "In Review"
+                                    option value="Blocked" "Blocked"
+                                    option value="Done" "Done"
+                                }
+                            }
+                        }
+                        xsl:when test="name = 'Developer'" {
+                            dt "Developer"
+                            dd.select {
+                                input type="text" value="Jaden Carver" {}
+                                select name="property" data-name="Developer" {
+                                    option value="Jaden Carver <jaden.carver@gmail.com>" "Jaden Carver"
+                                    option value="Bob Dole <bdole69@gmail.com>" "Bob Dole"
+                                }
+                            }
+                        }
+                        xsl:when test="name = 'Description'" {
+                            dt "Description"
+                            dd {
+                                textarea name="property" data-name="Description" {
+                                    xsl:value-of select="value" {}
+                                }
+                            }
+                        }
+                        xsl:otherwise {
+                            dt "Estimate"
+                            dd.input {
+                                input type="text" name="property" data-name="Estimate" value="{value}" {}
+                            }
                         }
                     }
                 }

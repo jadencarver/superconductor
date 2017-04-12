@@ -1,4 +1,4 @@
-(function(window, PM) {
+(function(window, PM, hljs) {
   var document = window.document;
   var host = document.createElement('div');
   var root = document.createElement('div');
@@ -35,11 +35,12 @@
     if (event.target.type === "submit") {
       console.log('click');
       var form = DOM.querySelector('#__pm__commit');
-      sendForm(form, event);
+      serialize(form, event);
       event.preventDefault();
     } else {
-      var parentElement = event.target.parentElement;
-      if (parentElement && parentElement.id === '__pm__commit__changes') {
+      var legend = closest(event.target, function(e) { return e.id === '__pm__commit__changes_legend'; }, 2);
+      var parentElement = legend.parentElement;
+      if (parentElement) {
         var classList = parentElement.classList;
         if (classList.contains('open')) {
             classList.remove('open');
@@ -55,7 +56,7 @@
   DOM.addEventListener('change', function (event) {
     var debounceRoot = root;
     setTimeout(function() {
-      if (root === debounceRoot) sendForm(event.target.form, event);
+      if (root === debounceRoot) serialize(event.target.form, event);
     }, event.target.tagName === "TEXTAREA" ? 250 : 0);
   });
 
@@ -72,7 +73,7 @@
     };
     var toggleCheckbox = function (checkbox) {
       checkbox.checked = !checkbox.checked;
-      sendForm(checkbox.form, event);
+      serialize(checkbox.form, event);
     };
 
     if (isActionable) {
@@ -134,12 +135,13 @@
     var socket = new WebSocket("ws://127.0.0.1:2794", "superconductor");
     socket.onmessage = function (event) {
       var state = parser.parseFromString(event.data, "text/xml");
+      console.log(state);
       setState(state);
     }
     return socket;
   }
 
-  function sendForm(form, event) {
+  function serialize(form, event) {
     var serializer = new XMLSerializer();
     var request = document.implementation.createDocument(null, form.name);
     var message = request.children[0];
@@ -165,15 +167,30 @@
             var input = inputs[i];
             if (input.name) {
                 var element = request.createElement(input.name)
-                element.textContent = input.value;
+                var inputHasData = Object.keys(input.dataset).length > 0;
+                if (inputHasData) {
+                    for(data in input.dataset) {
+                        var dataElement = request.createElement(data);
+                        dataElement.textContent = input.dataset[data];
+                        element.appendChild(dataElement);
+                    }
+                    var valueElement = request.createElement('value');
+                    valueElement.textContent = input.value;
+                    element.appendChild(valueElement);
+                } else {
+                    element.textContent = input.value;
+                }
                 if (input.tagName === 'INPUT' && input.type.toUpperCase() === 'CHECKBOX') {
                     if (input.checked) {
                         message.appendChild(element);
                     }
                 } else if (input.tagName === 'BUTTON' || input.tagName === 'INPUT' && input.type.toUpperCase() === 'SUBMIT') {
                     if (event && input === event.target) {
-                        if (input.value) element.textContent = input.value;
-                        else element.textContent = event.type;
+                        var textContent;
+                        if (input.value) textContent = input.value;
+                        else textContent = event.type;
+                        textContent = request.createCDATASection(textContent);
+                        element.appendChild(textContent);
                         message.appendChild(element);
                     }
                 } else {
@@ -223,10 +240,14 @@
     stickToBottom();
   }
 
-  function closest(element, filter) {
+  function closest(element, filter, limit) {
+    limit = limit || -1
+    var count = 0;
     while (element) {
       if (filter(element)) return element;
+      else if (count === limit) return false;
       else element = element.parentElement;
+      count++;
     }
   }
 
@@ -283,4 +304,4 @@
   };
 
   //PM.open();
-})(window, PM);
+})(window, PM, null);
