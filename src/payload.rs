@@ -12,8 +12,7 @@ extern crate md5;
 extern crate chrono;
 use self::chrono::{TimeZone, FixedOffset};
 
-extern crate yaml_rust;
-use self::yaml_rust::{Yaml, YamlLoader};
+use yaml_rust::{Yaml, YamlLoader};
 
 pub fn generate(previous_commit: Option<State>) -> String {
     let current = project::current();

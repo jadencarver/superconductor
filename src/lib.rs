@@ -9,6 +9,8 @@ extern crate libc;
 extern crate serde_derive;
 extern crate serde_xml;
 
+extern crate yaml_rust;
+
 use libc::{c_char};
 use std::ffi::CString;
 

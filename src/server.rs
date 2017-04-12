@@ -24,6 +24,8 @@ use std::sync::mpsc::Sender;
 use std::sync::mpsc::Receiver;
 
 use serde_xml as xml;
+use yaml_rust::yaml::Hash;
+use yaml_rust::{Yaml, YamlEmitter};
 
 #[derive(Debug)]
 enum NotifierMessage<'a> {
@@ -134,10 +136,24 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
 
                         if let Some(event) = state.save_update.clone() {
                             let author = repo.signature().unwrap();
+                            let mut yaml = String::new();
+                            {
+                                // Constructing the properties YAML
+                                let mut tasks = Hash::new();
+                                let mut properties = Hash::new();
+                                let mut emitter = YamlEmitter::new(&mut yaml);
+                                for property in state.property {
+                                    properties.insert(Yaml::String(property.name), Yaml::String(property.value));
+                                }
+                                tasks.insert(Yaml::String(String::from("BLBA-1234")), Yaml::Hash(properties));
+                                emitter.dump(&Yaml::Hash(tasks)).unwrap();
+                            }
+                            let message = state.message + "\n" + &yaml;
+
                             index.read(false);
                             let tree_oid = index.write_tree().unwrap();
                             let tree = repo.find_tree(tree_oid).unwrap();
-                            repo.commit(Some("HEAD"), &author, &author, &state.message, &tree, &[&head.as_commit().unwrap()]);
+                            repo.commit(Some("HEAD"), &author, &author, &message, &tree, &[&head.as_commit().unwrap()]);
                             let message = WebMessage::text(payload::generate(None));
                             sender.send_message(&message).unwrap();
                             last_state = None;
