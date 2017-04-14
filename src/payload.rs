@@ -1,15 +1,19 @@
 use State;
 use project;
 
+use std::cell::RefCell;
+
 extern crate git2;
 use self::git2::Repository;
 use self::git2::Reference;
 use self::git2::StatusOptions;
 use self::git2::Delta;
+use self::git2::{Diff, DiffFormat, DiffDelta, DiffHunk, DiffLine};
 use git2::ObjectType;
 
 extern crate md5;
 extern crate chrono;
+use maud::PreEscaped;
 use self::chrono::{TimeZone, FixedOffset};
 
 use yaml_rust::{Yaml, YamlLoader};
@@ -196,20 +200,35 @@ pub fn generate(previous_commit: Option<State>) -> String {
                 }
             }
             diffs {
-                @if let Some(commit) = previous_commit.clone() {
-                    @for delta in changes.deltas() {
-                        diff {
-                            @if let Ok(blob) = repo.find_blob(delta.new_file().id()) {
-                                @let content = String::from_utf8_lossy(blob.content()) {
-                                    content (content)
-                                    lines (content.lines().count())
-                                }
-                            }
-                        }
-                    }
+                @for change in diff(changes) {
+                    (change)
                 }
             }
         }
     }.into_string();
     payload
+}
+
+fn diff(changes: Diff) -> Vec<PreEscaped<String>> {
+    let mut result = RefCell::new(vec![]);
+    changes.foreach(&mut |delta: DiffDelta, i: f32| {
+        result.borrow_mut().push(html!(
+            @if let Some(path) = delta.new_file().path() {
+                label (path.to_str().unwrap_or("[invalid]"))
+            }
+        ));
+        true
+    }, None, None, Some(&mut |delta: DiffDelta, hunk: Option<DiffHunk>, line: DiffLine| {
+        let class = match line.origin() {
+            '+' | '>' => "add",
+            '-' | '<' => "sub",
+            'H' | 'F' => "meta",
+            _ => ""
+        };
+        result.borrow_mut().push(html!(
+            span class=(class) (String::from_utf8_lossy(&line.content()))
+        ));
+        true
+    }));
+    result.into_inner()
 }

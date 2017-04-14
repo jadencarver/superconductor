@@ -1,3 +1,5 @@
+require 'superconductor'
+
 module Superconductor
   class Middleware
 
@@ -5,7 +7,7 @@ module Superconductor
 
     def initialize(app)
       @app = app
-      @assets = Dir[File.expand_path('../../assets/**/*.{js,css}', __FILE__)].map { |d| d[Dir.pwd.length+8..-1] }
+      @assets = Dir[File.expand_path('../../../assets/**/*.{js,css}', __FILE__)].map { |d| d[Dir.pwd.length+8..-1] }
     end
 
     def call(env)
@@ -18,7 +20,7 @@ module Superconductor
     def serve_asset(path)
       if asset = @assets.find { |p| p == path[1..-1] }
         status, headers = 200, {}
-        local_path = File.expand_path(File.join('..', '..', 'assets', asset), __FILE__)
+        local_path = File.expand_path(File.join('..', '..', '..', 'assets', asset), __FILE__)
         body = [open(local_path).read]
         headers['Content-Type'] = content_type(path)
         [status, headers, body]

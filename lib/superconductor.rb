@@ -2,8 +2,8 @@ require 'fiddle'
 require 'fiddle/import'
 
 module Superconductor
-  autoload :Middleware, 'middleware'
-  autoload :Documentation, 'documentation'
+  autoload :Middleware, 'superconductor/middleware'
+  autoload :Documentation, 'superconductor/documentation'
   autoload :VERSION, 'superconductor/version'
 
   extend Fiddle::Importer

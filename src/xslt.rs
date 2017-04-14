@@ -8,6 +8,7 @@ pub fn panel_xslt() -> String {
     let markup = html! {
         xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" {
             xsl:output method="html" indent="yes" {}
+
             xsl:template match="/" {
                 div#__pm__panel {
                     style type="text/css" (css)
@@ -63,8 +64,8 @@ pub fn panel_xslt() -> String {
                         }
                     }
                     xsl:choose {
-                        xsl:when test="/state/diffs/diff" {
-                            xsl:apply-templates select="/state/diffs/diff" {}
+                        xsl:when test="/state/diffs" {
+                            xsl:apply-templates select="/state/diffs" {}
                         }
                         xsl:otherwise {
                             xsl:apply-templates select="/state/tasks" {}
@@ -121,16 +122,11 @@ pub fn panel_xslt() -> String {
                     xsl:value-of select="." {}
                 }
             }
-            xsl:template match="/state/diffs/diff" {
+            xsl:template match="/state/diffs" {
                 div.diff {
-                    ol.lines {
-                        xsl:call-template name="diff-lines" {
-                            xsl:with-param name="limit" select="lines" {}
-                        }
-                    }
                     pre {
                         code {
-                            xsl:value-of select="content" {}
+                            xsl:copy-of select="*" {}
                         }
                     }
                 }

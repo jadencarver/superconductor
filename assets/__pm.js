@@ -1,4 +1,4 @@
-(function(window, PM, hljs) {
+(PM.superconductor = function(window, PM, hljs) {
   var document = window.document;
   var host = document.createElement('div');
   var root = document.createElement('div');
@@ -6,11 +6,8 @@
 
   setInterval(applyTimeAgo, 60000);
 
-  if (host.attachShadow) {
-    DOM = host.attachShadow({mode: 'open'});
-  } else {
-    DOM = host;
-  }
+  DOM = (host.attachShadow) ? host.attachShadow({mode: 'open'}) : host;
+
   DOM.appendChild(root);
   document.body.appendChild(host);
 

@@ -1,0 +1,37 @@
+---
+Status:
+  Type: Select
+  Options:
+    - Sprint
+    - In Progress
+    - In Review
+    - Blocked
+    - Done
+
+Estimate:
+  Type: Number
+
+Developer:
+  Type: Signature
+
+Description:
+  Type: Text
+
+Specification:
+  Type: Code
+  Path: "spec/features"
+  Inference: format!("{}#{}", controller, action)
+
+Sprint:
+  DependsOn: Epic
+  Type: Task
+
+Epic:
+  DependsOn: Project
+  Type: Task
+
+Project:
+  Type: Task
+
+Blocker:
+  Type: Task
