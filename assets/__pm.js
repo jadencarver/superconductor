@@ -1,4 +1,4 @@
-(PM.superconductor = function(window, PM, hljs) {
+(PM.superconductor = function(window, PM) {
   var document = window.document;
   var host = document.createElement('div');
   var root = document.createElement('div');
@@ -81,6 +81,7 @@
   });
 
   var dragging;
+  var dropping;
   DOM.addEventListener('dragstart', function (event) {
     dragging = event.target;
     var dropTargets = DOM.querySelectorAll('.tiles > li');
@@ -89,34 +90,51 @@
       dropTarget.addEventListener('dragenter', dragEnter);
       dropTarget.addEventListener('dragleave', dragLeave);
       dropTarget.addEventListener('dragover', isDropTarget);
-      dropTarget.addEventListener('drop', isDropTarget);
+      dropTarget.addEventListener('drop', dragDropped);
     };
   });
+
   DOM.addEventListener('dragend', function (event) {
+    dragging = null;
     var dropTargets = DOM.querySelectorAll('.tiles > li');
     for (dropTarget of dropTargets) {
       if (dropTarget === event.target) continue;
       dropTarget.removeEventListener('dragenter', dragEnter);
       dropTarget.removeEventListener('dragleave', dragLeave);
       dropTarget.removeEventListener('dragover', isDropTarget);
-      dropTarget.removeEventListener('drop', isDropTarget);
+      dropTarget.removeEventListener('drop', dragDropped);
     };
   });
 
   //////////////////////////////////////////////////////////////////////////////////////////////////
   
   function dragEnter(event) {
+    console.log('dragEnter', this, dragging, dropping, event.target);
     if (dragging !== this) {
       this.classList.add('droppable');
+      dropping = this;
       event.preventDefault;
     }
   }
+
   function dragLeave(event) {
-    this.classList.remove('droppable');
-    event.preventDefault;
+    console.log('dragLeave', this, dragging, dropping, event.target);
+    if (dropping !== this) {
+      console.log('DRAG_DID_LEAVE', this, dropping);
+      this.classList.remove('droppable');
+      event.preventDefault;
+    }
   }
 
   function isDropTarget(event) {
+    event.preventDefault();
+  };
+
+  function dragDropped(event) {
+    console.log('dragDropped');
+    this.classList.add('dropped');
+    var form = DOM.querySelector('#__pm__commit');
+    serialize(form, event);
     event.preventDefault();
   };
 
@@ -301,5 +319,5 @@
     root.classList.add('open');
   };
 
-  //PM.open();
-})(window, PM, null);
+  PM.open();
+})(window, PM);

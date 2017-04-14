@@ -34,6 +34,7 @@
   }
   ul.tiles li {
     padding-bottom: 1em;
+    width: 100pt;
     > div {
       cursor: pointer;
       width: 100pt;
@@ -45,6 +46,10 @@
       margin: 0i
     }
   }
+  .droppable > * {
+    background-color: $color4;
+    pointer-events: none;
+  }
   .droppable::after {
     content: '▿';
     width: 100pt;
@@ -55,6 +60,14 @@
     text-align: center;
     display: block;
     opacity: 0.5;
+    margin-top: 10pt;
     background-color: $color3;
+  }
+  .dropped {
+    transition: margin-top 250ms;
+    margin-top: 110pt;
+  }
+  .dropped::after {
+    display: none;
   }
 }

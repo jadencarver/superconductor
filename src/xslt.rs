@@ -147,32 +147,32 @@ pub fn panel_xslt() -> String {
             xsl:template match="/state/tasks" {
                 ul.tiles {
                     header "Sprint"
-                    li draggable="true" {
-                        div {
+                    li {
+                        div draggable="true" {
                             strong "BLBA-1234"
                             p "Some upcoming issue"
                         }
                     }
-                    li draggable="true" {
-                        div {
+                    li {
+                        div draggable="true" {
                             strong "BLBA-1234"
                             p "Some upcoming issue"
                         }
                     }
-                    li draggable="true" {
-                        div {
+                    li {
+                        div draggable="true" {
                             strong "BLBA-1234"
                             p "Some upcoming issue"
                         }
                     }
-                    li draggable="true" {
-                        div {
+                    li {
+                        div draggable="true" {
                             strong "BLBA-1234"
                             p "Some upcoming issue"
                         }
                     }
-                    li draggable="true" {
-                        div {
+                    li {
+                        div draggable="true" {
                             strong "BLBA-1234"
                             p "Some upcoming issue"
                         }
@@ -182,8 +182,8 @@ pub fn panel_xslt() -> String {
                     header {
                         "In Progress"
                     }
-                    li draggable="true" {
-                        div {
+                    li {
+                        div draggable="true" {
                             strong {
                                 xsl:value-of select="/state/task" {}
                             }
