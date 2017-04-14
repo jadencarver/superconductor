@@ -64,7 +64,7 @@ pub fn panel_xslt() -> String {
                         }
                     }
                     xsl:choose {
-                        xsl:when test="/state/diffs" {
+                        xsl:when test="/state/diffs/*" {
                             xsl:apply-templates select="/state/diffs" {}
                         }
                         xsl:otherwise {
