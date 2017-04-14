@@ -36,9 +36,10 @@
       event.preventDefault();
     } else {
       var legend = closest(event.target, function(e) { return e.id === '__pm__commit__changes_legend'; }, 2);
-      var parentElement = legend.parentElement;
-      if (parentElement) {
-        var classList = parentElement.classList;
+      if (legend) {
+        legend.focus();
+        var detailsElement = legend.parentElement;
+        var classList = detailsElement.classList;
         if (classList.contains('open')) {
             classList.remove('open');
             DOM.querySelector('#__pm__commit__message').focus();
@@ -153,9 +154,9 @@
         return builder;
     }, {});
 
-    if (event) {
+    if (event && DOM.activeElement) {
       var focus = request.createElement('focus');
-      focus.textContent = document.activeElement.id;
+      focus.textContent = DOM.activeElement.id;
       message.appendChild(focus);
     }
     for(name in elements) {
