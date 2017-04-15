@@ -42,8 +42,25 @@
       background-color: #F5F5F5;
       box-shadow: 2pt 2pt 2pt rgba(128,128,128,0.5);
       border: solid 1px $color4;
+      border-radius: 3pt;
       padding: 0 5pt;
-      margin: 0i
+      margin: 0;
+
+      strong {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+    }
+    .tiles__tile--head {
+      border-color: $color2;
+      box-shadow: 3pt 3pt 3pt rgba(128,128,128,0.5), inset 0pt -3pt 0pt $color2;
+    }
+    .remote {
+      box-shadow: 3pt 3pt 3pt rgba(128,128,128,0.5), inset 0pt -3pt 0pt $color1;
+      height: 5em;
     }
   }
   .droppable > * {

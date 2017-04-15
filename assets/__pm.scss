@@ -127,7 +127,7 @@
 
     ol.lines, pre {
       width: calc(100% - 3em);
-      font-family: 'Monaco';
+      font-family: 'Andale Mono', "Monaco", monospace;
       font-size: 10pt;
       line-height: 1.15em;
       font-weight: 100;
@@ -144,25 +144,54 @@
     pre {
       white-space: pre-wrap;
       width: 100%;
+      font-size: calc(1em + 1px);
 
       label {
         display: block;
-        margin-left: -5pt;
+        margin-left: calc(-1em);
         line-height: 2em;
         background-color: $color0;
         color: $color5;
+        &:before {
+          content: '≡';
+          font-size: 1.5em;
+          margin: 0 0.5em;
+        }
       }
       .meta { display: none; }
       .sub {
         background-color: $color1;
+        position: relative;
+        &::before {
+          content: '<';
+          background-color: lighten($color1, 10%);
+          display: block;
+          width: 1em;
+          text-align: center;
+          position: absolute;
+          top: 0;
+          left: -1em;
+        }
       }
       .add {
         background-color: $color2;
+        position: relative;
+        &::before {
+          content: '>';
+          background-color: lighten($color2, 10%);
+          border-radius: 0.25 0 0 0.25em;
+          display: block;
+          width: 1em;
+          text-align: center;
+          position: absolute;
+          top: 0;
+          left: -1em;
+        }
       }
 
       code {
         display: block;
-        padding-left: 5pt;
+        padding-left: calc(1em);
 
         $bound: darken($color4, 10%);
         background-color: $color1;

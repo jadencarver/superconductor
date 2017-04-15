@@ -8,6 +8,7 @@ use self::git2::Repository;
 use self::git2::Reference;
 use self::git2::StatusOptions;
 use self::git2::Delta;
+use self::git2::BranchType;
 use self::git2::{Diff, DiffFormat, DiffDelta, DiffHunk, DiffLine};
 use git2::ObjectType;
 
@@ -46,9 +47,14 @@ pub fn generate(previous_commit: Option<State>) -> String {
             }
             @if let Ok(branches) = repo.branches(None) {
                 tasks {
-                    @for (branch, branch_type) in branches.map(|b|b.unwrap()) {
+                    @for (branch, branch_type) in branches.map(|b|b.unwrap()).filter(|&(ref b, t)| !b.is_head()) {
                         task {
                             name (branch.name().ok().unwrap().unwrap())
+                            type @match branch_type {
+                                BranchType::Remote => "remote",
+                                BranchType::Local => "local",
+                                _ => ""
+                            }
                         }
                     }
                 }

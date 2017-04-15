@@ -30,7 +30,6 @@
 
   DOM.addEventListener('click', function (event) {
     if (event.target.type === "submit") {
-      console.log('click');
       var form = DOM.querySelector('#__pm__commit');
       serialize(form, event);
       event.preventDefault();
@@ -109,7 +108,6 @@
   //////////////////////////////////////////////////////////////////////////////////////////////////
   
   function dragEnter(event) {
-    console.log('dragEnter', this, dragging, dropping, event.target);
     if (dragging !== this) {
       this.classList.add('droppable');
       dropping = this;
@@ -118,9 +116,7 @@
   }
 
   function dragLeave(event) {
-    console.log('dragLeave', this, dragging, dropping, event.target);
     if (dropping !== this) {
-      console.log('DRAG_DID_LEAVE', this, dropping);
       this.classList.remove('droppable');
       event.preventDefault;
     }
@@ -131,7 +127,6 @@
   };
 
   function dragDropped(event) {
-    console.log('dragDropped');
     this.classList.add('dropped');
     var form = DOM.querySelector('#__pm__commit');
     serialize(form, event);

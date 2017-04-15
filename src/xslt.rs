@@ -144,46 +144,27 @@ pub fn panel_xslt() -> String {
                     }
                 }
             }
+            xsl:template match="/state/tasks/task" {
+                li {
+                    div draggable="true" class="{type}" {
+                        strong {
+                            xsl:value-of select="name" {}
+                        }
+                        p "Some upcoming issue"
+                    }
+                }
+            }
             xsl:template match="/state/tasks" {
                 ul.tiles {
                     header "Sprint"
-                    li {
-                        div draggable="true" {
-                            strong "BLBA-1234"
-                            p "Some upcoming issue"
-                        }
-                    }
-                    li {
-                        div draggable="true" {
-                            strong "BLBA-1234"
-                            p "Some upcoming issue"
-                        }
-                    }
-                    li {
-                        div draggable="true" {
-                            strong "BLBA-1234"
-                            p "Some upcoming issue"
-                        }
-                    }
-                    li {
-                        div draggable="true" {
-                            strong "BLBA-1234"
-                            p "Some upcoming issue"
-                        }
-                    }
-                    li {
-                        div draggable="true" {
-                            strong "BLBA-1234"
-                            p "Some upcoming issue"
-                        }
-                    }
+                    xsl:apply-templates select="task" {}
                 }
                 ul.tiles {
                     header {
                         "In Progress"
                     }
                     li {
-                        div draggable="true" {
+                        div draggable="true" class="tiles__tile--head" {
                             strong {
                                 xsl:value-of select="/state/task" {}
                             }
@@ -192,26 +173,12 @@ pub fn panel_xslt() -> String {
                 }
                 ul.tiles {
                     header "In Review"
-                    li draggable="true" {
-                        div {
-                            strong {
-                                "Some issue"
-                            }
-                        }
-                    }
                 }
                 ul.tiles {
                     header "Blocked"
                 }
                 ul.tiles {
                     header "Done"
-                    li draggable="true" {
-                        div {
-                            strong {
-                                "Some other issue"
-                            }
-                        }
-                    }
                 }
             }
             xsl:template match="/state/log/commit" {
