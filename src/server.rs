@@ -16,7 +16,7 @@ use git2::Repository;
 use git2::ObjectType;
 
 use payload;
-use State;
+use state::State;
 
 extern crate fsevent;
 use self::fsevent::Event as FsEvent;

@@ -1,17 +1,17 @@
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct State {
-    focus: String,
-    message: String,
-    include: Vec<String>,
-    property: Vec<Property>,
-    diff: Vec<String>,
-    save_update: Option<String>
+    pub focus: String,
+    pub message: String,
+    pub include: Vec<String>,
+    pub property: Vec<Property>,
+    pub diff: Vec<String>,
+    pub save_update: Option<String>
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Property {
-    name: String,
-    value: String
+    pub name: String,
+    pub value: String
 }
 
 impl State {
