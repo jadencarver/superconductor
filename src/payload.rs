@@ -2,6 +2,8 @@ use State;
 use project;
 
 use std::cell::RefCell;
+use std::fs::File;
+use std::io::prelude::*;
 
 extern crate git2;
 use self::git2::Repository;
@@ -9,7 +11,7 @@ use self::git2::Reference;
 use self::git2::StatusOptions;
 use self::git2::Delta;
 use self::git2::BranchType;
-use self::git2::{Diff, DiffFormat, DiffDelta, DiffHunk, DiffLine};
+use self::git2::{Diff, DiffFormat, DiffDelta, DiffHunk, DiffLine, DiffBinary};
 use git2::ObjectType;
 
 extern crate md5;
@@ -18,6 +20,10 @@ use maud::PreEscaped;
 use self::chrono::{TimeZone, FixedOffset};
 
 use yaml_rust::{Yaml, YamlLoader};
+
+extern crate base64;
+
+use self::base64::{encode, decode};
 
 pub fn generate(previous_commit: Option<State>) -> String {
     let current = project::current();
@@ -43,7 +49,7 @@ pub fn generate(previous_commit: Option<State>) -> String {
                 email (current.user.email)
             }
             task {
-                id (current.task.id)
+                name (current.task.id)
             }
             @if let Ok(branches) = repo.branches(None) {
                 tasks {
@@ -189,7 +195,7 @@ pub fn generate(previous_commit: Option<State>) -> String {
                 }
                 @for change in repo.statuses(Some(&mut status_opts)).unwrap().iter() {
                     @let path = change.path().unwrap() {
-                        change id=(path.replace("/", "_").replace(".", "_")) {
+                        change id=(path.replace("/", "_").replace(".", "_").replace(" ", "_")) {
                             path (path)
                             insertions {}
                             deletions {}
@@ -224,7 +230,25 @@ fn diff(changes: Diff) -> Vec<PreEscaped<String>> {
             }
         ));
         true
-    }, None, None, Some(&mut |delta: DiffDelta, hunk: Option<DiffHunk>, line: DiffLine| {
+    }, Some(&mut |delta: DiffDelta, binary: DiffBinary| {
+        if binary.contains_data() {
+            result.borrow_mut().push(html!(
+                img src=(format!("data:image/jpeg,{}", (String::from_utf8_lossy(&binary.new_file().data())))) {}
+            ));
+        } else {
+            let path = delta.new_file().path().unwrap();
+            println!("{:?}", path);
+            let mut file = File::open(path).unwrap();
+            println!("{:?}", file);
+            let mut contents = vec![];
+            file.read_to_end(&mut contents).unwrap();
+            println!("{:?}", contents);
+            result.borrow_mut().push(html!(
+                img src=(format!("data:image/jpeg;base64,{}", encode(&contents))) alt=(format!("{}", path.to_str().unwrap())) {}
+            ));
+        }
+        true
+    }), None, Some(&mut |delta: DiffDelta, hunk: Option<DiffHunk>, line: DiffLine| {
         let class = match line.origin() {
             '+' | '>' => "add",
             '-' | '<' => "sub",

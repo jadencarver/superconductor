@@ -16,6 +16,7 @@ yaml-rust = "*"
 md5 = "*"
 fsevent = "*"
 chrono = "*"
+base64 = "*"
 
 serde = "0.8"
 serde_derive = "0.8"

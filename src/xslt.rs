@@ -144,7 +144,7 @@ pub fn panel_xslt() -> String {
                     }
                 }
             }
-            xsl:template match="/state/tasks/task" {
+            xsl:template match="task" {
                 li {
                     div draggable="true" class="{type}" {
                         strong {
@@ -163,13 +163,7 @@ pub fn panel_xslt() -> String {
                     header {
                         "In Progress"
                     }
-                    li {
-                        div draggable="true" class="tiles__tile--head" {
-                            strong {
-                                xsl:value-of select="/state/task" {}
-                            }
-                        }
-                    }
+                    xsl:apply-templates select="/state/task" {}
                 }
                 ul.tiles {
                     header "In Review"

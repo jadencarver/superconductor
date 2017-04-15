@@ -146,6 +146,12 @@
       width: 100%;
       font-size: calc(1em + 1px);
 
+      img {
+        display: block;
+        max-height: 100%;
+        margin: 1em auto;
+      }
+
       label {
         display: block;
         margin-left: calc(-1em);
