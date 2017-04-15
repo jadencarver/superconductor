@@ -21,6 +21,10 @@ $r: 0.4em;
         border-radius: 0 $r $r 0;
         border-width: 1pt 1pt 1pt 0;
     }
+    > span:first-child:last-child {
+        border-radius: $r $r $r $r;
+        border-width: 1pt;
+    }
     .token--positive {
         background-color: $color2;
         text-shadow: 0 0 1pt darken($color2, 50%);
