@@ -237,12 +237,9 @@ fn diff(changes: Diff) -> Vec<PreEscaped<String>> {
             ));
         } else {
             let path = delta.new_file().path().unwrap();
-            println!("{:?}", path);
             let mut file = File::open(path).unwrap();
-            println!("{:?}", file);
             let mut contents = vec![];
             file.read_to_end(&mut contents).unwrap();
-            println!("{:?}", contents);
             result.borrow_mut().push(html!(
                 img src=(format!("data:image/jpeg;base64,{}", encode(&contents))) alt=(format!("{}", path.to_str().unwrap())) {}
             ));
