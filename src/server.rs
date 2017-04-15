@@ -90,11 +90,12 @@ fn start_monitor(tx: Sender<NotifierMessage>) {
     loop {
         let event = rx.recv().unwrap();
         thread::sleep(Duration::from_millis(500));
-        let mut aggregator = vec![];
-        while let Ok(agg_event) = rx.try_recv() {
-            aggregator.push(agg_event);
+        let mut events = vec![];
+        events.push(event);
+        while let Ok(aggregator) = rx.try_recv() {
+            events.push(aggregator);
         }
-        tx.send(NotifierMessage::FsEvent(event));
+        tx.send(NotifierMessage::FsEvent(events.pop().unwrap()));
     }
     observer.join();
 }
