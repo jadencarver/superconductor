@@ -1,6 +1,7 @@
 use std::thread;
 use std::thread::JoinHandle;
 use std::path::Path;
+use std::time::Duration;
 
 use websocket::{WebSocketStream, Server};
 use websocket::Message as WebMessage;
@@ -88,6 +89,11 @@ fn start_monitor(tx: Sender<NotifierMessage>) {
     });
     loop {
         let event = rx.recv().unwrap();
+        thread::sleep(Duration::from_millis(500));
+        let mut aggregator = vec![];
+        while let Ok(agg_event) = rx.try_recv() {
+            aggregator.push(agg_event);
+        }
         tx.send(NotifierMessage::FsEvent(event));
     }
     observer.join();
