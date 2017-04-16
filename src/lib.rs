@@ -22,6 +22,7 @@ mod state;
 mod xslt;
 mod server;
 mod payload;
+mod task;
 
 #[no_mangle]
 pub extern "C" fn panel_xslt() -> *mut c_char {
