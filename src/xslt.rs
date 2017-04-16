@@ -150,7 +150,9 @@ pub fn panel_xslt() -> String {
                         strong {
                             xsl:value-of select="name" {}
                         }
-                        p "Some upcoming issue"
+                        xsl:value-of select="property" {}
+                        "Properties"
+                        xsl:value-of select="after/parent::property[name]" {}
                     }
                 }
             }

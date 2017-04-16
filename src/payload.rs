@@ -32,8 +32,11 @@ pub fn generate(previous_commit: Option<State>) -> String {
     revwalk.set_sorting(git2::SORT_REVERSE);
     revwalk.push_head().unwrap();
 
-    let head = repo.head().unwrap().peel(ObjectType::Tree).unwrap();
-    let head_tree = head.as_tree().unwrap();
+    let head = repo.head().unwrap();
+    let head_tree_obj = head.peel(ObjectType::Tree).unwrap();
+    let head_tree = head_tree_obj.as_tree().unwrap();
+    let head_commit_obj = head.peel(ObjectType::Commit).unwrap();
+    let head_commit = head_commit_obj.as_commit().unwrap();
     let changes = repo.diff_tree_to_index(Some(&head_tree), None, None).unwrap();
 
     let mut status_opts = StatusOptions::new();
@@ -48,20 +51,31 @@ pub fn generate(previous_commit: Option<State>) -> String {
                 name  (config.get_string("user.name" ).unwrap_or(String::from("Unknown")))
                 email (config.get_string("user.email").unwrap_or(String::from("root@localhost")))
             }
-            task {
-                name (repo.head().unwrap().shorthand().unwrap())
+            @let mut message = head_commit.message().unwrap().split("---\n") {
+                message (message.next().unwrap())
+                @for task in Task::from_commit(&repo, &head_commit, message.next().unwrap_or("")) {
+                    (render_task(&task, task.changes(&repo, &head_commit, false)))
+                }
             }
             @if let Ok(branches) = repo.branches(None) {
                 tasks {
                     @for (branch, branch_type) in branches.map(|b|b.unwrap()).filter(|&(ref b, t)| !b.is_head()) {
-                        task {
-                            name (branch.name().ok().unwrap().unwrap())
-                            type @match branch_type {
-                                BranchType::Remote => "remote",
-                                BranchType::Local => "local",
-                                _ => ""
+                        @if let Some(commit) = branch.get().peel(ObjectType::Commit).unwrap().as_commit() {
+                            @let mut message = commit.message().unwrap().split("---\n") {
+                                message (message.next().unwrap())
+                                @for task in Task::from_commit(&repo, &commit, message.next().unwrap_or("")) {
+                                    (render_task(&task, task.changes(&repo, &commit, false)))
+                                }
                             }
                         }
+                        //task {
+                        //    name (branch.name().ok().unwrap().unwrap())
+                        //    type @match branch_type {
+                        //        BranchType::Remote => "remote",
+                        //        BranchType::Local => "local",
+                        //        _ => ""
+                        //    }
+                        //}
                     }
                 }
             }
@@ -87,18 +101,7 @@ pub fn generate(previous_commit: Option<State>) -> String {
                             @let mut message = commit.message().unwrap().split("---\n") {
                                 message (message.next().unwrap())
                                 @for task in Task::from_commit(&repo, &commit, message.next().unwrap_or("")) {
-                                    task {
-                                        name (task.name)
-                                        @for (name, before, after) in task.changes(&repo, &commit) {
-                                            property {
-                                                name (name)
-                                                @if let Some(before) = before {
-                                                    before (before)
-                                                }
-                                                after (after)
-                                            }
-                                        }
-                                    }
+                                    (render_task(&task, task.changes(&repo, &commit, true)))
                                 }
                             }
                         }
@@ -226,4 +229,19 @@ fn diff(changes: Diff) -> Vec<PreEscaped<String>> {
         true
     }));
     result.into_inner()
+}
+
+fn render_task(task: &Task, changes: Vec<(String, Option<String>, String)>) -> PreEscaped<String> {
+    html!(task {
+        name (task.name)
+        @for (name, before, after) in changes {
+            property {
+                name (name)
+                @if let Some(before) = before {
+                    before (before)
+                }
+                after (after)
+            }
+        }
+    })
 }

@@ -30,20 +30,22 @@ impl Task {
         tasks
     }
 
-    pub fn changes(&self, repo: &Repository, commit: &Commit) -> Vec<(String, Option<String>, String)> {
+    pub fn changes(&self, repo: &Repository, commit: &Commit, history: bool) -> Vec<(String, Option<String>, String)> {
         let mut changes = vec![];
         let mut parents = vec![];
 
-        for parent in commit.parents() {
-            let mut walk = repo.revwalk().unwrap();
-            walk.set_sorting(git2::SORT_REVERSE);
-            if let Ok(_) = walk.push(parent.id()) {
-                for rev in walk {
-                    let parent_commit = repo.find_commit(rev.unwrap()).unwrap();
-                    let mut parent_message = parent_commit.message().unwrap().split("---\n");
-                    parent_message.next().unwrap();
-                    if let Some(yaml) = parent_message.next() {
-                        parents.append(&mut Task::from_commit(repo, &parent_commit, yaml));
+        if history {
+            for parent in commit.parents() {
+                let mut walk = repo.revwalk().unwrap();
+                walk.set_sorting(git2::SORT_REVERSE);
+                if let Ok(_) = walk.push(parent.id()) {
+                    for rev in walk {
+                        let parent_commit = repo.find_commit(rev.unwrap()).unwrap();
+                        let mut parent_message = parent_commit.message().unwrap().split("---\n");
+                        parent_message.next().unwrap();
+                        if let Some(yaml) = parent_message.next() {
+                            parents.append(&mut Task::from_commit(repo, &parent_commit, yaml));
+                        }
                     }
                 }
             }
@@ -58,13 +60,15 @@ impl Task {
                 _ => String::from("[unknown]")
             };
             let mut before = None;
-            for parent in parents.iter() {
-                if let Some(value) = parent.properties.get(property) {
-                    before = match value {
-                        &Yaml::String(ref s) => Some(s.clone()),
-                        &Yaml::Integer(i) => Some(format!("{}", i)),
-                        &Yaml::Boolean(b) => Some(format!("{}", b)),
-                        _ => None
+            if history {
+                for parent in parents.iter() {
+                    if let Some(value) = parent.properties.get(property) {
+                        before = match value {
+                            &Yaml::String(ref s) => Some(s.clone()),
+                            &Yaml::Integer(i) => Some(format!("{}", i)),
+                            &Yaml::Boolean(b) => Some(format!("{}", b)),
+                            _ => None
+                        }
                     }
                 }
             }
