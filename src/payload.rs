@@ -89,10 +89,12 @@ pub fn generate(previous_commit: Option<State>) -> String {
                                 @for task in Task::from_commit(&repo, &commit, message.next().unwrap_or("")) {
                                     task {
                                         name (task.name)
-                                        @for (name, before, after) in task.changes(&repo) {
+                                        @for (name, before, after) in task.changes(&repo, &commit) {
                                             property {
                                                 name (name)
-                                                before (before)
+                                                @if let Some(before) = before {
+                                                    before (before)
+                                                }
                                                 after (after)
                                             }
                                         }

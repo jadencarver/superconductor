@@ -196,7 +196,7 @@ pub fn panel_xslt() -> String {
                     }
                     xsl:if test="task" {
                         dl.tasks {
-                            xsl:apply-templates select="task" {}
+                            xsl:apply-templates select="task[property]" {}
                         }
                     }
                     div {
