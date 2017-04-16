@@ -130,22 +130,25 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
                         };
                         let commit = head.peel(ObjectType::Commit).unwrap();
                         let mut index = repo.index().unwrap();
+                        if let Some(last_state) = last_state {
+                            if state.task == last_state.task {
+                                let to_remove = index.iter().fold(vec![], |mut acc, entry| {
+                                    let entry_path = String::from_utf8_lossy(entry.path.as_ref());
+                                    match state.include.iter().find(|i| i.as_ref() == entry_path) {
+                                        None => acc.push(entry_path.into_owned()),
+                                        _ => {}
+                                    };
+                                    acc
+                                });
 
-                        let to_remove = index.iter().fold(vec![], |mut acc, entry| {
-                            let entry_path = String::from_utf8_lossy(entry.path.as_ref());
-                            match state.include.iter().find(|i| i.as_ref() == entry_path) {
-                                None => acc.push(entry_path.into_owned()),
-                                _ => {}
-                            };
-                            acc
-                        });
-
-                        repo.reset_default(Some(&commit), to_remove.iter()).unwrap();
-                        for change in state.clone().include {
-                            let path = Path::new(&change);
-                            index.add_path(path).unwrap();
+                                repo.reset_default(Some(&commit), to_remove.iter()).unwrap();
+                                for change in state.clone().include {
+                                    let path = Path::new(&change);
+                                    index.add_path(path).unwrap();
+                                }
+                                index.write().unwrap();
+                            }
                         }
-                        index.write().unwrap();
 
                         if let Some(event) = state.save_update.clone() {
                             let author = repo.signature().unwrap();
