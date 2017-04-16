@@ -51,7 +51,7 @@ fn connect(connection: Connection<WebSocketStream, WebSocketStream>) {
     println!("Connected");
 
     if let Some(&WebSocketProtocol(ref protocols)) = headers.get() {
-        if protocols.contains(&("rust-websocket".to_string())) {
+        if protocols.contains(&("superconductor".to_string())) {
             response.headers.set(WebSocketProtocol(vec!["superconductor".to_string()]));
         }
     }

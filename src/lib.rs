@@ -3,23 +3,21 @@
 
 extern crate maud;
 extern crate websocket;
+extern crate yaml_rust;
 extern crate libc;
 
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_xml;
 
-extern crate yaml_rust;
-
 use libc::{c_char};
 use std::ffi::CString;
-
-pub static XML: &'static str = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
 
 extern crate git2;
 use git2::Repository;
 
-mod tasks;
+pub static XML: &'static str = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
+
 mod state;
 mod xslt;
 mod server;
