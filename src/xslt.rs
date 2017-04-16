@@ -113,12 +113,12 @@ pub fn panel_xslt() -> String {
                 }
             }
             xsl:template match="/state/properties/property/options/option" {
+                xsl:variable name="name" select="./parent::options/parent::property/name" {}
                 xsl:element name="option" {
                     xsl:attribute name="value" {
                         xsl:value-of select="." {}
                     }
-                    //xsl:if test="/state/task/property[name[text()=./parent::options/parent::property/name[text()]]]/value = ." {
-                    xsl:if test="/state/task/property[name[text()='Developer']]/value = ." {
+                    xsl:if test="/state/task/property[name[text()=$name]]/value = ." {
                         xsl:attribute name="selected" "selected"
                     }
                     xsl:value-of select="." {}
