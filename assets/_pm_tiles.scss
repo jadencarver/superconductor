@@ -62,6 +62,9 @@
       box-shadow: 3pt 3pt 3pt rgba(128,128,128,0.5), inset 0pt -3pt 0pt $color1;
       height: 5em;
     }
+    .selected {
+      border-color: $color1;
+    }
   }
   .droppable > * {
     background-color: $color4;
