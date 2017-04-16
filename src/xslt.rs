@@ -14,16 +14,16 @@ pub fn panel_xslt() -> String {
                     style type="text/css" (css)
                     style type="text/css" "@import url('//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/styles/agate.min.css');"
                     form#__pm__commit method="post" name="commit" {
-                        input type="hidden" name="task" value="{/state/task/name}" {}
+                        input type="hidden" id="__pm__commit__task" name="task" value="{/state/task/name}" {}
                         ul#__pm__commits {
                             xsl:apply-templates select="/state/log/commit" {}
                         }
                         hr {}
-                        dl.properties {
-                            xsl:apply-templates select="/state/properties/property" {
-                                xsl:with-param name="value" "5"
-                            }
-                        }
+                        //dl.properties {
+                        //    xsl:apply-templates select="/state/properties/property" {
+                        //        xsl:with-param name="value" "5"
+                        //    }
+                        //}
                         textarea id="__pm__commit__message" tabindex="1" name="message" placeholder="Add a Comment" {
                             xsl:value-of select="/state/message" {}
                         }
@@ -148,7 +148,7 @@ pub fn panel_xslt() -> String {
             }
             xsl:template match="task" {
                 li {
-                    div draggable="true" class="{type}" {
+                    div draggable="true" class="task {type}" data-name="{name}" {
                         strong {
                             xsl:value-of select="name" {}
                         }

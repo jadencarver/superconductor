@@ -71,12 +71,8 @@ pub fn generate(state: Option<State>) -> String {
                 tasks {
                     @for (branch, branch_type) in branches.map(|b|b.unwrap()).filter(|&(ref b, t)| !b.is_head()) {
                         @if let Some(commit) = branch.get().peel(ObjectType::Commit).unwrap().as_commit() {
-                            @let mut message = commit.message().unwrap().split("---\n") {
-                                @if let Some(_) = message.next() {
-                                    @for task in Task::from_commit(&repo, &commit, message.next().unwrap_or("")) {
-                                        (render_task(&task, task.changes(&repo, &commit, false)))
-                                    }
-                                }
+                            @let task = Task::from_ref(&repo, branch.get()) {
+                                (render_task(&task, task.changes(&repo, &commit, false)))
                             }
                         }
                         //task {

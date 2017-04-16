@@ -158,7 +158,7 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
                                 for property in state.property {
                                     properties.insert(Yaml::String(property.name), Yaml::String(property.value));
                                 }
-                                tasks.insert(Yaml::String(String::from("BLBA-1234")), Yaml::Hash(properties));
+                                tasks.insert(Yaml::String(String::from(head.shorthand().unwrap_or("master"))), Yaml::Hash(properties));
                                 emitter.dump(&Yaml::Hash(tasks)).unwrap();
                             }
                             let message = state.message + "\n" + &yaml;

@@ -29,8 +29,12 @@
   }, true);
 
   DOM.addEventListener('click', function (event) {
+    var form = DOM.querySelector('#__pm__commit');
     if (event.target.type === "submit") {
-      var form = DOM.querySelector('#__pm__commit');
+      serialize(form, event);
+      event.preventDefault();
+    } else if (event.target.classList.contains('task')) {
+      DOM.querySelector("#__pm__commit__task").value = event.target.dataset.name;
       serialize(form, event);
       event.preventDefault();
     } else {
