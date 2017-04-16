@@ -14,6 +14,7 @@ use websocket::header::WebSocketProtocol;
 
 use git2::Repository;
 use git2::ObjectType;
+use git2::BranchType;
 
 use payload;
 use state::State;
@@ -122,7 +123,12 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
                         println!("{:?}", state);
 
                         let repo = Repository::discover(".").unwrap();
-                        let head = repo.head().unwrap().peel(ObjectType::Commit).unwrap();
+                        let branch = repo.find_branch(&state.task, BranchType::Local);
+                        let head = match branch {
+                            Ok(branch) => branch.into_reference(),
+                            _ => repo.head().unwrap()
+                        };
+                        let commit = head.peel(ObjectType::Commit).unwrap();
                         let mut index = repo.index().unwrap();
 
                         let to_remove = index.iter().fold(vec![], |mut acc, entry| {
@@ -134,7 +140,7 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
                             acc
                         });
 
-                        repo.reset_default(Some(&head), to_remove.iter()).unwrap();
+                        repo.reset_default(Some(&commit), to_remove.iter()).unwrap();
                         for change in state.clone().include {
                             let path = Path::new(&change);
                             index.add_path(path).unwrap();
@@ -160,8 +166,7 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
                             index.read(false);
                             let tree_oid = index.write_tree().unwrap();
                             let tree = repo.find_tree(tree_oid).unwrap();
-                            repo.commit(Some("HEAD"), &author, &author, &message, &tree, &[&head.as_commit().unwrap()]);
-                            last_state = None;
+                            repo.commit(Some(&head.name().unwrap_or("HEAD")), &author, &author, &message, &tree, &[&commit.as_commit().unwrap()]);
                             let message = WebMessage::text(payload::generate(None));
                             sender.send_message(&message).unwrap();
                             last_state = None;

@@ -2,8 +2,8 @@ use yaml_rust::{Yaml, YamlLoader};
 use yaml_rust::yaml::Hash;
 
 extern crate git2;
-use self::git2::Repository;
-use self::git2::Commit;
+use self::git2::{Repository, ObjectType};
+use self::git2::{Commit, Reference};
 
 pub struct Task {
     pub name: String,
@@ -11,6 +11,20 @@ pub struct Task {
 }
 
 impl Task {
+    pub fn from_ref(repo: &Repository, reference: &Reference) -> Task {
+        let commit_obj = reference.peel(ObjectType::Commit).unwrap();
+        let commit = commit_obj.as_commit().unwrap();
+        let mut messages = commit.message().unwrap().split("---\n");
+        let message = messages.next().unwrap();
+        let name = reference.shorthand().unwrap_or("master");
+        let mut commits = Task::from_commit(&repo, &commit, &message);
+        commits.retain(|c| c.name == name);
+        commits.pop().unwrap_or(Task {
+            name: String::from(name),
+            properties: Hash::new()
+        })
+    }
+
     pub fn from_commit(repo: &Repository, commit: &Commit, message: &str) -> Vec<Task> {
         let mut tasks = vec![];
         if let Ok(loader) = YamlLoader::load_from_str(message) {

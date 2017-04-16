@@ -1,5 +1,6 @@
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct State {
+    pub task: String,
     pub focus: String,
     pub message: String,
     pub include: Vec<String>,
@@ -17,6 +18,7 @@ pub struct Property {
 impl State {
     pub fn blank() -> State {
         State {
+            task: String::from("master"),
             focus: String::new(),
             message: String::new(),
             include: vec![],

@@ -54,7 +54,7 @@ pub fn generate(state: Option<State>) -> String {
             @if let Some(state) = state {
                 message (state.message)
                 task {
-                    name "undefined"
+                    name (head.shorthand().unwrap_or("[unknown]"))
                     @for property in state.property {
                         property {
                             name (property.name)
@@ -63,12 +63,8 @@ pub fn generate(state: Option<State>) -> String {
                     }
                 }
             } @else {
-                @let mut message = head_commit.message().unwrap().split("---\n") {
-                    @if let Some(_) = message.next() {
-                        @for task in Task::from_commit(&repo, &head_commit, message.next().unwrap_or("")) {
-                            (render_task(&task, task.changes(&repo, &head_commit, false)))
-                        }
-                    }
+                @let task = Task::from_ref(&repo, &head) {
+                    (render_task(&task, task.changes(&repo, &head_commit, false)))
                 }
             }
             @if let Ok(branches) = repo.branches(None) {
