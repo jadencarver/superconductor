@@ -19,11 +19,9 @@ pub fn panel_xslt() -> String {
                             xsl:apply-templates select="/state/log/commit" {}
                         }
                         hr {}
-                        //dl.properties {
-                        //    xsl:apply-templates select="/state/properties/property" {
-                        //        xsl:with-param name="value" "5"
-                        //    }
-                        //}
+                        dl.properties {
+                            xsl:apply-templates select="/state/properties/property" {}
+                        }
                         textarea id="__pm__commit__message" tabindex="1" name="message" placeholder="Add a Comment" {
                             xsl:value-of select="/state/message" {}
                         }
@@ -152,7 +150,7 @@ pub fn panel_xslt() -> String {
                         xsl:attribute name="draggable" "true"
                         xsl:attribute name="class" {
                             "task "
-                            xsl:if test="/state/task = name" "selected"
+                            xsl:if test="/state/task/name = name" "selected"
                         }
                         xsl:attribute name="data-name" {
                             xsl:value-of select="name" {}
