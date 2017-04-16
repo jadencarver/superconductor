@@ -100,63 +100,6 @@ pub fn generate(previous_commit: Option<State>) -> String {
                                         }
                                     }
                                 }
-                                //@if let Some(yaml) = message.next() {
-                                //    @if let Ok(yaml) = YamlLoader::load_from_str(yaml) {
-                                //        @if yaml.len() > 0 {
-                                //            @if let Some(tasks) = yaml[0].as_hash() {
-                                //                @for (task, values) in tasks {
-                                //                    task {
-                                //                        name (task.as_str().unwrap_or("None"))
-                                //                        @for (name, value) in values.as_hash().unwrap() {
-                                //                          property {
-                                //                                name (name.as_str().unwrap_or("[]"))
-                                //                                @for parent in commit.parents() {
-                                //                                    @let mut propwalk = repo.revwalk().unwrap() {
-                                //                                        @if let Ok(_) = propwalk.push(parent.id()) {
-                                //                                            @for proprev in propwalk {
-                                //                                                @let propcommit = repo.find_commit(proprev.unwrap()).unwrap() {
-                                //                                                    @let mut propmessages = propcommit.message().unwrap().split("---\n") {
-                                //                                                        @if let Some(propmessage) = propmessages.next() {
-                                //                                                            @if let Some(yaml) = propmessages.next() {
-                                //                                                                @if let Ok(yaml) = YamlLoader::load_from_str(yaml) {
-                                //                                                                    @if yaml.len() > 0 {
-                                //                                                                        @for (proptask, propvalues) in yaml[0].as_hash().unwrap() {
-                                //                                                                            @if proptask == proptask {
-                                //                                                                                @for (propname, propvalue) in propvalues.as_hash().unwrap() {
-                                //                                                                                    @if propname == name {
-                                //                                                                                        @if let Some(propbefore) = propvalue.as_str() {
-                                //                                                                                            before (propbefore)
-                                //                                                                                        }
-                                //                                                                                    }
-                                //                                                                                }
-                                //                                                                            }
-                                //                                                                        }
-                                //                                                                    }
-                                //                                                                }
-                                //                                                            }
-                                //                                                        }
-                                //                                                    }
-                                //                                                }
-                                //                                            }
-                                //                                        }
-                                //                                    }
-                                //                                }
-                                //                                after {
-                                //                                    @match value {
-                                //                                        &Yaml::Integer(int) => (int),
-                                //                                        &Yaml::String(ref string) => (string),
-                                //                                        &Yaml::Boolean(b) => (b),
-                                //                                        _ => ("[unknown]")
-                                //                                    }
-                                //                                }
-                                //                            }
-                                //                        }
-                                //                    }
-                                //                }
-                                //            }
-                                //        }
-                                //    }
-                                //}
                             }
                         }
                     }
