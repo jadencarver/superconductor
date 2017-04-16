@@ -161,6 +161,7 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
                             let tree_oid = index.write_tree().unwrap();
                             let tree = repo.find_tree(tree_oid).unwrap();
                             repo.commit(Some("HEAD"), &author, &author, &message, &tree, &[&head.as_commit().unwrap()]);
+                            last_state = None;
                             let message = WebMessage::text(payload::generate(None));
                             sender.send_message(&message).unwrap();
                             last_state = None;

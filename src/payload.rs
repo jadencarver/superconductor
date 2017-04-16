@@ -64,9 +64,10 @@ pub fn generate(state: Option<State>) -> String {
                 }
             } @else {
                 @let mut message = head_commit.message().unwrap().split("---\n") {
-                    message (message.next().unwrap())
-                    @for task in Task::from_commit(&repo, &head_commit, message.next().unwrap_or("")) {
-                        (render_task(&task, task.changes(&repo, &head_commit, false)))
+                    @if let Some(_) = message.next() {
+                        @for task in Task::from_commit(&repo, &head_commit, message.next().unwrap_or("")) {
+                            (render_task(&task, task.changes(&repo, &head_commit, false)))
+                        }
                     }
                 }
             }
