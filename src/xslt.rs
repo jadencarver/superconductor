@@ -148,7 +148,15 @@ pub fn panel_xslt() -> String {
             }
             xsl:template match="task" {
                 li {
-                    div draggable="true" class="task {type}" data-name="{name}" {
+                    xsl:element name="div" {
+                        xsl:attribute name="draggable" "true"
+                        xsl:attribute name="class" {
+                            "task "
+                            xsl:if test="/state/task = name" "selected"
+                        }
+                        xsl:attribute name="data-name" {
+                            xsl:value-of select="name" {}
+                        }
                         strong {
                             xsl:value-of select="name" {}
                         }

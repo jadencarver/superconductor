@@ -28,9 +28,6 @@ use self::base64::{encode, decode};
 pub fn generate(state: Option<State>) -> String {
     let repo = Repository::discover(".").unwrap();
     let config = repo.config().unwrap();
-    let mut revwalk = repo.revwalk().unwrap();
-    revwalk.set_sorting(git2::SORT_REVERSE);
-    revwalk.push_head().unwrap();
 
     let head = repo.head().unwrap();
     let head_tree_obj = head.peel(ObjectType::Tree).unwrap();
@@ -38,6 +35,17 @@ pub fn generate(state: Option<State>) -> String {
     let head_commit_obj = head.peel(ObjectType::Commit).unwrap();
     let head_commit = head_commit_obj.as_commit().unwrap();
     let changes = repo.diff_tree_to_index(Some(&head_tree), None, None).unwrap();
+
+    let mut rev = &head;
+    let branch = if let Some(state) = state.clone() {
+        repo.find_branch(&state.task, BranchType::Local).unwrap().into_reference()
+    } else {
+        repo.find_branch("master", BranchType::Local).unwrap().into_reference()
+    };
+
+    let mut revwalk = repo.revwalk().unwrap();
+    revwalk.set_sorting(git2::SORT_REVERSE);
+    revwalk.push(branch.target().unwrap()).unwrap();
 
     let mut status_opts = StatusOptions::new();
     status_opts.include_untracked(true);
@@ -54,7 +62,7 @@ pub fn generate(state: Option<State>) -> String {
             @if let Some(state) = state {
                 message (state.message)
                 task {
-                    name (head.shorthand().unwrap_or("[unknown]"))
+                    name (state.task)
                     @for property in state.property {
                         property {
                             name (property.name)
@@ -63,13 +71,13 @@ pub fn generate(state: Option<State>) -> String {
                     }
                 }
             } @else {
-                @let task = Task::from_ref(&repo, &head) {
+                @let task = Task::from_ref(&repo, &branch) {
                     (render_task(&task, task.changes(&repo, &head_commit, false)))
                 }
             }
             @if let Ok(branches) = repo.branches(None) {
                 tasks {
-                    @for (branch, branch_type) in branches.map(|b|b.unwrap()).filter(|&(ref b, t)| !b.is_head()) {
+                    @for (branch, branch_type) in branches.map(|b|b.unwrap()) {
                         @if let Some(commit) = branch.get().peel(ObjectType::Commit).unwrap().as_commit() {
                             @let task = Task::from_ref(&repo, branch.get()) {
                                 (render_task(&task, task.changes(&repo, &commit, false)))
