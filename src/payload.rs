@@ -1,5 +1,4 @@
 use state::State;
-use project;
 
 use std::cell::RefCell;
 use std::fs::File;
@@ -26,8 +25,8 @@ extern crate base64;
 use self::base64::{encode, decode};
 
 pub fn generate(previous_commit: Option<State>) -> String {
-    let current = project::current();
     let repo = Repository::discover(".").unwrap();
+    let config = repo.config().unwrap();
     let mut revwalk = repo.revwalk().unwrap();
     revwalk.set_sorting(git2::SORT_REVERSE);
     revwalk.push_head().unwrap();
@@ -45,11 +44,11 @@ pub fn generate(previous_commit: Option<State>) -> String {
                 focus (commit.focus)
             }
             user {
-                name  (current.user.name)
-                email (current.user.email)
+                name  (config.get_string("user.name" ).unwrap_or(String::from("Unknown")))
+                email (config.get_string("user.email").unwrap_or(String::from("root@localhost")))
             }
             task {
-                name (current.task.id)
+                name (repo.head().unwrap().shorthand().unwrap())
             }
             @if let Ok(branches) = repo.branches(None) {
                 tasks {

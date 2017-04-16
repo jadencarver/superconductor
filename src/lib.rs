@@ -21,7 +21,6 @@ use git2::Repository;
 
 mod tasks;
 mod state;
-mod project;
 mod xslt;
 mod server;
 mod payload;
