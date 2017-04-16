@@ -25,7 +25,7 @@ extern crate base64;
 
 use self::base64::{encode, decode};
 
-pub fn generate(previous_commit: Option<State>) -> String {
+pub fn generate(state: Option<State>) -> String {
     let repo = Repository::discover(".").unwrap();
     let config = repo.config().unwrap();
     let mut revwalk = repo.revwalk().unwrap();
@@ -44,17 +44,30 @@ pub fn generate(previous_commit: Option<State>) -> String {
 
     let payload = html! {
         state {
-            @if let Some(commit) = previous_commit.clone() {
+            @if let Some(commit) = state.clone() {
                 focus (commit.focus)
             }
             user {
                 name  (config.get_string("user.name" ).unwrap_or(String::from("Unknown")))
                 email (config.get_string("user.email").unwrap_or(String::from("root@localhost")))
             }
-            @let mut message = head_commit.message().unwrap().split("---\n") {
-                message (message.next().unwrap())
-                @for task in Task::from_commit(&repo, &head_commit, message.next().unwrap_or("")) {
-                    (render_task(&task, task.changes(&repo, &head_commit, false)))
+            @if let Some(state) = state {
+                message (state.message)
+                task {
+                    name "undefined"
+                    @for property in state.property {
+                        property {
+                            name (property.name)
+                            value (property.value)
+                        }
+                    }
+                }
+            } @else {
+                @let mut message = head_commit.message().unwrap().split("---\n") {
+                    message (message.next().unwrap())
+                    @for task in Task::from_commit(&repo, &head_commit, message.next().unwrap_or("")) {
+                        (render_task(&task, task.changes(&repo, &head_commit, false)))
+                    }
                 }
             }
             @if let Ok(branches) = repo.branches(None) {
@@ -62,9 +75,10 @@ pub fn generate(previous_commit: Option<State>) -> String {
                     @for (branch, branch_type) in branches.map(|b|b.unwrap()).filter(|&(ref b, t)| !b.is_head()) {
                         @if let Some(commit) = branch.get().peel(ObjectType::Commit).unwrap().as_commit() {
                             @let mut message = commit.message().unwrap().split("---\n") {
-                                message (message.next().unwrap())
-                                @for task in Task::from_commit(&repo, &commit, message.next().unwrap_or("")) {
-                                    (render_task(&task, task.changes(&repo, &commit, false)))
+                                @if let Some(_) = message.next() {
+                                    @for task in Task::from_commit(&repo, &commit, message.next().unwrap_or("")) {
+                                        (render_task(&task, task.changes(&repo, &commit, false)))
+                                    }
                                 }
                             }
                         }
@@ -108,52 +122,30 @@ pub fn generate(previous_commit: Option<State>) -> String {
                     }
                 }
             }
-            @if let Some(commit) = previous_commit.clone() {
-                properties {
-                    @for property in commit.property {
-                        property {
-                            name (property.name)
-                            value (property.value)
-                            options {
-                                option "Sprint"
-                                option "In Progress"
-                                option "In Review"
-                                option "Blocked"
-                                option "Done"
-                            }
-                        }
+            properties {
+                property {
+                    name "Status"
+                    options {
+                        option "Sprint"
+                        option "In Progress"
+                        option "In Review"
+                        option "Blocked"
+                        option "Done"
                     }
                 }
-                message (commit.message)
-            } @else {
-                properties {
-                    property {
-                        name "Status"
-                        value "Done"
-                        options {
-                            option "Sprint"
-                            option "In Progress"
-                            option "In Review"
-                            option "Blocked"
-                            option "Done"
-                        }
+                property {
+                    name "Estimate"
+                }
+                property {
+                    name "Developer"
+                    value "Jaden Carver <jaden.carver@gmail.com>"
+                    options {
+                        option value="Jaden Carver <jaden.carver@gmail.com>" "Jaden Carver"
+                        option value="Bob Dole <bdole69@gmail.com>" "Bob Dole"
                     }
-                    property {
-                        name "Estimate"
-                        value "5"
-                    }
-                    property {
-                        name "Developer"
-                        value "Jaden Carver <jaden.carver@gmail.com>"
-                        options {
-                            option value="Jaden Carver <jaden.carver@gmail.com>" "Jaden Carver"
-                            option value="Bob Dole <bdole69@gmail.com>" "Bob Dole"
-                        }
-                    }
-                    property {
-                        name "Description"
-                        value ""
-                    }
+                }
+                property {
+                    name "Description"
                 }
             }
             changes {
@@ -234,13 +226,13 @@ fn diff(changes: Diff) -> Vec<PreEscaped<String>> {
 fn render_task(task: &Task, changes: Vec<(String, Option<String>, String)>) -> PreEscaped<String> {
     html!(task {
         name (task.name)
-        @for (name, before, after) in changes {
+        @for (name, before, value) in changes {
             property {
                 name (name)
                 @if let Some(before) = before {
                     before (before)
                 }
-                after (after)
+                value (value)
             }
         }
     })

@@ -79,33 +79,33 @@ pub fn panel_xslt() -> String {
                         xsl:when test="name = 'Status'" {
                             dt { label for="__pm__commit__properties--status" "Status" }
                             dd.select tabindex="1" {
-                                xsl:value-of select="value" {}
+                                xsl:value-of select="/state/task/property[name[text()='Status']]/value" {}
                                 select id="__pm__commit__properties--status" name="property" data-name="Status" {
                                     xsl:apply-templates "options/option" {}
                                 }
                             }
                         }
                         xsl:when test="name = 'Developer'" {
-                            dt "Developer"
+                            dt { label for="__pm__commit__properties--developer" "Developer" }
                             dd.select {
-                                input type="text" value="Jaden Carver" {}
+                                input type="text" id="__pm__commit__properties--developer" value="{/state/task/property[name[text()='Developer']]/value}" {}
                                 select name="property" data-name="Developer" {
                                     xsl:apply-templates "options/option" {}
                                 }
                             }
                         }
                         xsl:when test="name = 'Description'" {
-                            dt "Description"
+                            dt { label for="__pm__commit__properties--description" "Description" }
                             dd {
-                                textarea name="property" data-name="Description" {
-                                    xsl:value-of select="value" {}
+                                textarea id="__pm__commit__properties--description" name="property" data-name="Description" {
+                                    xsl:value-of select="/state/task/property[name[text()='Description']]/value" {}
                                 }
                             }
                         }
                         xsl:otherwise {
-                            dt "Estimate"
+                            dt { label for="__pm__commit__properties--estimate" "Estimate" }
                             dd.input {
-                                input type="text" name="property" data-name="Estimate" value="{value}" {}
+                                input type="text" id="__pm__commit__properties--estimate" name="property" data-name="Estimate" value="{value}" {}
                             }
                         }
                     }
@@ -116,7 +116,8 @@ pub fn panel_xslt() -> String {
                     xsl:attribute name="value" {
                         xsl:value-of select="." {}
                     }
-                    xsl:if test="./parent::options/parent::property/value = ." {
+                    //xsl:if test="/state/task/property[name[text()=./parent::options/parent::property/name[text()]]]/value = ." {
+                    xsl:if test="/state/task/property[name[text()='Developer']]/value = ." {
                         xsl:attribute name="selected" "selected"
                     }
                     xsl:value-of select="." {}
@@ -150,7 +151,7 @@ pub fn panel_xslt() -> String {
                         strong {
                             xsl:value-of select="name" {}
                         }
-                        xsl:value-of select="property[name[text()='Description']]/after" {}
+                        xsl:value-of select="property[name[text()='Description']]/value" {}
                     }
                 }
             }
@@ -220,7 +221,7 @@ pub fn panel_xslt() -> String {
                     xsl:if test="before" {
                         span.before.token--neutral { xsl:value-of select="before" {} }
                     }
-                    span.after.token--positive { xsl:value-of select="after" {} }
+                    span.after.token--positive { xsl:value-of select="value" {} }
                 }
             }
             xsl:template match="/state/changes/change" {
