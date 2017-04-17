@@ -17,12 +17,19 @@ impl Task {
         let mut messages = commit.message().unwrap().split("---\n");
         let message = messages.next().unwrap();
         let name = reference.shorthand().unwrap_or("master");
-        let mut commits = Task::from_commit(&repo, &commit, &message);
-        commits.retain(|c| c.name == name);
-        commits.pop().unwrap_or(Task {
-            name: String::from(name),
-            properties: Hash::new()
-        })
+        if let Some(yaml) = messages.next() {
+            let mut tasks = Task::from_commit(&repo, &commit, &yaml);
+            tasks.retain(|c| c.name == name);
+            tasks.pop().unwrap_or(Task {
+                name: String::from(name),
+                properties: Hash::new()
+            })
+        } else {
+            Task {
+                name: String::from(name),
+                properties: Hash::new()
+            }
+        }
     }
 
     pub fn from_commit(repo: &Repository, commit: &Commit, message: &str) -> Vec<Task> {
