@@ -27,4 +27,15 @@ impl State {
             save_update: None
         }
     }
+    pub fn reset(&self) -> State {
+        State {
+            task: self.task.clone(),
+            focus: self.focus.clone(),
+            message: self.message.clone(),
+            include: vec![],
+            property: vec![],
+            diff: vec![],
+            save_update: None
+        }
+    }
 }

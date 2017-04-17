@@ -51,6 +51,15 @@ impl Task {
         tasks
     }
 
+    fn from_values(repo: &Repository, commit: &Commit, name: &str, properties: &Hash) -> Task {
+        let properties = properties.clone();
+
+        Task {
+            name: String::from(name),
+            properties: properties,
+        }
+    }
+
     pub fn changes(&self, repo: &Repository, commit: &Commit, history: bool) -> Vec<(String, Option<String>, String)> {
         let mut changes = vec![];
         let mut parents = vec![];
@@ -102,15 +111,6 @@ impl Task {
             }
         }
         changes
-    }
-
-    fn from_values(repo: &Repository, commit: &Commit, name: &str, properties: &Hash) -> Task {
-        let properties = properties.clone();
-
-        Task {
-            name: String::from(name),
-            properties: properties,
-        }
     }
 
 }

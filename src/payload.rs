@@ -61,11 +61,11 @@ pub fn generate(state: Option<State>) -> String {
             }
             @if let Some(state) = state {
                 message (state.message)
-                if (state.property.len() == 0) {
+                @if (state.property.len() == 0) {
                     @let task = Task::from_ref(&repo, &branch) {
                         (render_task(&task, task.changes(&repo, &head_commit, false)))
                     }
-                } else {
+                } @else {
                     task {
                         name (state.task)
                         @for property in state.property {
