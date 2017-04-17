@@ -165,7 +165,7 @@ pub fn panel_xslt() -> String {
             xsl:template match="/state/tasks" {
                 ul.tiles {
                     header "Sprint"
-                    xsl:apply-templates select="task[property[name='Status']/value='Sprint']" {}
+                    xsl:apply-templates select="task[not(property)]|task[property[name='Status']/value='Sprint']" {}
                 }
                 ul.tiles {
                     header {

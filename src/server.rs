@@ -120,8 +120,8 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
                         let payload = String::from_utf8_lossy(message.payload.as_ref());
                         let mut state: State = xml::from_str(&payload).unwrap();
 
-                        println!("\n{:?}", state);
-                        println!("Last {:?}", last_state);
+                        println!("\nLast {:?}", last_state);
+                        println!("{:?}\n", state);
 
                         let repo = Repository::discover(".").unwrap();
                         let branch = repo.find_branch(&state.task, BranchType::Local);

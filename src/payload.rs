@@ -81,7 +81,7 @@ pub fn generate(state: Option<State>) -> String {
                     (render_task(&task, task.changes(&repo, &head_commit, false)))
                 }
             }
-            @if let Ok(branches) = repo.branches(None) {
+            @if let Ok(branches) = repo.branches(Some(BranchType::Local)) {
                 tasks {
                     @for (branch, branch_type) in branches.map(|b|b.unwrap()) {
                         @if let Some(commit) = branch.get().peel(ObjectType::Commit).unwrap().as_commit() {
