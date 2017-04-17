@@ -165,22 +165,25 @@ pub fn panel_xslt() -> String {
             xsl:template match="/state/tasks" {
                 ul.tiles {
                     header "Sprint"
-                    xsl:apply-templates select="task" {}
+                    xsl:apply-templates select="task[property[name='Status']/value='Sprint']" {}
                 }
                 ul.tiles {
                     header {
                         "In Progress"
                     }
-                    xsl:apply-templates select="/state/task" {}
+                    xsl:apply-templates select="task[property[name='Status']/value='In Progress']" {}
                 }
                 ul.tiles {
                     header "In Review"
+                    xsl:apply-templates select="task[property[name='Status']/value='In Review']" {}
                 }
                 ul.tiles {
                     header "Blocked"
+                    xsl:apply-templates select="task[property[name='Status']/value='Blocked']" {}
                 }
                 ul.tiles {
                     header "Done"
+                    xsl:apply-templates select="task[property[name='Status']/value='Done']" {}
                 }
             }
             xsl:template match="/state/log/commit" {
