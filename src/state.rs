@@ -31,7 +31,7 @@ impl State {
         State {
             task: self.task.clone(),
             focus: self.focus.clone(),
-            message: self.message.clone(),
+            message: String::new(),
             include: vec![],
             property: vec![],
             diff: vec![],
