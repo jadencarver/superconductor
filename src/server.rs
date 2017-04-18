@@ -1,3 +1,4 @@
+use std;
 use std::thread;
 use std::thread::JoinHandle;
 use std::path::Path;
@@ -35,16 +36,13 @@ enum NotifierMessage<'a> {
     FsEvent(FsEvent)
 }
 
-pub fn start() {
-    let server = Server::bind("127.0.0.1:2794").unwrap();
-    thread::spawn(move || {
-        for connection in server {
-            thread::spawn(move || connect(connection.unwrap()));
-        }
-    });
+pub fn start(port: Option<i32>) -> Result<Server<'static>, std::io::Error> {
+    let port = port.unwrap_or(2794);
+    let host = format!("127.0.0.1:{}", port);
+    Server::bind(host)
 }
 
-fn connect(connection: Connection<WebSocketStream, WebSocketStream>) {
+pub fn connect(connection: Connection<WebSocketStream, WebSocketStream>) {
     let request = connection.read_request().unwrap();
     let headers = request.headers.clone();
     request.validate().unwrap();

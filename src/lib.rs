@@ -12,6 +12,10 @@ extern crate serde_xml;
 
 use libc::{c_char};
 use std::ffi::CString;
+use std::thread;
+
+extern crate rand;
+use rand::Rng;
 
 extern crate git2;
 use git2::Repository;
@@ -31,7 +35,23 @@ pub extern "C" fn panel_xslt() -> *mut c_char {
 
 #[no_mangle]
 pub extern "C" fn start() {
-    server::start()
+    let mut _server = server::start(None);
+    if _server.is_err() {
+        println!("Failed to connect on default websocket port");
+        let mut rng = rand::thread_rng();
+        let port = 2794 + rng.gen::<i32>() % 10;
+        _server = server::start(Some(port));
+    }
+    match _server {
+        Ok(server) => {
+            thread::spawn(move || {
+                for connection in server {
+                    thread::spawn(move || server::connect(connection.unwrap()));
+                }
+            });
+        },
+        _ => println!("Unable to start websocket server")
+    };
 }
 
 #[no_mangle]

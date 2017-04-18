@@ -10,6 +10,7 @@ dependencies = [
  "maud 0.16.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "maud_macros 0.16.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "md5 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rand 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 0.8.23 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 0.8.23 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_xml 0.9.1 (registry+https://github.com/rust-lang/crates.io-index)",
