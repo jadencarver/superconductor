@@ -33,7 +33,7 @@ impl State {
             focus: self.focus.clone(),
             message: String::new(),
             include: vec![],
-            property: vec![],
+            property: self.property.iter().filter_map(|p| if p.name == "Status" { Some(p.clone()) } else { None }).collect(),
             diff: vec![],
             save_update: None
         }

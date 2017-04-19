@@ -59,7 +59,7 @@ pub fn generate(state: Option<State>) -> String {
                 name  (config.get_string("user.name" ).unwrap_or(String::from("Unknown")))
                 email (config.get_string("user.email").unwrap_or(String::from("root@localhost")))
             }
-            @if let Some(state) = state {
+            @if let Some(state) = state.clone() {
                 message (state.message)
                 @if (state.property.len() == 0) {
                     @let task = Task::from_ref(&repo, &branch) {
@@ -86,7 +86,15 @@ pub fn generate(state: Option<State>) -> String {
                     @for (branch, branch_type) in branches.map(|b|b.unwrap()) {
                         @if let Some(commit) = branch.get().peel(ObjectType::Commit).unwrap().as_commit() {
                             @let task = Task::from_ref(&repo, branch.get()) {
-                                (render_task(&task, task.changes(&repo, &commit, false)))
+                                @if let Some(state) = state.clone() {
+                                    @if (state.task != task.name) {
+                                        (render_task(&task, task.changes(&repo, &commit, false)))
+                                    }
+                                } @else {
+                                    @if !branch.is_head() {
+                                        (render_task(&task, task.changes(&repo, &commit, false)))
+                                    }
+                                }
                             }
                         }
                         //task {

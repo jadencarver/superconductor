@@ -89,22 +89,23 @@
         }
     }
   }
+
+  .droppable {
+    height: 150pt;
+  }
+  .droppable::after {
+    color: $color3;
+    content: '';
+    position: absolute;
+    border: solid $color0 0.5em;
+    opacity: 0.25;
+    width: calc(100pt - 3em);
+    height: calc(50pt - 3em);
+    margin: 1em;
+  }
   .droppable > * {
     background-color: $color4;
     pointer-events: none;
-  }
-  .droppable::after {
-    content: '▿';
-    width: 100pt;
-    height: 100pt;
-    font-size: 100pt;
-    line-height: 100pt;
-    border-radius: 5pt;
-    text-align: center;
-    display: block;
-    opacity: 0.5;
-    margin-top: 10pt;
-    background-color: $color3;
   }
   .dropped {
     transition: margin-top 250ms;
