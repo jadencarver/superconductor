@@ -100,35 +100,35 @@ pub fn generate(state: Option<State>) -> String {
                     }
                 }
             }
-            log {
-                @for rev in revwalk {
-                    @let commit = repo.find_commit(rev.unwrap()).unwrap() {
-                        commit {
-                            id (commit.id())
-                            @let time = commit.time() {
-                                timestamp (time.seconds())
-                                localtime (FixedOffset::east(time.offset_minutes()*60).timestamp(time.seconds(), 0).to_rfc3339())
-                            }
-                            user {
-                                @let author = commit.author() {
-                                    name (author.name().unwrap())
-                                    @let email = author.email().unwrap().trim() {
-                                        email (email)
-                                        image (format!("https://www.gravatar.com/avatar/{:x}?s=64", md5::compute(email.to_lowercase())))
-                                    }
-                                }
-                            }
+            //log {
+            //    @for rev in revwalk {
+            //        @let commit = repo.find_commit(rev.unwrap()).unwrap() {
+            //            commit {
+            //                id (commit.id())
+            //                @let time = commit.time() {
+            //                    timestamp (time.seconds())
+            //                    localtime (FixedOffset::east(time.offset_minutes()*60).timestamp(time.seconds(), 0).to_rfc3339())
+            //                }
+            //                user {
+            //                    @let author = commit.author() {
+            //                        name (author.name().unwrap())
+            //                        @let email = author.email().unwrap().trim() {
+            //                            email (email)
+            //                            image (format!("https://www.gravatar.com/avatar/{:x}?s=64", md5::compute(email.to_lowercase())))
+            //                        }
+            //                    }
+            //                }
 
-                            @let mut message = commit.message().unwrap().split("---\n") {
-                                message (message.next().unwrap())
-                                @for task in Task::from_commit(&repo, &commit, message.next().unwrap_or("")) {
-                                    (render_task(&task, task.changes(&repo, &commit, true)))
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            //                @let mut message = commit.message().unwrap().split("---\n") {
+            //                    message (message.next().unwrap())
+            //                    @for task in Task::from_commit(&repo, &commit, message.next().unwrap_or("")) {
+            //                        (render_task(&task, task.changes(&repo, &commit, true)))
+            //                    }
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
             properties {
                 property {
                     name "Status"
@@ -188,6 +188,7 @@ pub fn generate(state: Option<State>) -> String {
             }
         }
     }.into_string();
+    println!("Payload sent");
     payload
 }
 
