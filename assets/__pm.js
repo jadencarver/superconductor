@@ -142,7 +142,14 @@
     var processorRequest = new XMLHttpRequest();
     processorRequest.open("GET", "/__panel.xslt", false);
     processorRequest.send(null);
-    processor.importStylesheet(processorRequest.responseXML);
+    try {
+        processor.importStylesheet(processorRequest.responseXML);
+    } catch(error) {
+        if (typeof(root) !== "undefined") DOM.removeChild(root);
+        root = errorNotice();
+        DOM.appendChild(root);
+        throw error;
+    }
     return processor;
   }
 
@@ -227,15 +234,11 @@
     if (fragment) {
       root = fragment.firstChild;
     } else {
-      root = document.createElement('div');
-      root.style.position = 'fixed';
-      root.style.left = 0; root.style.right = 0; root.style.bottom = 0;
-      root.style.textAlign = 'center'; root.style.lineHeight = '3em';
-      root.style.backgroundColor='#fe6d39'; root.style.color="#fff";
-      root.textContent = "An error occurred initializing Superconductor";
+      root = errorNotice();
     }
     applyTimeAgo();
-    if (hljs) Array.prototype.forEach.call(root.querySelectorAll('pre code'), hljs.highlightBlock);
+    var forEachCodeBlock = Array.prototype.forEach.bind(root.querySelectorAll('pre code'));
+    if (typeof hljs !== "undefined") forEachCodeBlock(hljs.highlightBlock);
     DOM.appendChild(root);
     if (open) {
       root.classList.add('open');
@@ -253,6 +256,16 @@
       }
     }
     stickToBottom();
+  }
+
+  function errorNotice() {
+      root = document.createElement('div');
+      root.style.position = 'fixed';
+      root.style.left = 0; root.style.right = 0; root.style.bottom = 0;
+      root.style.textAlign = 'center'; root.style.lineHeight = '3em';
+      root.style.backgroundColor='#fe6d39'; root.style.color="#fff";
+      root.textContent = "An error occurred initializing Superconductor";
+      return root;
   }
 
   function closest(element, filter, limit) {

@@ -10,7 +10,7 @@
     width: 115pt;
     overflow-y: auto;
     height: 100%;
-    line-height: 2em;
+    line-height: 1.25em;
   }
   ul.tiles header {
     font-weight: bold;
@@ -39,18 +39,22 @@
       cursor: pointer;
       width: 100pt;
       height: 100pt;
-      background-color: #F5F5F5;
+      background-color: $color0;
       box-shadow: 2pt 2pt 2pt rgba(128,128,128,0.5);
-      border: solid 1px $color4;
+      border: solid 1px darken($white, 20%);
       border-radius: 3pt;
-      padding: 0 5pt;
+      padding: 0 5pt 0 1em;
       margin: 0;
+      box-shadow: 3pt 3pt 3pt rgba(128,128,128,0.5), inset 3pt 0pt 0pt $white;
+      overflow: hidden;
+      text-overflow: ellipsis;
 
       strong {
         display: block;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        line-height: 2em;
       }
 
     }
@@ -64,8 +68,25 @@
     }
     .selected {
       border-color: $color2;
-      box-shadow: 3pt 3pt 3pt rgba(128,128,128,0.5), inset 0pt -3pt 0pt $color2;
       margin-top: -0.1em;
+      margin-bottom: 0.1em;
+      background-color: $white;
+      box-shadow: 3pt 3pt 3pt rgba(128,128,128,0.5), inset 3pt 0pt 0pt $color3;
+    }
+    .task--status-blocked {
+      box-shadow: 3pt 3pt 3pt rgba(128,128,128,0.5), inset 3pt 0pt 0pt darken($color1, 10%);
+      &.selected {
+          border-color: $color1;
+      box-shadow: 3pt 3pt 3pt rgba(128,128,128,0.5), inset 3pt 0pt 0pt $color1;
+      }
+    }
+    .task--status-done {
+        height: 5em;
+        box-shadow: 3pt 3pt 3pt rgba(128,128,128,0.5), inset 0 -3pt 0pt $color0;
+        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAADCAYAAABWKLW/AAAADklEQVQImWNgQAAp3AwABaMAT0kwJI8AAAAASUVORK5CYII=);
+        &.selected {
+            box-shadow: 3pt 3pt 3pt rgba(128,128,128,0.5), inset 0 -3pt 0pt $color3;
+        }
     }
   }
   .droppable > * {

@@ -131,26 +131,14 @@ pub fn panel_xslt() -> String {
                     }
                 }
             }
-            xsl:template name="diff-lines" {
-                xsl:param name="limit" select="1" {}
-                xsl:param name="count" select="1" {}
-                xsl:if test="$count <= $limit" {
-                    li {
-                        xsl:value-of select="$count" {}
-                    }
-                    xsl:call-template name="diff-lines" {
-                        xsl:with-param name="limit" select="$limit" {}
-                        xsl:with-param name="count" select="$count + 1" {}
-                    }
-                }
-            }
             xsl:template match="task" {
                 li {
                     xsl:element name="div" {
                         xsl:attribute name="draggable" "true"
                         xsl:attribute name="class" {
-                            "task "
-                            xsl:if test="/state/task/name = name" "selected"
+                            " task "
+                            xsl:if test="/state/task/name = name" " selected "
+                            xsl:value-of select="concat('task--status-', translate(property[name='Status']/value, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'))" {}
                         }
                         xsl:attribute name="data-name" {
                             xsl:value-of select="name" {}
@@ -158,7 +146,7 @@ pub fn panel_xslt() -> String {
                         strong {
                             xsl:value-of select="name" {}
                         }
-                        xsl:value-of select="property[name[text()='Description']]/value" {}
+                        xsl:value-of select="property[name='Description']/value" {}
                     }
                 }
             }
