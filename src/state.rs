@@ -27,13 +27,23 @@ impl State {
             save_update: None
         }
     }
-    pub fn reset(&self) -> State {
+    pub fn reset(&self, status: bool) -> State {
+        let mut properties = vec![];
+        if (status) {
+            properties = self.property.iter().filter_map(|p| {
+                if p.name == "Status" {
+                    Some(p.clone())
+                } else {
+                    None
+                }
+            }).collect();
+        }
         State {
             task: self.task.clone(),
             focus: self.focus.clone(),
             message: String::new(),
             include: vec![],
-            property: self.property.iter().filter_map(|p| if p.name == "Status" { Some(p.clone()) } else { None }).collect(),
+            property: properties,
             diff: vec![],
             save_update: None
         }

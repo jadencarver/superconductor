@@ -35,6 +35,7 @@
   ul.tiles li {
     padding-bottom: 1em;
     width: 100pt;
+
     > div {
       cursor: pointer;
       width: 100pt;
@@ -48,6 +49,18 @@
       box-shadow: 3pt 3pt 3pt rgba(128,128,128,0.5), inset 3pt 0pt 0pt $white;
       overflow: hidden;
       text-overflow: ellipsis;
+      position: relative;
+
+      &::after {
+        content: '';
+        display: block;
+        position: absolute;
+        bottom: 0; height: 50%;
+        left: 5pt; right: 0;
+        background: rgba(255,255,255,0.5);
+        background: -webkit-linear-gradient(top, rgba($color0,0), rgba($color0,1));
+        background:         linear-gradient(top, rgba($color0,0), rgba($color0,1));
+      }
 
       strong {
         display: block;
@@ -55,17 +68,21 @@
         text-overflow: ellipsis;
         white-space: nowrap;
         line-height: 2em;
+        border-bottom: dotted 1px darken($white, 20%);
+        margin-bottom: 0.5em;
       }
-
     }
+
     .tiles__tile--head {
       border-color: $color2;
       box-shadow: 3pt 3pt 3pt rgba(128,128,128,0.5), inset 0pt -3pt 0pt $color2;
     }
+
     .remote {
       box-shadow: 3pt 3pt 3pt rgba(128,128,128,0.5), inset 0pt -3pt 0pt $color1;
       height: 5em;
     }
+
     .selected {
       border-color: $color2;
       margin-top: -0.1em;
@@ -73,26 +90,35 @@
       background-color: $white;
       box-shadow: 3pt 3pt 3pt rgba(128,128,128,0.5), inset 3pt 0pt 0pt $color3;
     }
+
     .task--status-blocked {
       box-shadow: 3pt 3pt 3pt rgba(128,128,128,0.5), inset 3pt 0pt 0pt darken($color1, 5%);
+
       &.selected {
-          border-color: $color1;
-      box-shadow: 3pt 3pt 3pt rgba(128,128,128,0.5), inset 3pt 0pt 0pt $color1;
+        border-color: $color1;
+        box-shadow: 3pt 3pt 3pt rgba(128,128,128,0.5), inset 3pt 0pt 0pt $color1;
       }
     }
+
     .task--status-done {
         height: 4em;
         background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAADCAYAAABWKLW/AAAADklEQVQImWNgQAAp3AwABaMAT0kwJI8AAAAASUVORK5CYII=);
         box-shadow: 3pt 3pt 3pt rgba(128,128,128,0.5), inset 3pt 0 0pt rgba($color3, 0.75);
+
         &.selected {
             box-shadow: 3pt 3pt 3pt rgba(128,128,128,0.5), inset 3pt 0 0pt $color3;
         }
+    }
+
+    .task__property--description {
+      white-space: pre-wrap;
     }
   }
 
   .droppable {
     height: 150pt;
   }
+
   .droppable::after {
     color: $color3;
     content: '';
@@ -103,14 +129,17 @@
     height: calc(50pt - 3em);
     margin: 1em;
   }
+
   .droppable > * {
     background-color: $color4;
     pointer-events: none;
   }
+
   .dropped {
-    transition: margin-top 250ms;
     margin-top: 110pt;
+    transition: margin-top 250ms;
   }
+
   .dropped::after {
     display: none;
   }

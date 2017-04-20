@@ -133,7 +133,7 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
 
                             // reset the state when switching tasks
                             if state.task != last.task {
-                                state = state.reset();
+                                state = state.reset(false);
                             }
 
                             // apply git index changes only if task is the working directory
@@ -174,7 +174,7 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
                                 let tree_oid = index.write_tree().unwrap();
                                 let tree = repo.find_tree(tree_oid).unwrap();
                                 repo.commit(Some(&head.name().unwrap_or("HEAD")), &author, &author, &message, &tree, &[&commit.as_commit().unwrap()]);
-                                last_state = Some(last.reset());
+                                last_state = Some(last.reset(false));
                             } else {
                                 println!("passing on state {:?}", state);
                                 last_state = Some(state);
