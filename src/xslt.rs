@@ -155,31 +155,31 @@ pub fn panel_xslt() -> String {
             xsl:template match="/state/tasks" {
                 ul.tiles data-property-name="Status" data-property-value="Sprint" {
                     header "Sprint"
-                    xsl:apply-templates select="//task[not(property)]|//task[property[name='Status']/value='Sprint']" {
+                    xsl:apply-templates select="(/state/task|./task)[not(property)]|(/state/task|./task)[property[name='Status']/value='Sprint']" {
                         xsl:sort select="name" {}
                     }
                 }
                 ul.tiles data-property-name="Status" data-property-value="In Progress" {
                     header "In Progress"
-                    xsl:apply-templates select="//task[property[name='Status']/value='In Progress']" {
+                    xsl:apply-templates select="(/state/task|./task)[property[name='Status']/value='In Progress']" {
                         xsl:sort select="name" {}
                     }
                 }
                 ul.tiles data-property-name="Status" data-property-value="In Review" {
                     header "In Review"
-                    xsl:apply-templates select="//task[property[name='Status']/value='In Review']" {
+                    xsl:apply-templates select="(/state/task|./task)[property[name='Status']/value='In Review']" {
                         xsl:sort select="name" {}
                     }
                 }
                 ul.tiles data-property-name="Status" data-property-value="Blocked" {
                     header "Blocked"
-                    xsl:apply-templates select="//task[property[name='Status']/value='Blocked']" {
+                    xsl:apply-templates select="(/state/task|./task)[property[name='Status']/value='Blocked']" {
                         xsl:sort select="name" {}
                     }
                 }
                 ul.tiles data-property-name="Status" data-property-value="Done" {
                     header "Done"
-                    xsl:apply-templates select="//task[property[name='Status']/value='Done']" {
+                    xsl:apply-templates select="(/state/task|./task)[property[name='Status']/value='Done']" {
                         xsl:sort select="name" {}
                     }
                 }

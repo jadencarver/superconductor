@@ -46,6 +46,7 @@ pub fn generate(state: Option<State>) -> String {
     let mut revwalk = repo.revwalk().unwrap();
     revwalk.set_sorting(git2::SORT_REVERSE);
     revwalk.push(branch.target().unwrap()).unwrap();
+    revwalk.hide_ref("refs/heads/master").unwrap();
 
     let mut status_opts = StatusOptions::new();
     status_opts.include_untracked(true);
@@ -108,35 +109,36 @@ pub fn generate(state: Option<State>) -> String {
                     }
                 }
             }
-            //log {
-            //    @for rev in revwalk {
-            //        @let commit = repo.find_commit(rev.unwrap()).unwrap() {
-            //            commit {
-            //                id (commit.id())
-            //                @let time = commit.time() {
-            //                    timestamp (time.seconds())
-            //                    localtime (FixedOffset::east(time.offset_minutes()*60).timestamp(time.seconds(), 0).to_rfc3339())
-            //                }
-            //                user {
-            //                    @let author = commit.author() {
-            //                        name (author.name().unwrap())
-            //                        @let email = author.email().unwrap().trim() {
-            //                            email (email)
-            //                            image (format!("https://www.gravatar.com/avatar/{:x}?s=64", md5::compute(email.to_lowercase())))
-            //                        }
-            //                    }
-            //                }
-
-            //                @let mut message = commit.message().unwrap().split("---\n") {
-            //                    message (message.next().unwrap())
-            //                    @for task in Task::from_commit(&repo, &commit, message.next().unwrap_or("")) {
-            //                        (render_task(&task, task.changes(&repo, &commit, true)))
-            //                    }
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
+            log {
+                @for (i, rev) in revwalk.enumerate() {
+                    @if i < 10 {
+                        @let commit = repo.find_commit(rev.unwrap()).unwrap() {
+                            commit {
+                                id (commit.id())
+                                @let time = commit.time() {
+                                    timestamp (time.seconds())
+                                    localtime (FixedOffset::east(time.offset_minutes()*60).timestamp(time.seconds(), 0).to_rfc3339())
+                                }
+                                user {
+                                    @let author = commit.author() {
+                                        name (author.name().unwrap())
+                                        @let email = author.email().unwrap().trim() {
+                                            email (email)
+                                            image (format!("https://www.gravatar.com/avatar/{:x}?s=64", md5::compute(email.to_lowercase())))
+                                        }
+                                    }
+                                }
+                                @let mut message = commit.message().unwrap().split("---\n") {
+                                    message (message.next().unwrap())
+                                    @for task in Task::from_commit(&repo, &commit, message.next().unwrap_or("")) {
+                                        (render_task(&task, task.changes(&repo, &commit, true)))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             properties {
                 property {
                     name "Status"
