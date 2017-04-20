@@ -91,7 +91,7 @@
     var dropping;
     DOM.addEventListener('dragstart', function (event) {
         dragging = event.target;
-        var dropTargets = DOM.querySelectorAll('.tiles > li');
+        var dropTargets = DOM.querySelectorAll('.tiles > li, .tiles');
         for (dropTarget of dropTargets) {
             if (dropTarget === event.target) continue;
             dropTarget.addEventListener('dragenter', dragEnter);
@@ -103,7 +103,7 @@
 
     DOM.addEventListener('dragend', function (event) {
         dragging = null;
-        var dropTargets = DOM.querySelectorAll('.tiles > li');
+        var dropTargets = DOM.querySelectorAll('.tiles > li, .tiles');
         for (dropTarget of dropTargets) {
             if (dropTarget === event.target) continue;
             dropTarget.removeEventListener('dragenter', dragEnter);
@@ -136,9 +136,10 @@
         this.classList.add('dropped');
         var form = DOM.querySelector('#__pm__commit');
         var task = DOM.querySelector("#__pm__commit__task");
-        var field = form.querySelector("*[data-name='"+this.parentElement.dataset['property-name']+"']");
-        task.value = dragging.dataset.name;
-        field.value = this.parentElement.dataset['property-value'];
+        var name = (this.dataset['property-name'] || this.parentElement.dataset['property-name']);
+        var field = form.querySelector("*[data-name='"+name+"']");
+        task.value = dragging ? dragging.dataset.name : '';
+        field.value = (this.dataset['property-value'] || this.parentElement.dataset['property-value']);
         serialize(form, event);
         dragging = false;
         event.preventDefault();
