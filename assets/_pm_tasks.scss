@@ -12,26 +12,30 @@
     height: 100%;
     line-height: 1.25em;
   }
+
   ul.tiles header {
-    font-weight: bold;
-    border-bottom: solid $color4 1pt;
-    margin: 0 0 5pt 0;
     width: 100pt;
+    font-weight: bold;
     background-color: $color0;
-    position: sticky;
-    position: -webkit-sticky;
+    position: fixed;
+    line-height: 2em;
+    margin: 0 5pt 5pt;
     top: 0px;
     &:after {
       content: '';
       width: 15pt;
       height: 100%;
       display: block;
-      position: absolute;
+      position: fixed;
       top: 0;
       left: 100%;
       background-color: $color0;
     }
+    & + * {
+      margin-top: 2.5em;
+    }
   }
+
   ul.tiles li {
     padding-bottom: 1em;
     width: 100pt;

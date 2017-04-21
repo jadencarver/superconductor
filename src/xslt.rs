@@ -138,7 +138,7 @@ pub fn panel_xslt() -> String {
             }
             xsl:template match="task" {
                 li {
-                    xsl:element name="div" {
+                    xsl:element name="div" tabindex="99" {
                         xsl:attribute name="draggable" "true"
                         xsl:attribute name="class" {
                             " task "

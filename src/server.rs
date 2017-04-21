@@ -189,7 +189,7 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
                                     let commit = commit_obj.as_commit().unwrap();
                                     repo.branch(&new_task, &commit, false).unwrap();
                                     state.task = new_task;
-                                    last_state = Some(state.reset(true));
+                                    last_state = Some(state.reset(false));
                                 } else {
                                     // @todo pass an error that the master branch was not found
                                     last_state = Some(state);
