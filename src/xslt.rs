@@ -26,11 +26,16 @@ pub fn panel_xslt() -> String {
                             xsl:value-of select="/state/message" {}
                         }
                         div#__pm__new_commit {
-                            input type="submit" tabindex="4" name="save_update" value="Save Update" {}
+                            ul#__pm__new_commit__actions {
+                                li input type="submit" tabindex="5" name="new_task" value="New Task" {}
+                                li input type="submit" tabindex="4" name="save_update" value="Save Update" {}
+                            }
                             xsl:if test="/state/changes/change" {
                                 fieldset#__pm__commit__changes.details {
                                     legend#__pm__commit__changes_legend tabindex="2" role="button" {
-                                        "Include Changes"
+                                        xsl:if test="not(/state/changes/statistics)" {
+                                            "Include Changes"
+                                        }
                                         span#__pm__commit__changes__statistics.token {
                                             xsl:if test="/state/changes/statistics/files != 0" {
                                                 span {

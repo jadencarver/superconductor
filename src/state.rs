@@ -6,7 +6,8 @@ pub struct State {
     pub include: Vec<String>,
     pub property: Vec<Property>,
     pub diff: Vec<String>,
-    pub save_update: Option<String>
+    pub save_update: Option<String>,
+    pub new_task: Option<String>
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]

@@ -46,6 +46,7 @@ pub fn connect(connection: Connection<WebSocketStream, WebSocketStream>) {
     let request = connection.read_request().unwrap();
     let headers = request.headers.clone();
     request.validate().unwrap();
+
     let mut response = request.accept();
     println!("Connected");
 

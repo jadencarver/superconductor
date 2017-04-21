@@ -167,10 +167,12 @@ pub fn generate(state: Option<State>) -> String {
             }
             changes {
                 @if let Ok(delta) = changes.stats() {
-                    statistics {
-                        files (delta.files_changed())
-                        insertions (delta.insertions())
-                        deletions (delta.deletions())
+                    @if delta.files_changed() + delta.insertions() + delta.deletions() > 0 {
+                        statistics {
+                            files (delta.files_changed())
+                            insertions (delta.insertions())
+                            deletions (delta.deletions())
+                        }
                     }
                 }
                 @for change in repo.statuses(Some(&mut status_opts)).unwrap().iter() {
@@ -214,7 +216,7 @@ fn diff(changes: Diff) -> Vec<PreEscaped<String>> {
     }, Some(&mut |delta: DiffDelta, binary: DiffBinary| {
         if binary.contains_data() {
             result.borrow_mut().push(html!(
-                img src=(format!("data:image/jpeg,{}", (String::from_utf8_lossy(&binary.new_file().data())))) {}
+                img src=(format!("data:image/png,{}", (String::from_utf8_lossy(&binary.new_file().data())))) {}
             ));
         } else {
             let path = delta.new_file().path().unwrap();

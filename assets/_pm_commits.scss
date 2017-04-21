@@ -28,10 +28,15 @@
     min-height: 3em;
     line-height: 3em;
     background-color: $color0;
-    input[type='submit'][name='save_update'] {
+    ul#__pm__new_commit__actions {
+      display: flex;
       position: absolute;
-      right: 0;
       top: 0;
+      right: 0;
+      list-style-type: none;
+    }
+    input[type='submit'] {
+      margin-left: 5pt;
     }
   }
 
@@ -50,9 +55,6 @@
         color: #A3A3A3;
         line-height: 2.5em;
       }
-    }
-    #__pm__commit__changes__statistics {
-      margin-left: 1em;
     }
   }
 
