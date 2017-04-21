@@ -55,6 +55,15 @@
       text-overflow: ellipsis;
       position: relative;
 
+      &:focus {
+        border-color: $color2;
+        margin-top: -0.1em;
+        margin-bottom: 0.1em;
+        background-color: $white;
+        box-shadow: 3pt 3pt 3pt rgba(128,128,128,0.5), inset 3pt 0pt 0pt $color3;
+        outline: none;
+      }
+
       &::after {
         content: '';
         display: block;
@@ -92,7 +101,7 @@
       margin-top: -0.1em;
       margin-bottom: 0.1em;
       background-color: $white;
-      box-shadow: 3pt 3pt 3pt rgba(128,128,128,0.5), inset 3pt 0pt 0pt $color3;
+      box-shadow: 3pt 3pt 3pt rgba(128,128,128,0.5), inset 3pt 0pt 0pt lighten($color3, 20%);
     }
 
     .task--status-blocked {

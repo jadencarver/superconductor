@@ -138,8 +138,12 @@ pub fn panel_xslt() -> String {
             }
             xsl:template match="task" {
                 li {
-                    xsl:element name="div" tabindex="99" {
+                    xsl:element name="div" {
                         xsl:attribute name="draggable" "true"
+                        xsl:attribute name="tabindex" "99"
+                        xsl:attribute name="id" {
+                            xsl:value-of select="concat('__pm__task_', name)" {}
+                        }
                         xsl:attribute name="class" {
                             " task "
                             xsl:if test="/state/task/name = name" " selected "
