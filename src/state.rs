@@ -25,7 +25,8 @@ impl State {
             include: vec![],
             diff: vec![],
             property: vec![],
-            save_update: None
+            save_update: None,
+            new_task: None
         }
     }
     pub fn reset(&self, status: bool) -> State {
@@ -46,7 +47,8 @@ impl State {
             include: vec![],
             property: properties,
             diff: vec![],
-            save_update: None
+            save_update: None,
+            new_task: None
         }
     }
 }

@@ -40,6 +40,7 @@ pub fn generate(state: Option<State>) -> String {
     let branch = if let Some(state) = state.clone() {
         repo.find_branch(&state.task, BranchType::Local).unwrap().into_reference()
     } else {
+        println!("did not find specified branch, using master");
         repo.find_branch("master", BranchType::Local).unwrap().into_reference()
     };
 

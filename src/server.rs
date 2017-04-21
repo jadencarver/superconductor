@@ -3,6 +3,8 @@ use std::thread;
 use std::thread::JoinHandle;
 use std::path::Path;
 use std::time::Duration;
+use rand;
+use rand::Rng;
 
 use websocket::{WebSocketStream, Server};
 use websocket::Message as WebMessage;
@@ -103,6 +105,7 @@ fn start_monitor(tx: Sender<NotifierMessage>) {
 
 fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<WebSocketStream>) {
     let mut last_state: Option<State> = None;
+    let mut rng = rand::thread_rng();
     loop {
         let event = rx.recv().unwrap();
         match event {
@@ -130,54 +133,68 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
                         };
                         let commit = head.peel(ObjectType::Commit).unwrap();
                         let mut index = repo.index().unwrap();
-                        if let Some(last) = last_state {
 
-                            // reset the state when switching tasks
+                        if let Some(ref last) = last_state {
+                            println!("reset the state when switching tasks");
                             if state.task != last.task {
                                 state = state.reset(false);
                             }
+                        }
 
-                            // apply git index changes only if task is the working directory
-                            if state.task == repo.head().unwrap().shorthand().unwrap() {
-                                let to_remove = index.iter().fold(vec![], |mut acc, entry| {
-                                    let entry_path = String::from_utf8_lossy(entry.path.as_ref());
-                                    match state.include.iter().find(|i| i.as_ref() == entry_path) {
-                                        None => acc.push(entry_path.into_owned()),
-                                        _ => {}
-                                    };
-                                    acc
-                                });
-                                repo.reset_default(Some(&commit), to_remove.iter()).unwrap();
-                                for change in state.clone().include {
-                                    let path = Path::new(&change);
-                                    index.add_path(path).unwrap();
-                                }
-                                index.write().unwrap();
+                        // apply git index changes only if task is the working directory
+                        if state.task == repo.head().unwrap().shorthand().unwrap() {
+                            let to_remove = index.iter().fold(vec![], |mut acc, entry| {
+                                let entry_path = String::from_utf8_lossy(entry.path.as_ref());
+                                match state.include.iter().find(|i| i.as_ref() == entry_path) {
+                                    None => acc.push(entry_path.into_owned()),
+                                    _ => {}
+                                };
+                                acc
+                            });
+                            repo.reset_default(Some(&commit), to_remove.iter()).unwrap();
+                            for change in state.clone().include {
+                                let path = Path::new(&change);
+                                index.add_path(path).unwrap();
                             }
+                            index.write().unwrap();
+                        }
 
-                            if state.save_update.is_some() {
-                                let author = repo.signature().unwrap();
-                                let mut yaml = String::new();
-                                {
-                                    // Constructing the properties YAML
-                                    let mut tasks = Hash::new();
-                                    let mut properties = Hash::new();
-                                    let mut emitter = YamlEmitter::new(&mut yaml);
-                                    for property in state.property.clone() {
-                                        properties.insert(Yaml::String(property.name), Yaml::String(property.value));
-                                    }
-                                    tasks.insert(Yaml::String(String::from(head.shorthand().unwrap_or("master"))), Yaml::Hash(properties));
-                                    emitter.dump(&Yaml::Hash(tasks)).unwrap();
+                        if state.save_update.is_some() || state.new_task.is_some() {
+                            let author = repo.signature().unwrap();
+                            let mut yaml = String::new();
+                            {
+                                // Constructing the properties YAML
+                                let mut tasks = Hash::new();
+                                let mut properties = Hash::new();
+                                let mut emitter = YamlEmitter::new(&mut yaml);
+                                for property in state.property.clone() {
+                                    properties.insert(Yaml::String(property.name), Yaml::String(property.value));
                                 }
-                                let message = state.message + "\n" + &yaml;
+                                tasks.insert(Yaml::String(String::from(head.shorthand().unwrap_or("master"))), Yaml::Hash(properties));
+                                emitter.dump(&Yaml::Hash(tasks)).unwrap();
+                            }
+                            let message = format!("{}\n{}", state.message, yaml);
 
-                                index.read(false);
-                                let tree_oid = index.write_tree().unwrap();
-                                let tree = repo.find_tree(tree_oid).unwrap();
-                                repo.commit(Some(&head.name().unwrap_or("HEAD")), &author, &author, &message, &tree, &[&commit.as_commit().unwrap()]);
-                                last_state = Some(last.reset(false));
+                            index.read(false);
+                            let tree_oid = index.write_tree().unwrap();
+                            let tree = repo.find_tree(tree_oid).unwrap();
+                            repo.commit(Some(&head.name().unwrap_or("HEAD")), &author, &author, &message, &tree, &[&commit.as_commit().unwrap()]);
+                            if state.new_task.is_some() {
+                                let num = rng.gen::<u32>();
+                                let new_task = format!("S{}", num);
+                                println!("creating branch {}", new_task);
+                                if let Ok(master_branch) = repo.find_branch("master", BranchType::Local) {
+                                    let master = master_branch.into_reference();
+                                    let commit_obj = master.peel(ObjectType::Commit).unwrap();
+                                    let commit = commit_obj.as_commit().unwrap();
+                                    repo.branch(&new_task, &commit, false).unwrap();
+                                    state.task = new_task;
+                                    last_state = Some(state.reset(true));
+                                } else {
+                                    // @todo pass an error that the master branch was not found
+                                    last_state = Some(state);
+                                }
                             } else {
-                                println!("passing on state {:?}", state);
                                 last_state = Some(state);
                             }
                         } else {
