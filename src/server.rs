@@ -180,8 +180,8 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
                             let tree = repo.find_tree(tree_oid).unwrap();
                             repo.commit(Some(&head.name().unwrap_or("HEAD")), &author, &author, &message, &tree, &[&commit.as_commit().unwrap()]);
                             if state.new_task.is_some() {
-                                let num = rng.gen::<u32>();
-                                let new_task = format!("S{}", num);
+                                let num = rng.gen::<u16>();
+                                let new_task = format!("{:X}", num);
                                 println!("creating branch {}", new_task);
                                 if let Ok(master_branch) = repo.find_branch("master", BranchType::Local) {
                                     let master = master_branch.into_reference();

@@ -5,7 +5,7 @@
     margin: 0 5pt;
     font-size: 0.8em;
     list-style-type: none;
-    padding: 0;
+    padding: 2.75em 0 0 0;
     float: left;
     width: 115pt;
     overflow-y: auto;
@@ -14,13 +14,16 @@
   }
 
   ul.tiles header {
-    width: 100pt;
+    width: 105pt;
     font-weight: bold;
     background-color: $color0;
     position: fixed;
     line-height: 2em;
-    margin: 0 5pt 5pt;
+    margin: 0;
     top: 0px;
+    border-bottom: solid darken($white, 10%) 1px;
+    z-index: 1;
+
     &:after {
       content: '';
       width: 15pt;
@@ -30,9 +33,6 @@
       top: 0;
       left: 100%;
       background-color: $color0;
-    }
-    & + * {
-      margin-top: 2.5em;
     }
   }
 
@@ -129,23 +129,19 @@
   }
 
   .droppable {
-    height: 150pt;
-  }
-
-  .droppable::after {
-    color: $color3;
-    content: '';
-    position: absolute;
-    border: solid $color0 0.5em;
-    opacity: 0.25;
-    width: calc(100pt - 3em);
-    height: calc(50pt - 3em);
-    margin: 1em;
+    margin: 0;
+    &::after {
+      content: '';
+      display: block;
+      height: 90pt;
+      width: 100pt;
+      margin: 0.7em 0 0 0;
+      background-color: darken($color0, 10%);
+      border-radius: 3pt;
+    }
   }
 
   .droppable > * {
-    background-color: $color4;
-    pointer-events: none;
   }
 
   .dropped {
