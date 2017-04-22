@@ -132,7 +132,7 @@ pub fn generate(state: Option<State>) -> String {
                             }
                             @let mut message = commit.message().unwrap().split("---\n") {
                                 message (message.next().unwrap())
-                                @for task in Task::from_commit(&repo, &commit, message.next().unwrap_or("")) {
+                                @for task in Task::from_commit(&repo, &commit) {
                                     (render_task(&task, task.changes(&repo, &commit, true)))
                                 }
                             }

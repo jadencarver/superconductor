@@ -7,41 +7,36 @@ use self::git2::{Commit, Reference};
 
 pub struct Task {
     pub name: String,
-    properties: Hash
+    changes: Hash
 }
 
 impl Task {
     pub fn from_ref(repo: &Repository, reference: &Reference) -> Task {
         let commit_obj = reference.peel(ObjectType::Commit).unwrap();
         let commit = commit_obj.as_commit().unwrap();
-        let mut messages = commit.message().unwrap().split("---\n");
-        let message = messages.next().unwrap();
         let name = reference.shorthand().unwrap_or("master");
-        if let Some(yaml) = messages.next() {
-            let mut tasks = Task::from_commit(&repo, &commit, &yaml);
-            tasks.retain(|c| c.name == name);
-            tasks.pop().unwrap_or(Task {
-                name: String::from(name),
-                properties: Hash::new()
-            })
-        } else {
-            Task {
-                name: String::from(name),
-                properties: Hash::new()
-            }
-        }
+        let mut tasks = Task::from_commit(&repo, &commit);
+        tasks.retain(|c| c.name == name);
+        tasks.pop().unwrap_or(Task {
+            name: String::from(name),
+            changes: Hash::new()
+        })
     }
 
-    pub fn from_commit(repo: &Repository, commit: &Commit, message: &str) -> Vec<Task> {
+    pub fn from_commit(repo: &Repository, commit: &Commit) -> Vec<Task> {
+        let mut messages = commit.message().unwrap().split("---\n");
+        let message = messages.next().unwrap();
         let mut tasks = vec![];
-        if let Ok(loader) = YamlLoader::load_from_str(message) {
-            for yaml in loader.iter() {
-                if let Some(hash) = yaml.as_hash() {
-                    for (key, values) in hash {
-                        if let Some(key) = key.as_str() {
-                            if let Some(values) = values.as_hash() {
-                                let mut task = Task::from_values(repo, commit, key, values);
-                                tasks.push(task);
+        if let Some(yaml) = messages.next() {
+            if let Ok(loader) = YamlLoader::load_from_str(yaml) {
+                for yaml in loader.iter() {
+                    if let Some(hash) = yaml.as_hash() {
+                        for (key, values) in hash {
+                            if let Some(key) = key.as_str() {
+                                if let Some(values) = values.as_hash() {
+                                    let mut task = Task::from_values(repo, commit, key, values);
+                                    tasks.push(task);
+                                }
                             }
                         }
                     }
@@ -51,12 +46,12 @@ impl Task {
         tasks
     }
 
-    fn from_values(repo: &Repository, commit: &Commit, name: &str, properties: &Hash) -> Task {
-        let properties = properties.clone();
+    fn from_values(repo: &Repository, commit: &Commit, name: &str, changes: &Hash) -> Task {
+        let changes = changes.clone();
 
         Task {
             name: String::from(name),
-            properties: properties,
+            changes: changes,
         }
     }
 
@@ -71,17 +66,13 @@ impl Task {
                 if let Ok(_) = walk.push(parent.id()) {
                     for rev in walk {
                         let parent_commit = repo.find_commit(rev.unwrap()).unwrap();
-                        let mut parent_message = parent_commit.message().unwrap().split("---\n");
-                        parent_message.next().unwrap();
-                        if let Some(yaml) = parent_message.next() {
-                            parents.append(&mut Task::from_commit(repo, &parent_commit, yaml));
-                        }
+                        parents.append(&mut Task::from_commit(repo, &parent_commit));
                     }
                 }
             }
         }
 
-        for (property, value) in &self.properties {
+        for (property, value) in &self.changes {
             let name = String::from(property.as_str().unwrap_or("[unknown]"));
             let after = match value {
                 &Yaml::String(ref s) => s.clone(),
@@ -92,7 +83,7 @@ impl Task {
             let mut before = None;
             if history {
                 for parent in parents.iter() {
-                    if let Some(value) = parent.properties.get(property) {
+                    if let Some(value) = parent.changes.get(property) {
                         before = match value {
                             &Yaml::String(ref s) => Some(s.clone()),
                             &Yaml::Integer(i) => Some(format!("{}", i)),
