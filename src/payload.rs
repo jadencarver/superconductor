@@ -67,7 +67,7 @@ pub fn generate(state: Option<State>) -> String {
                 message (state.message)
                 @if (state.property.len() == 0) {
                     @let task = Task::from_ref(&repo, &branch) {
-                        (render_task(&task, task.changes(&repo, &head_commit, false)))
+                        (render_task(&task, task.changes(&repo, &head_commit)))
                     }
                 } @else {
                     task {
@@ -82,7 +82,7 @@ pub fn generate(state: Option<State>) -> String {
                 }
             } @else {
                 @let task = Task::from_ref(&repo, &branch) {
-                    (render_task(&task, task.changes(&repo, &head_commit, false)))
+                    (render_task(&task, task.changes(&repo, &head_commit)))
                 }
             }
             @if let Ok(branches) = repo.branches(Some(BranchType::Local)) {
@@ -92,11 +92,11 @@ pub fn generate(state: Option<State>) -> String {
                             @let task = Task::from_ref(&repo, branch.get()) {
                                 @if let Some(state) = state.clone() {
                                     @if (state.task != task.name) {
-                                        (render_task(&task, task.changes(&repo, &commit, false)))
+                                        (render_task(&task, task.changes(&repo, &commit)))
                                     }
                                 } @else {
                                     @if !branch.is_head() {
-                                        (render_task(&task, task.changes(&repo, &commit, false)))
+                                        (render_task(&task, task.changes(&repo, &commit)))
                                     }
                                 }
                             }
@@ -132,8 +132,8 @@ pub fn generate(state: Option<State>) -> String {
                             }
                             @let mut message = commit.message().unwrap().split("---\n") {
                                 message (message.next().unwrap())
-                                @for task in Task::from_commit(&repo, &commit) {
-                                    (render_task(&task, task.changes(&repo, &commit, true)))
+                                @for task in Task::from_commit(&repo, &branch.shorthand().unwrap(), &commit) {
+                                    (render_task(&task, task.changes(&repo, &commit)))
                                 }
                             }
                         }

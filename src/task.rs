@@ -15,7 +15,7 @@ impl Task {
         let commit_obj = reference.peel(ObjectType::Commit).unwrap();
         let commit = commit_obj.as_commit().unwrap();
         let name = reference.shorthand().unwrap_or("master");
-        let mut tasks = Task::from_commit(&repo, &commit);
+        let mut tasks = Task::from_commit(&repo, &name, &commit);
         tasks.retain(|c| c.name == name);
         tasks.pop().unwrap_or(Task {
             name: String::from(name),
@@ -23,7 +23,7 @@ impl Task {
         })
     }
 
-    pub fn from_commit(repo: &Repository, commit: &Commit) -> Vec<Task> {
+    pub fn from_commit(repo: &Repository, name: &str, commit: &Commit) -> Vec<Task> {
         let mut messages = commit.message().unwrap().split("---\n");
         let message = messages.next().unwrap();
         let mut tasks = vec![];
@@ -34,8 +34,10 @@ impl Task {
                         for (key, values) in hash {
                             if let Some(key) = key.as_str() {
                                 if let Some(values) = values.as_hash() {
-                                    let mut task = Task::from_values(repo, commit, key, values);
-                                    tasks.push(task);
+                                    tasks.push(Task {
+                                        name: String::from(name),
+                                        changes: values.clone(),
+                                    });
                                 }
                             }
                         }
@@ -46,28 +48,17 @@ impl Task {
         tasks
     }
 
-    fn from_values(repo: &Repository, commit: &Commit, name: &str, changes: &Hash) -> Task {
-        let changes = changes.clone();
-
-        Task {
-            name: String::from(name),
-            changes: changes,
-        }
-    }
-
-    pub fn changes(&self, repo: &Repository, commit: &Commit, history: bool) -> Vec<(String, Option<String>, String)> {
+    pub fn changes(&self, repo: &Repository, commit: &Commit) -> Vec<(String, Option<String>, String)> {
         let mut changes = vec![];
         let mut parents = vec![];
 
-        if history {
-            for parent in commit.parents() {
-                let mut walk = repo.revwalk().unwrap();
-                walk.set_sorting(git2::SORT_REVERSE);
-                if let Ok(_) = walk.push(parent.id()) {
-                    for rev in walk {
-                        let parent_commit = repo.find_commit(rev.unwrap()).unwrap();
-                        parents.append(&mut Task::from_commit(repo, &parent_commit));
-                    }
+        for parent in commit.parents() {
+            let mut walk = repo.revwalk().unwrap();
+            walk.set_sorting(git2::SORT_REVERSE);
+            if let Ok(_) = walk.push(parent.id()) {
+                for rev in walk {
+                    let parent_commit = repo.find_commit(rev.unwrap()).unwrap();
+                    parents.append(&mut Task::from_commit(repo, &self.name, &parent_commit));
                 }
             }
         }
@@ -81,15 +72,13 @@ impl Task {
                 _ => String::from("[unknown]")
             };
             let mut before = None;
-            if history {
-                for parent in parents.iter() {
-                    if let Some(value) = parent.changes.get(property) {
-                        before = match value {
-                            &Yaml::String(ref s) => Some(s.clone()),
-                            &Yaml::Integer(i) => Some(format!("{}", i)),
-                            &Yaml::Boolean(b) => Some(format!("{}", b)),
-                            _ => None
-                        }
+            for parent in parents.iter() {
+                if let Some(value) = parent.changes.get(property) {
+                    before = match value {
+                        &Yaml::String(ref s) => Some(s.clone()),
+                        &Yaml::Integer(i) => Some(format!("{}", i)),
+                        &Yaml::Boolean(b) => Some(format!("{}", b)),
+                        _ => None
                     }
                 }
             }
