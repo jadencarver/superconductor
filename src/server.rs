@@ -88,7 +88,7 @@ fn start_monitor(tx: Sender<NotifierMessage>) {
         let mut changes = vec![];
         loop {
             if let Ok(event) = rx.try_recv() {
-                if event.flag.contains(ITEM_MODIFIED) {
+                if event.flag.contains(ITEM_MODIFIED) && (!event.path.contains(".git") || !event.path.contains(".lock")) {
                     println!("Registered {:?}", event);
                     changes.push(event);
                 } else {
