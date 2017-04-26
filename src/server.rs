@@ -17,6 +17,7 @@ use payload;
 use state::State;
 
 extern crate fsevent;
+use self::fsevent::ITEM_MODIFIED;
 use self::fsevent::Event as FsEvent;
 use std::sync::mpsc::channel;
 use std::sync::mpsc::Sender;
@@ -84,15 +85,22 @@ fn start_monitor(tx: Sender<NotifierMessage>) {
     loop {
         let event = rx.recv().unwrap();
         thread::sleep(Duration::from_millis(500));
-        let mut events = vec![];
-        events.push(event);
-        while let Ok(aggregator) = rx.try_recv() {
-            events.push(aggregator);
+        let mut changes = vec![];
+        loop {
+            if let Ok(event) = rx.try_recv() {
+                if event.flag.contains(ITEM_MODIFIED) {
+                    println!("Registered {:?}", event);
+                    changes.push(event);
+                } else {
+                    println!("Ignored {:?}", event);
+                }
+            } else {
+                break;
+            }
         }
-        for event in &events {
-            println!("{:?}", event);
+        if !changes.is_empty() {
+            tx.send(NotifierMessage::FsEvent(changes.pop().unwrap()));
         }
-        tx.send(NotifierMessage::FsEvent(events.pop().unwrap()));
     }
     observer.join();
 }

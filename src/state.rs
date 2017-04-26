@@ -65,7 +65,6 @@ impl State {
 
         if let Some(ref last) = last_state {
             if self.task != last.task {
-                println!("reset the state when switching tasks");
                 self.reset();
             }
         }
