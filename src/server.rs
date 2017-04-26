@@ -1,10 +1,8 @@
 use std;
 use std::thread;
 use std::thread::JoinHandle;
-use std::path::Path;
 use std::time::Duration;
 use rand;
-use rand::Rng;
 
 use websocket::{WebSocketStream, Server};
 use websocket::Message as WebMessage;
@@ -14,10 +12,6 @@ use websocket::Receiver as WebReceiver;
 use websocket::message::Type as WebMessageType;
 use websocket::server::Connection;
 use websocket::header::WebSocketProtocol;
-
-use git2::Repository;
-use git2::ObjectType;
-use git2::BranchType;
 
 use payload;
 use state::State;
@@ -29,8 +23,6 @@ use std::sync::mpsc::Sender;
 use std::sync::mpsc::Receiver;
 
 use serde_xml as xml;
-use yaml_rust::yaml::Hash;
-use yaml_rust::{Yaml, YamlEmitter};
 
 #[derive(Debug)]
 enum NotifierMessage<'a> {
@@ -97,6 +89,9 @@ fn start_monitor(tx: Sender<NotifierMessage>) {
         while let Ok(aggregator) = rx.try_recv() {
             events.push(aggregator);
         }
+        for event in &events {
+            println!("{:?}", event);
+        }
         tx.send(NotifierMessage::FsEvent(events.pop().unwrap()));
     }
     observer.join();
@@ -122,92 +117,14 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
                         let payload = String::from_utf8_lossy(message.payload.as_ref());
                         let mut state: State = xml::from_str(&payload).unwrap();
 
-                        println!("\nLast {:?}", last_state);
-                        println!("{:?}\n", state);
+                        last_state = state.apply(last_state, &mut rng).ok();
 
-                        let repo = Repository::discover(".").unwrap();
-                        let branch = repo.find_branch(&state.task, BranchType::Local);
-                        let head = match branch {
-                            Ok(branch) => branch.into_reference(),
-                            _ => repo.head().unwrap()
-                        };
-                        let commit = head.peel(ObjectType::Commit).unwrap();
-                        let mut index = repo.index().unwrap();
-
-                        if let Some(ref last) = last_state {
-                            println!("reset the state when switching tasks");
-                            if state.task != last.task {
-                                state = state.reset(false);
-                            }
-                        }
-
-                        // apply git index changes only if task is the working directory
-                        if state.task == repo.head().unwrap().shorthand().unwrap() {
-                            let to_remove = index.iter().fold(vec![], |mut acc, entry| {
-                                let entry_path = String::from_utf8_lossy(entry.path.as_ref());
-                                match state.include.iter().find(|i| i.as_ref() == entry_path) {
-                                    None => acc.push(entry_path.into_owned()),
-                                    _ => {}
-                                };
-                                acc
-                            });
-                            repo.reset_default(Some(&commit), to_remove.iter()).unwrap();
-                            for change in state.clone().include {
-                                let path = Path::new(&change);
-                                index.add_path(path).unwrap();
-                            }
-                            index.write().unwrap();
-                        }
-
-                        if state.save_update.is_some() || state.new_task.is_some() {
-                            let author = repo.signature().unwrap();
-                            let mut yaml = String::new();
-                            {
-                                // Constructing the properties YAML
-                                let mut tasks = Hash::new();
-                                let mut properties = Hash::new();
-                                let mut emitter = YamlEmitter::new(&mut yaml);
-                                for property in state.property.clone() {
-                                    properties.insert(Yaml::String(property.name), Yaml::String(property.value));
-                                }
-                                tasks.insert(Yaml::String(String::from(head.shorthand().unwrap_or("master"))), Yaml::Hash(properties));
-                                emitter.dump(&Yaml::Hash(tasks)).unwrap();
-                            }
-                            let message = format!("{}\n{}", state.message, yaml);
-
-                            index.read(false);
-                            let tree_oid = index.write_tree().unwrap();
-                            let tree = repo.find_tree(tree_oid).unwrap();
-                            repo.commit(Some(&head.name().unwrap_or("HEAD")), &author, &author, &message, &tree, &[&commit.as_commit().unwrap()]);
-                            if state.new_task.is_some() {
-                                let num = rng.gen::<u16>();
-                                let new_task = format!("{:X}", num);
-                                println!("creating branch {}", new_task);
-                                if let Ok(master_branch) = repo.find_branch("master", BranchType::Local) {
-                                    let master = master_branch.into_reference();
-                                    let commit_obj = master.peel(ObjectType::Commit).unwrap();
-                                    let commit = commit_obj.as_commit().unwrap();
-                                    repo.branch(&new_task, &commit, false).unwrap();
-                                    state.task = new_task;
-                                    last_state = Some(state.reset(false));
-                                } else {
-                                    // @todo pass an error that the master branch was not found
-                                    last_state = Some(state);
-                                }
-                            } else {
-                                last_state = Some(state);
-                            }
-                        } else {
-                            println!("passing on state {:?}", state);
-                            last_state = Some(state);
-                        }
-                        let message = WebMessage::text(payload::generate(last_state.clone()));
+                        let message = WebMessage::text(payload::generate(Some(state)));
                         sender.send_message(&message).unwrap();
                     }
                 }
             },
             NotifierMessage::FsEvent(event) => {
-                let repo = Repository::discover(".").unwrap();
                 let message = WebMessage::text(payload::generate(last_state.clone()));
                 sender.send_message(&message).unwrap();
             }

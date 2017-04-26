@@ -91,33 +91,4 @@ impl Task {
         }
         changes
     }
-
-        //for (property, value) in &self.changes {
-        //    let name = String::from(property.as_str().unwrap_or("[unknown]"));
-        //    let after = match value {
-        //        &Yaml::String(ref s) => s.clone(),
-        //        &Yaml::Integer(i) => format!("{}", i),
-        //        &Yaml::Boolean(b) => format!("{}", b),
-        //        _ => String::from("[unknown]")
-        //    };
-        //    let mut before = None;
-        //    for parent in parents.iter() {
-        //        if let Some(value) = parent.get(&repo, property) {
-        //            before = match value {
-        //                Yaml::String(ref s) => Some(s.clone()),
-        //                Yaml::Integer(i) => Some(format!("{}", i)),
-        //                Yaml::Boolean(b) => Some(format!("{}", b)),
-        //                _ => None
-        //            }
-        //        }
-        //    }
-        //    if let Some(before) = before {
-        //        if before != after {
-        //            changes.push((name, Some(before), after));
-        //        }
-        //    } else {
-        //        changes.push((name, before, after));
-        //    }
-        //}
-
 }
