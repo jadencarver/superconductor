@@ -17,7 +17,7 @@ use payload;
 use state::State;
 
 extern crate fsevent;
-use self::fsevent::{ITEM_MODIFIED, ITEM_CREATED};
+use self::fsevent::{ITEM_MODIFIED, ITEM_CREATED, ITEM_REMOVED};
 use self::fsevent::Event as FsEvent;
 use std::sync::mpsc::channel;
 use std::sync::mpsc::Sender;
@@ -88,7 +88,7 @@ fn start_monitor(tx: Sender<NotifierMessage>) {
         let mut changes = vec![];
         loop {
             if let Ok(event) = rx.try_recv() {
-                if (event.flag.contains(ITEM_MODIFIED) || event.flag.contains(ITEM_CREATED)) && (!event.path.contains(".git") || !event.path.contains(".lock")) {
+                if (event.flag.contains(ITEM_MODIFIED) || event.flag.contains(ITEM_CREATED) || event.flag.contains(ITEM_REMOVED)) && (!event.path.contains(".git") || !event.path.contains(".lock")) {
                     println!("Registered {:?}", event);
                     changes.push(event);
                 } else {
