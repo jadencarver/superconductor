@@ -30,7 +30,7 @@ pub struct Property {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Filter {
     pub name: String,
-    pub value: Option<String>
+    pub value: String
 }
 
 enum StateError {

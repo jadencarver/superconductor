@@ -73,20 +73,22 @@ impl Task {
         }
     }
 
-    pub fn changes(&self, repo: &Repository, commit: &Commit) -> Vec<(String, Option<String>, String)> {
+    pub fn changes(&self, repo: &Repository) -> Vec<(String, Option<String>, String)> {
         let mut changes = vec![];
-
-        let properties = ["Status","Estimate","Developer","Description"];
-        for property in properties.iter() {
-            let prop = Yaml::String(String::from(*property));
-            if let Some(value) = self.get(&repo, &prop) {
-                let after = match value {
-                    Yaml::String(ref s) => s.clone(),
-                    Yaml::Integer(i) => format!("{}", i),
-                    Yaml::Boolean(b) => format!("{}", b),
-                    _ => String::from("[unknown]")
-                };
-                changes.push((String::from(*property), None, after));
+        if let Some(commit_oid) = self.commit {
+            let commit = repo.find_commit(commit_oid).expect("Unable to find commit!");
+            let properties = ["Status","Estimate","Developer","Description"];
+            for property in properties.iter() {
+                let prop = Yaml::String(String::from(*property));
+                if let Some(value) = self.get(&repo, &prop) {
+                    let after = match value {
+                        Yaml::String(ref s) => s.clone(),
+                        Yaml::Integer(i) => format!("{}", i),
+                        Yaml::Boolean(b) => format!("{}", b),
+                        _ => String::from("[unknown]")
+                    };
+                    changes.push((String::from(*property), None, after));
+                }
             }
         }
         changes

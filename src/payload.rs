@@ -36,6 +36,34 @@ pub fn generate(state: Option<State>) -> String {
     let head_commit = head_commit_obj.as_commit().unwrap();
     let changes = repo.diff_tree_to_index(Some(&head_tree), None, None).unwrap();
 
+    let branches = repo.branches(Some(BranchType::Local)).unwrap().filter_map(|b|b.ok());
+    let all_tasks: Vec<Task> = branches.filter_map(|(branch, branch_type)| {
+        let task = Task::from_ref(&repo, branch.get());
+        if let Some(ref state) = state {
+            if (task.name != state.task) { Some(task) } else { None }
+        } else {
+            if (!branch.is_head()) { Some(task) } else { None }
+        }
+    }).collect();
+    let mut tasks = vec![];
+
+    if let Some(ref state) = state {
+        if let Some(ref filter) = state.filter {
+            let filter_name = Yaml::String(filter.name.clone());
+            let filter_by_value = Yaml::String(filter.value.clone());
+            tasks = all_tasks.iter().filter(|task| {
+                match task.get(&repo, &filter_name) {
+                    Some(ref value) if *value == filter_by_value => true,
+                    _ => false
+                }
+            }).collect();
+        } else {
+            tasks = all_tasks.iter().map(|t|t).collect();
+        }
+    } else {
+        tasks = all_tasks.iter().map(|t|t).collect();
+    }
+
     let mut rev = &head;
     let branch = if let Some(state) = state.clone() {
         repo.find_branch(&state.task, BranchType::Local).unwrap().into_reference()
@@ -67,7 +95,7 @@ pub fn generate(state: Option<State>) -> String {
                 message (state.message)
                 @if (state.property.len() == 0) {
                     @let task = Task::from_ref(&repo, &branch) {
-                        (render_task(&task, task.changes(&repo, &head_commit)))
+                        (render_task(&task, task.changes(&repo)))
                     }
                 } @else {
                     task {
@@ -82,34 +110,12 @@ pub fn generate(state: Option<State>) -> String {
                 }
             } @else {
                 @let task = Task::from_ref(&repo, &branch) {
-                    (render_task(&task, task.changes(&repo, &head_commit)))
+                    (render_task(&task, task.changes(&repo)))
                 }
             }
-            @if let Ok(branches) = repo.branches(Some(BranchType::Local)) {
-                tasks {
-                    @for (branch, branch_type) in branches.map(|b|b.unwrap()) {
-                        @if let Some(commit) = branch.get().peel(ObjectType::Commit).unwrap().as_commit() {
-                            @let task = Task::from_ref(&repo, branch.get()) {
-                                @if let Some(state) = state.clone() {
-                                    @if (state.task != task.name) {
-                                        (render_task(&task, task.changes(&repo, &commit)))
-                                    }
-                                } @else {
-                                    @if !branch.is_head() {
-                                        (render_task(&task, task.changes(&repo, &commit)))
-                                    }
-                                }
-                            }
-                        }
-                        //task {
-                        //    name (branch.name().ok().unwrap().unwrap())
-                        //    type @match branch_type {
-                        //        BranchType::Remote => "remote",
-                        //        BranchType::Local => "local",
-                        //        _ => ""
-                        //    }
-                        //}
-                    }
+            tasks {
+                @for task in tasks {
+                    (render_task(&task, task.changes(&repo)))
                 }
             }
             log {
@@ -133,7 +139,7 @@ pub fn generate(state: Option<State>) -> String {
                             @let mut message = commit.message().unwrap().split("---\n") {
                                 message (message.next().unwrap())
                                 @for task in Task::from_commit(&repo, &branch.shorthand().unwrap(), &commit) {
-                                    (render_task(&task, task.changes(&repo, &commit)))
+                                    (render_task(&task, task.changes(&repo)))
                                 }
                             }
                         }
