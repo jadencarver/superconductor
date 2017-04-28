@@ -11,68 +11,70 @@ pub fn panel_xslt() -> String {
 
             xsl:template match="/" {
                 div#__pm__panel {
-                    style type="text/css" (css)
-                    style type="text/css" "@import url('//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/styles/agate.min.css');"
                     form#__pm__commit method="post" name="commit" {
-                        input type="hidden" id="__pm__commit__task" name="task" value="{/state/task/name}" {}
-                        ul#__pm__commits {
-                            xsl:apply-templates select="/state/log/commit" {}
-                        }
-                        hr {}
-                        dl.properties {
-                            xsl:apply-templates select="/state/properties/property" {}
-                        }
-                        textarea id="__pm__commit__message" tabindex="1" name="message" placeholder="Add a Comment" {
-                            xsl:value-of select="/state/message" {}
-                        }
-                        div#__pm__new_commit {
-                            ul#__pm__new_commit__actions {
-                                li input type="submit" tabindex="5" name="new_task" value="New Task" {}
-                                li input type="submit" tabindex="4" name="save_update" value="Save Update" {}
+                        style type="text/css" (css)
+                        style type="text/css" "@import url('//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/styles/agate.min.css');"
+                        div#__pm__task {
+                            input type="hidden" id="__pm__commit__task" name="task" value="{/state/task/name}" {}
+                            ul#__pm__commits {
+                                xsl:apply-templates select="/state/log/commit" {}
                             }
-                            xsl:if test="/state/changes/change" {
-                                fieldset#__pm__commit__changes.details {
-                                    legend#__pm__commit__changes_legend tabindex="2" role="button" {
-                                        xsl:if test="not(/state/changes/statistics)" {
-                                            "Include Changes"
-                                        }
-                                        span#__pm__commit__changes__statistics.token {
-                                            xsl:if test="/state/changes/statistics/files != 0" {
-                                                span {
-                                                    xsl:value-of select="format-number(/state/changes/statistics/files, '#,###.##')" {}
-                                                    " file"
-                                                    xsl:if test="/state/changes/statistics/files != 1" {
-                                                        "s"
+                            hr {}
+                            dl.properties {
+                                xsl:apply-templates select="/state/properties/property" {}
+                            }
+                            textarea id="__pm__commit__message" tabindex="1" name="message" placeholder="Add a Comment" {
+                                xsl:value-of select="/state/message" {}
+                            }
+                            div#__pm__new_commit {
+                                ul#__pm__new_commit__actions {
+                                    li input type="submit" tabindex="5" name="new_task" value="New Task" {}
+                                    li input type="submit" tabindex="4" name="save_update" value="Save Update" {}
+                                }
+                                xsl:if test="/state/changes/change" {
+                                    fieldset#__pm__commit__changes.details {
+                                        legend#__pm__commit__changes_legend tabindex="2" role="button" {
+                                            xsl:if test="not(/state/changes/statistics)" {
+                                                "Include Changes"
+                                            }
+                                            span#__pm__commit__changes__statistics.token {
+                                                xsl:if test="/state/changes/statistics/files != 0" {
+                                                    span {
+                                                        xsl:value-of select="format-number(/state/changes/statistics/files, '#,###.##')" {}
+                                                        " file"
+                                                        xsl:if test="/state/changes/statistics/files != 1" {
+                                                            "s"
+                                                        }
+                                                    }
+                                                }
+                                                xsl:if test="/state/changes/statistics/insertions != 0" {
+                                                    span.token--positive {
+                                                        "+"
+                                                        xsl:value-of select="format-number(/state/changes/statistics/insertions, '#,###.##')" {}
+                                                    }
+                                                }
+                                                xsl:if test="/state/changes/statistics/deletions != 0" {
+                                                    span.token--negative {
+                                                        "-"
+                                                        xsl:value-of select="format-number(/state/changes/statistics/deletions, '#,###.##')" {}
                                                     }
                                                 }
                                             }
-                                            xsl:if test="/state/changes/statistics/insertions != 0" {
-                                                span.token--positive {
-                                                    "+"
-                                                    xsl:value-of select="format-number(/state/changes/statistics/insertions, '#,###.##')" {}
-                                                }
-                                            }
-                                            xsl:if test="/state/changes/statistics/deletions != 0" {
-                                                span.token--negative {
-                                                    "-"
-                                                    xsl:value-of select="format-number(/state/changes/statistics/deletions, '#,###.##')" {}
-                                                }
-                                            }
                                         }
-                                    }
-                                    ul {
-                                        xsl:apply-templates select="/state/changes/change" {}
+                                        ul {
+                                            xsl:apply-templates select="/state/changes/change" {}
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                    xsl:choose {
-                        xsl:when test="/state/diffs/*" {
-                            xsl:apply-templates select="/state/diffs" {}
-                        }
-                        xsl:otherwise {
-                            xsl:apply-templates select="/state/tasks" {}
+                        xsl:choose {
+                            xsl:when test="/state/diffs/*" {
+                                xsl:apply-templates select="/state/diffs" {}
+                            }
+                            xsl:otherwise {
+                                xsl:apply-templates select="/state/tasks" {}
+                            }
                         }
                     }
                 }
@@ -163,31 +165,41 @@ pub fn panel_xslt() -> String {
             }
             xsl:template match="/state/tasks" {
                 ul.tiles data-property-name="Status" data-property-value="Sprint" {
-                    header "Sprint"
+                    header {
+                        button type="submit" name="filter" data-name="Status" data-value="Sprint" { "Sprint" }
+                    }
                     xsl:apply-templates select="(/state/task|./task)[not(property)]|(/state/task|./task)[property[name='Status']/value='Sprint']" {
                         xsl:sort select="name" {}
                     }
                 }
                 ul.tiles data-property-name="Status" data-property-value="In Progress" {
-                    header "In Progress"
+                    header {
+                        button type="submit" name="filter" data-name="Status" data-value="In Progress" { "In Progress" }
+                    }
                     xsl:apply-templates select="(/state/task|./task)[property[name='Status']/value='In Progress']" {
                         xsl:sort select="name" {}
                     }
                 }
                 ul.tiles data-property-name="Status" data-property-value="In Review" {
-                    header "In Review"
+                    header {
+                        button type="submit" name="filter" data-name="Status" data-value="In Review" { "In Review" }
+                    }
                     xsl:apply-templates select="(/state/task|./task)[property[name='Status']/value='In Review']" {
                         xsl:sort select="name" {}
                     }
                 }
                 ul.tiles data-property-name="Status" data-property-value="Blocked" {
-                    header "Blocked"
+                    header {
+                        button type="submit" name="filter" data-name="Status" data-value="Blocked" { "Blocked" }
+                    }
                     xsl:apply-templates select="(/state/task|./task)[property[name='Status']/value='Blocked']" {
                         xsl:sort select="name" {}
                     }
                 }
                 ul.tiles data-property-name="Status" data-property-value="Done" {
-                    header "Done"
+                    header {
+                        button type="submit" name="filter" data-name="Status" data-value="Done" { "Done" }
+                    }
                     xsl:apply-templates select="(/state/task|./task)[property[name='Status']/value='Done']" {
                         xsl:sort select="name" {}
                     }

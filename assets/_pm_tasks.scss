@@ -24,6 +24,10 @@
     border-bottom: solid darken($white, 10%) 1px;
     z-index: 1;
 
+    button {
+      width: calc(100% - 5pt);
+    }
+
     &:after {
       content: '';
       width: 15pt;

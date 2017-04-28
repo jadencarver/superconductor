@@ -12,6 +12,7 @@ use yaml_rust::{Yaml, YamlEmitter};
 pub struct State {
     pub task: String,
     pub focus: String,
+    pub filter: Option<Filter>,
     pub message: String,
     pub include: Vec<String>,
     pub property: Vec<Property>,
@@ -24,6 +25,12 @@ pub struct State {
 pub struct Property {
     pub name: String,
     pub value: String
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct Filter {
+    pub name: String,
+    pub value: Option<String>
 }
 
 enum StateError {
@@ -40,7 +47,8 @@ impl State {
             diff: vec![],
             property: vec![],
             save_update: None,
-            new_task: None
+            new_task: None,
+            filter: None
         }
     }
 

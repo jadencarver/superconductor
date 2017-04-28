@@ -123,6 +123,7 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
                     },
                     _ => {
                         let payload = String::from_utf8_lossy(message.payload.as_ref());
+                        println!("{}", payload);
                         let mut state: State = xml::from_str(&payload).unwrap();
 
                         last_state = state.apply(last_state, &mut rng).ok();

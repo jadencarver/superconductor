@@ -179,7 +179,7 @@
         var filter = Array.prototype.filter.bind(elements);
         var reduce = Array.prototype.reduce.bind(elements);
         elements = filter(function (element) { return element.name !== ""; });
-        elements = reduce(function(builder, element) {
+        elements = reduce(function (builder, element) {
             var name = element.name;
             builder[name] = builder[name] || [];
             builder[name].push(element);
@@ -197,6 +197,7 @@
                 var input = inputs[i];
                 if (input.name) {
                     var element = request.createElement(input.name)
+                    var valueElement;
                     var inputHasData = Object.keys(input.dataset).length > 0;
                     if (inputHasData) {
                         for(data in input.dataset) {
@@ -204,9 +205,11 @@
                             dataElement.textContent = input.dataset[data];
                             element.appendChild(dataElement);
                         }
-                        var valueElement = request.createElement('value');
-                        valueElement.textContent = input.value;
-                        element.appendChild(valueElement);
+                        if (input.value) {
+                            valueElement = request.createElement('value');
+                            valueElement.textContent = input.value;
+                            element.appendChild(valueElement);
+                        }
                     } else {
                         element.textContent = input.value;
                     }
@@ -216,11 +219,6 @@
                         }
                     } else if (input.tagName === 'BUTTON' || input.tagName === 'INPUT' && input.type.toUpperCase() === 'SUBMIT') {
                         if (event && input === event.target) {
-                            var textContent;
-                            if (input.value) textContent = input.value;
-                            else textContent = event.type;
-                            textContent = request.createCDATASection(textContent);
-                            element.appendChild(textContent);
                             message.appendChild(element);
                         }
                     } else {
@@ -291,7 +289,7 @@
     }
 
     function stickToBottom() {
-        var commit = DOM.querySelector('#__pm__commit');
+        var commit = DOM.querySelector('#__pm__task');
         if (!commit) return false;
         var stickToBottomCallback = function () {
             commit.scrollTop = commit.scrollHeight;
