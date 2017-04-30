@@ -149,59 +149,81 @@ pub fn panel_xslt() -> String {
                         xsl:attribute name="class" {
                             " task "
                             xsl:if test="/state/task/name = name" " selected "
-                            xsl:value-of select="concat('task--status-', translate(property[name='Status']/value, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'))" {}
+                            xsl:value-of select="concat('task--status-', translate(property[name='Status']/value, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ', 'abcdefghijklmnopqrstuvwxyz-'))" {}
                         }
                         xsl:attribute name="data-name" {
                             xsl:value-of select="name" {}
                         }
-                        strong {
+                        div class="task--name" {
                             xsl:value-of select="name" {}
                         }
                         div.task__property--description {
                             xsl:copy-of select="property[name='Description']/value" {}
                         }
+                        xsl:if test="property[name='Estimate']/value != ''" {
+                            div.task__property--estimate {
+                                xsl:copy-of select="property[name='Estimate']/value" {}
+                            }
+                        }
                     }
                 }
             }
             xsl:template match="/state/tasks" {
-                ul.tiles data-property-name="Status" data-property-value="Sprint" {
-                    header {
-                        button type="submit" name="filter" data-name="Status" data-value="Sprint" { "Sprint" }
+                xsl:choose {
+                    xsl:when test="filter" {
+                        input type="hidden" name="filter" data-name="{filter/name}" data-value="{filter/value}" {}
+                        ul.list {
+                            header {
+                                button type="submit" name="filter" {
+                                    xsl:value-of select="filter/value" {}
+                                }
+                            }
+                            xsl:apply-templates select="/state/task|./task" {
+                                xsl:sort select="name" {}
+                            }
+                        }
                     }
-                    xsl:apply-templates select="(/state/task|./task)[not(property)]|(/state/task|./task)[property[name='Status']/value='Sprint']" {
-                        xsl:sort select="name" {}
-                    }
-                }
-                ul.tiles data-property-name="Status" data-property-value="In Progress" {
-                    header {
-                        button type="submit" name="filter" data-name="Status" data-value="In Progress" { "In Progress" }
-                    }
-                    xsl:apply-templates select="(/state/task|./task)[property[name='Status']/value='In Progress']" {
-                        xsl:sort select="name" {}
-                    }
-                }
-                ul.tiles data-property-name="Status" data-property-value="In Review" {
-                    header {
-                        button type="submit" name="filter" data-name="Status" data-value="In Review" { "In Review" }
-                    }
-                    xsl:apply-templates select="(/state/task|./task)[property[name='Status']/value='In Review']" {
-                        xsl:sort select="name" {}
-                    }
-                }
-                ul.tiles data-property-name="Status" data-property-value="Blocked" {
-                    header {
-                        button type="submit" name="filter" data-name="Status" data-value="Blocked" { "Blocked" }
-                    }
-                    xsl:apply-templates select="(/state/task|./task)[property[name='Status']/value='Blocked']" {
-                        xsl:sort select="name" {}
-                    }
-                }
-                ul.tiles data-property-name="Status" data-property-value="Done" {
-                    header {
-                        button type="submit" name="filter" data-name="Status" data-value="Done" { "Done" }
-                    }
-                    xsl:apply-templates select="(/state/task|./task)[property[name='Status']/value='Done']" {
-                        xsl:sort select="name" {}
+                    xsl:otherwise {
+                        ul.tiles data-property-name="Status" data-property-value="Sprint" {
+                            header {
+                                button type="submit" name="filter" data-name="Status" data-value="Sprint" { "Sprint" }
+                            }
+                            xsl:apply-templates select="(/state/task|./task)[not(property)]|(/state/task|./task)[property[name='Status']/value='Sprint']" {
+                                xsl:sort select="name" {}
+                            }
+                        }
+                        ul.tiles data-property-name="Status" data-property-value="In Progress" {
+                            header {
+                                button type="submit" name="filter" data-name="Status" data-value="In Progress" { "In Progress" }
+                            }
+                            xsl:apply-templates select="(/state/task|./task)[property[name='Status']/value='In Progress']" {
+                                xsl:sort select="name" {}
+                            }
+                        }
+                        ul.tiles data-property-name="Status" data-property-value="In Review" {
+                            header {
+                                button type="submit" name="filter" data-name="Status" data-value="In Review" { "In Review" }
+                            }
+                            xsl:apply-templates select="(/state/task|./task)[property[name='Status']/value='In Review']" {
+                                xsl:sort select="name" {}
+                            }
+                        }
+                        ul.tiles data-property-name="Status" data-property-value="Blocked" {
+                            header {
+                                button type="submit" name="filter" data-name="Status" data-value="Blocked" { "Blocked" }
+                            }
+                            xsl:apply-templates select="(/state/task|./task)[property[name='Status']/value='Blocked']" {
+                                xsl:sort select="name" {}
+                            }
+                        }
+                        ul.tiles data-property-name="Status" data-property-value="Done" {
+                            header {
+                                button type="submit" name="filter" data-name="Status" data-value="Done" { "Done" }
+                            }
+                            xsl:apply-templates select="(/state/task|./task)[property[name='Status']/value='Done']" {
+                                xsl:sort select="name" {}
+                            }
+                        }
                     }
                 }
             }

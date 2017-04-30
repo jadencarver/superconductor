@@ -1,25 +1,16 @@
 @import 'colors';
 
-#__pm__panel {
-  ul.tiles {
-    margin: 0 5pt;
-    font-size: 0.8em;
-    list-style-type: none;
-    padding: 3.25em 0 0 0;
-    float: left;
-    width: 115pt;
-    overflow-y: auto;
-    height: 100%;
-    line-height: 1.25em;
-  }
 
-  ul.tiles header {
-    width: 105pt;
+#__pm__panel {
+  header {
+    margin: 0 10pt;
+    font-weight: 400;
     font-weight: bold;
     background-color: $color0;
     position: fixed;
     line-height: 2em;
     margin: 0;
+    width: 100%;
     top: 0px;
     z-index: 1;
 
@@ -39,12 +30,78 @@
       background-color: $color0;
     }
   }
+}
+
+
+#__pm__panel {
+  ul.list {
+    font-size: 0.8em;
+    list-style-type: none;
+    margin: 0;
+    padding: 2.75em 5pt 5pt;
+    width: 67%;
+    header {
+      width: calc(67% - 5pt);
+    }
+
+    .task {
+      display: flex;
+      margin-top: 1pt;
+      background-color: $white;
+      border: solid darken($white, 25%) 1pt;
+      padding: 0 5pt;
+
+      &:focus, &.selected {
+        border-color: $color2;
+        box-shadow: inset 3pt 0pt 0pt $color3;
+        outline: none;
+      }
+    }
+
+    .task__property--description {
+      flex-grow: 1;
+    }
+
+    .task__property--estimate {
+      background-color: $color2;
+      color: $color0;
+      border-radius: 50%;
+      width: 2em;
+      height: 2em;
+      font-weight: bold;
+      line-height: 2em;
+      text-align: center;
+      margin-top: 0.25em
+    }
+
+    .task--name {
+      font-weight: bold;
+      width: 100pt;
+    }
+  }
+}
+
+#__pm__panel {
+  ul.tiles {
+    font-size: 0.8em;
+    margin: 0 5pt;
+    list-style-type: none;
+    padding: 3.25em 0 0 0;
+    float: left;
+    width: 115pt;
+    overflow-y: auto;
+    height: 100%;
+    line-height: 1.25em;
+    header {
+      width: 105pt;
+    }
+  }
 
   ul.tiles li {
     padding-bottom: 1em;
     width: 100pt;
 
-    > div {
+    .task {
       cursor: pointer;
       width: 100pt;
       height: 100pt;
@@ -59,7 +116,7 @@
       text-overflow: ellipsis;
       position: relative;
 
-      &:focus {
+      &:focus, &.selected {
         border-color: $color2;
         margin-top: -0.1em;
         margin-bottom: 0.1em;
@@ -78,16 +135,6 @@
         background: -webkit-linear-gradient(top, rgba($color0,0), rgba($color0,1));
         background:         linear-gradient(top, rgba($color0,0), rgba($color0,1));
       }
-
-      strong {
-        display: block;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        line-height: 2em;
-        border-bottom: dotted 1px darken($white, 20%);
-        margin-bottom: 0.5em;
-      }
     }
 
     .tiles__tile--head {
@@ -98,14 +145,6 @@
     .remote {
       box-shadow: 3pt 3pt 3pt rgba(128,128,128,0.5), inset 0pt -3pt 0pt $color1;
       height: 5em;
-    }
-
-    .selected {
-      border-color: $color2;
-      margin-top: -0.1em;
-      margin-bottom: 0.1em;
-      background-color: $white;
-      box-shadow: 3pt 3pt 3pt rgba(128,128,128,0.5), inset 3pt 0pt 0pt lighten($color3, 20%);
     }
 
     .task--status-blocked {
@@ -127,8 +166,34 @@
         }
     }
 
+    .task--name {
+      font-weight: bold;
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      line-height: 2em;
+      border-bottom: dotted 1px darken($white, 20%);
+      margin-bottom: 0.5em;
+    }
+
     .task__property--description {
       white-space: pre-wrap;
+    }
+
+    .task__property--estimate {
+      background-color: $color2;
+      color: $color0;
+      border-radius: 50%;
+      position: absolute;
+      right: 5pt;
+      bottom: 5pt;
+      z-index: 1;
+      width: 2em;
+      height: 2em;
+      font-weight: bold;
+      line-height: 2em;
+      text-align: center;
     }
   }
 

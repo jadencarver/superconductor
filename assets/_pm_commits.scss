@@ -23,6 +23,12 @@
     }
   }
 
+  #__pm__commit {
+    display: block;
+    overflow: auto;
+    height: 100%;
+  }
+
   #__pm__new_commit {
     position: relative;
     min-height: 3em;
@@ -69,7 +75,7 @@
     width: 33%;
     min-width: 300pt;
     overflow-y: scroll;
-    z-index: 1;
+    z-index: 2;
     input[type="submit"] {
       float: right;
     }

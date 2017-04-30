@@ -50,9 +50,10 @@
     });
 
     DOM.addEventListener('mouseup', function (event) {
-        if (event.target.classList.contains('task')) {
+        var target = closest(event.target, function(e) { return e.classList.contains('task'); });
+        if (target) {
             var form = DOM.querySelector('#__pm__commit');
-            DOM.querySelector("#__pm__commit__task").value = event.target.dataset.name;
+            DOM.querySelector("#__pm__commit__task").value = target.dataset.name;
             serialize(form, event);
             event.preventDefault();
         }
@@ -116,6 +117,7 @@
     //////////////////////////////////////////////////////////////////////////////////////////////////
 
     function dragEnter(event) {
+        console.log(dragEnter);
         if (dragging !== this) {
             this.classList.add('droppable');
             dropping = this;
@@ -124,15 +126,18 @@
     }
 
     function dragLeave(event) {
+        console.log('dragLeave');
         this.classList.remove('droppable');
         event.preventDefault;
     }
 
     function isDropTarget(event) {
+        console.log('isDropTarget');
         event.preventDefault();
     };
 
     function dragDropped(event) {
+        console.log('dragDropped');
         this.classList.add('dropped');
         var form = DOM.querySelector('#__pm__commit');
         var task = DOM.querySelector("#__pm__commit__task");
@@ -165,7 +170,6 @@
         var socket = new WebSocket("ws://127.0.0.1:2794", "superconductor");
         socket.onmessage = function (event) {
             var state = parser.parseFromString(event.data, "text/xml");
-            console.log(state);
             setState(state);
         }
         return socket;
@@ -193,6 +197,11 @@
         }
         for(name in elements) {
             var inputs = elements[name];
+            if (event.target.tagName === 'BUTTON') {
+                if (inputs.filter(function(i) { return event.target === i; }).length) {
+                    inputs = [event.target];
+                }
+            }
             for (var i = 0; i < inputs.length; i++) {
                 var input = inputs[i];
                 if (input.name) {
@@ -233,6 +242,7 @@
 
     var restoreState;
     function setState(state) {
+        console.log(state);
         if (dragging) return restoreState = state;
         if (restoreState) state = restoreState;
         var open, fragment = processor.transformToFragment(state, document);

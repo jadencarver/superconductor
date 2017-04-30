@@ -49,14 +49,18 @@ pub fn generate(state: Option<State>) -> String {
 
     if let Some(ref state) = state {
         if let Some(ref filter) = state.filter {
-            let filter_name = Yaml::String(filter.name.clone());
-            let filter_by_value = Yaml::String(filter.value.clone());
-            tasks = all_tasks.iter().filter(|task| {
-                match task.get(&repo, &filter_name) {
-                    Some(ref value) if *value == filter_by_value => true,
-                    _ => false
-                }
-            }).collect();
+            if filter.name != "" {
+                let filter_name = Yaml::String(filter.name.clone());
+                let filter_by_value = Yaml::String(filter.value.clone());
+                tasks = all_tasks.iter().filter(|task| {
+                    match task.get(&repo, &filter_name) {
+                        Some(ref value) if *value == filter_by_value => true,
+                        _ => false
+                    }
+                }).collect();
+            } else {
+                tasks = all_tasks.iter().map(|t|t).collect();
+            }
         } else {
             tasks = all_tasks.iter().map(|t|t).collect();
         }
@@ -114,6 +118,16 @@ pub fn generate(state: Option<State>) -> String {
                 }
             }
             tasks {
+                @if let Some(state) = state {
+                    @if let Some(filter) = state.filter {
+                        @if filter.name != "" {
+                            filter {
+                                name (filter.name)
+                                value (filter.value)
+                            }
+                        }
+                    }
+                }
                 @for task in tasks {
                     (render_task(&task, task.changes(&repo)))
                 }
