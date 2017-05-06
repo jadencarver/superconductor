@@ -115,6 +115,36 @@
     }
   }
 
+  menu {
+    position: fixed;
+    display: block;
+    background-color: $color0;
+    border: solid $grey 1px;
+    min-width: 100pt;
+    margin-top: -5pt;
+    margin-left: -5pt;
+    z-index: 10;
+    cursor: default;
+    box-shadow: 2pt 2pt 2pt $grey;
+    menuitem {
+      display: block;
+      padding-left: 5pt;
+
+      &:hover {
+        background-color: $color3;
+        color: $white;
+      }
+
+      &.warning {
+        color: $color1;
+        &:hover {
+          background-color: $color1;
+          color: $white;
+        }
+      }
+    }
+  }
+
   .diff {
     overflow-y: scroll;
     max-height: 100%;

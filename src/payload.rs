@@ -183,6 +183,14 @@ pub fn generate(state: Option<State>) -> String {
                     }
                 }
                 property {
+                    name "Manager"
+                    value "Jaden Carver <jaden.carver@gmail.com>"
+                    options {
+                        option value="Jaden Carver <jaden.carver@gmail.com>" "Jaden Carver"
+                        option value="Bob Dole <bdole69@gmail.com>" "Bob Dole"
+                    }
+                }
+                property {
                     name "Description"
                 }
             }

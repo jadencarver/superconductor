@@ -88,10 +88,43 @@
         }
     });
 
+    var menu;
+    DOM.addEventListener('contextmenu', function(event) {
+        if (menu) closeMenu();
+        menu = document.createElement('menu');
+        menu.id = '__pm__context-menu';
+        menu.style.top = event.clientY - root.getBoundingClientRect().top + 'px';
+        menu.style.left = event.clientX + 'px';
+        var options = [
+            ['New Subtask',     null,       function() {}],
+            ['Assign Task',     null,       function() {}],
+            ['Inspect Element', null,       function() { console.log('inspect', event.target) }],
+            ['Delete',          'warning',  function() {}]
+        ]
+        for(option of options) {
+            var label = option[0], cssClass = option[1], callback = option[2];
+            var item = document.createElement('menuitem');
+            item.tabIndex = 10;
+            if (cssClass) item.classList.add(cssClass);
+            if (callback) item.addEventListener('click', callback);
+            item.textContent = label;
+            menu.append(item);
+        }
+        root.append(menu);
+        function closeMenu() {
+            root.removeEventListener('click', closeMenu);
+            if (root.contains(menu)) root.removeChild(menu);
+            menu = null;
+        }
+        setTimeout(function() { root.addEventListener('click', closeMenu); }, 10);
+        event.preventDefault();
+    });
+
     var dragging;
     var dropping;
     DOM.addEventListener('dragstart', function (event) {
         dragging = event.target;
+        event.dataTransfer.setData('text/plain', null);
         var dropTargets = DOM.querySelectorAll('.tiles > li, .tiles');
         for (dropTarget of dropTargets) {
             if (dropTarget === event.target) continue;
@@ -141,13 +174,15 @@
         this.classList.add('dropped');
         var form = DOM.querySelector('#__pm__commit');
         var task = DOM.querySelector("#__pm__commit__task");
-        var name = (this.dataset['property-name'] || this.parentElement.dataset['property-name']);
+        var name = (this.dataset.propertyName || this.parentElement.dataset.propertyName);
         var field = form.querySelector("*[data-name='"+name+"']");
-        task.value = dragging ? dragging.dataset.name : '';
-        field.value = (this.dataset['property-value'] || this.parentElement.dataset['property-value']);
-        serialize(form, event);
-        dragging = false;
-        event.preventDefault();
+        if (field) {
+            task.value = dragging ? dragging.dataset.name : '';
+            field.value = (this.dataset.propertyValue || this.parentElement.dataset.propertyValue);
+            serialize(form, event);
+            dragging = false;
+            event.preventDefault();
+        }
     };
 
     function loadProcessor() {

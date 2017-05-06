@@ -100,6 +100,15 @@ pub fn panel_xslt() -> String {
                                 }
                             }
                         }
+                        xsl:when test="name = 'Manager'" {
+                            dt { label for="__pm__commit__properties--owner" "Manager" }
+                            dd.select {
+                                input type="text" id="__pm__commit__properties--manager" value="{/state/task/property[name[text()='Manager']]/value}" {}
+                                select name="property" data-name="Manager" {
+                                    xsl:apply-templates "options/option" {}
+                                }
+                            }
+                        }
                         xsl:when test="name = 'Description'" {
                             dt { label for="__pm__commit__properties--description" "Description" }
                             dd {
