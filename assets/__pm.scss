@@ -46,6 +46,10 @@
     pointer-events: auto;
   }
 
+  &.blocking, &.blocking * {
+    pointer-events: none;
+  }
+
   ul {
     padding-left: 5pt;
   }
@@ -56,7 +60,7 @@
   }
 
   $grey: darken($white, 25%);
-  textarea, input[type=text], .select {
+  textarea, input[type=text], input[type=email], input[type=number], .select {
     font-family: inherit;
     display: block;
     font-size: 1em;

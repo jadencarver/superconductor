@@ -6,6 +6,7 @@ use git2::Index;
 use git2::{Object, ObjectType};
 use git2::BranchType;
 use rand::{Rng, ThreadRng};
+use termion::color;
 use rand;
 
 use yaml_rust::yaml::Hash;
@@ -63,49 +64,34 @@ impl State {
         self.new_task = None;
     }
 
+    pub fn reset_with_status(&mut self) {
+        self.message = String::new();
+        self.property = self.property.iter().filter_map(|p| if p.name == "Status" { Some(p.clone()) } else { None }).collect();
+        self.include = vec![];
+        self.save_update = None;
+        self.new_task = None;
+    }
+
     pub fn apply(&mut self, mut last_state: Option<State>, rng: &mut rand::ThreadRng) -> Result<State, StateError> {
-        let new_last_state = self.clone();
+        let mut new_last_state = self.clone();
         if let Some(ref mut last) = last_state {
+            println!("{}{:?}{}", color::Fg(color::LightBlack), last, color::Fg(color::Reset));
+            println!("{:?}", self);
             if self.task != last.task {
                 let repo = Repository::discover(".").unwrap();
+                println!("----- SWITCHING TASKS -----");
+                println!("{}Saving {:?}{}", color::Fg(color::Red), last, color::Fg(color::Reset));
                 last.save_update(repo, rng);
-                last.reset();
+                self.reset_with_status();
             } else {
-            }
-        }
+                println!("----- UPDATING TASK -----");
+                self.apply_index();
 
-        {
-            let repo = Repository::discover(".").unwrap();
-            let branch = repo.find_branch(&self.task, BranchType::Local);
-            let head = match branch {
-                Ok(branch) => branch.into_reference(),
-                _ => repo.head().unwrap()
-            };
-            let commit = head.peel(ObjectType::Commit).unwrap();
-            let mut index = repo.index().unwrap();
-
-            // apply git index changes only if task is the working directory
-            if self.task == repo.head().unwrap().shorthand().unwrap() {
-                let to_remove = index.iter().fold(vec![], |mut acc, entry| {
-                    let entry_path = String::from_utf8_lossy(entry.path.as_ref());
-                    match self.include.iter().find(|i| i.as_ref() == entry_path) {
-                        None => acc.push(entry_path.into_owned()),
-                        _ => {}
-                    };
-                    acc
-                });
-                repo.reset_default(Some(&commit), to_remove.iter()).unwrap();
-                for change in &self.include {
-                    let path = Path::new(&change);
-                    index.add_path(path).unwrap();
+                if self.save_update.is_some() || self.new_task.is_some() {
+                    let repo = Repository::discover(".").unwrap();
+                    self.save_update(repo, rng);
                 }
-                index.write().unwrap();
             }
-        }
-
-        if self.save_update.is_some() || self.new_task.is_some() {
-            let repo = Repository::discover(".").unwrap();
-            self.save_update(repo, rng);
         }
         Ok(new_last_state)
     }
@@ -151,6 +137,35 @@ impl State {
                 self.reset();
             }
         }
-
     }
+
+    fn apply_index(&self) {
+        let repo = Repository::discover(".").unwrap();
+        let branch = repo.find_branch(&self.task, BranchType::Local);
+        let head = match branch {
+            Ok(branch) => branch.into_reference(),
+            _ => repo.head().unwrap()
+        };
+        let commit = head.peel(ObjectType::Commit).unwrap();
+        let mut index = repo.index().unwrap();
+
+        // apply git index changes only if task is the working directory
+        if self.task == repo.head().unwrap().shorthand().unwrap() {
+            let to_remove = index.iter().fold(vec![], |mut acc, entry| {
+                let entry_path = String::from_utf8_lossy(entry.path.as_ref());
+                match self.include.iter().find(|i| i.as_ref() == entry_path) {
+                    None => acc.push(entry_path.into_owned()),
+                    _ => {}
+                };
+                acc
+            });
+            repo.reset_default(Some(&commit), to_remove.iter()).unwrap();
+            for change in &self.include {
+                let path = Path::new(&change);
+                index.add_path(path).unwrap();
+            }
+            index.write().unwrap();
+        }
+    }
+
 }

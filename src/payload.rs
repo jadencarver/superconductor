@@ -229,7 +229,7 @@ pub fn generate(state: Option<State>) -> String {
             }
         }
     }.into_string();
-    println!("Payload sent");
+    println!("Payload Size: {}", payload.len());
     payload
 }
 

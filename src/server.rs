@@ -59,7 +59,7 @@ pub fn connect(connection: Connection<WebSocketStream, WebSocketStream>) {
     let (mut sender, mut receiver) = client.split();
     let notifier = thread::spawn(move || start_notifier(rx, sender));
     let txc = tx.clone();
-    let monitor = thread::spawn(move || start_monitor(txc));
+    //let monitor = thread::spawn(move || start_monitor(txc));
     for message in receiver.incoming_messages() {
         let message: WebMessage = message.unwrap_or(WebMessage::close());
         match message.opcode {
@@ -70,7 +70,7 @@ pub fn connect(connection: Connection<WebSocketStream, WebSocketStream>) {
             _ => tx.send(NotifierMessage::WebMessage(message))
         };
     }
-    monitor.join();
+    //monitor.join();
     notifier.join();
 }
 
@@ -92,7 +92,7 @@ fn start_monitor(tx: Sender<NotifierMessage>) {
                     println!("Registered {:?}", event);
                     changes.push(event);
                 } else {
-                    println!("Ignored {:?}", event);
+                    //println!("Ignored {:?}", event);
                 }
             } else {
                 break;
@@ -123,9 +123,8 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
                     },
                     _ => {
                         let payload = String::from_utf8_lossy(message.payload.as_ref());
-                        println!("{}", payload);
+                        println!("\n\n{}\n\n", payload);
                         let mut state: State = xml::from_str(&payload).unwrap();
-                        println!("{:?}", state);
 
                         last_state = state.apply(last_state, &mut rng).ok();
 

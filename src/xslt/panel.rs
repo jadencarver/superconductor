@@ -120,7 +120,7 @@ pub fn panel_xslt() -> String {
                         xsl:otherwise {
                             dt { label for="__pm__commit__properties--estimate" "Estimate" }
                             dd.input {
-                                input type="text" id="__pm__commit__properties--estimate" name="property" data-name="Estimate" value="{/state/task/property[name[text()='Estimate']]/value}" {}
+                                input type="range" id="__pm__commit__properties--estimate" name="property" data-name="Estimate" value="{/state/task/property[name[text()='Estimate']]/value}" {}
                             }
                         }
                     }

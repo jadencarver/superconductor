@@ -17,6 +17,8 @@ use std::thread;
 extern crate rand;
 use rand::Rng;
 
+extern crate termion;
+
 extern crate git2;
 use git2::Repository;
 
