@@ -82,7 +82,22 @@ impl State {
                 println!("----- SWITCHING TASKS -----");
                 println!("{}Saving {:?}{}", color::Fg(color::Red), last, color::Fg(color::Reset));
                 last.save_update(repo, rng);
-                self.reset_with_status();
+                // if the status has changed, we can safely assume
+                // the new task was dragged into the property.
+                let mut dragged = true;
+                {
+                    let last_status = last.property.iter().find(|p| p.name == "Status");
+                    let self_status = self.property.iter().find(|p| p.name == "Status");
+                    if last_status.is_some() && self_status.is_some() && last_status.unwrap() == self_status.unwrap() {
+                        dragged = false;
+                    }
+                }
+                if dragged {
+                    println!("\nDRAGGED\n");
+                    self.reset_with_status();
+                } else {
+                    self.reset();
+                }
             } else {
                 println!("----- UPDATING TASK -----");
                 self.apply_index();

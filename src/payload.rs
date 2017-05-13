@@ -99,7 +99,7 @@ pub fn generate(state: Option<State>) -> String {
                 message (state.message)
                 @if (state.property.len() == 0) {
                     @let task = Task::from_ref(&repo, &branch) {
-                        (render_task(&task, task.changes(&repo)))
+                        (render_task(&repo, &task, task.changes(&repo)))
                     }
                 } @else {
                     task {
@@ -114,7 +114,7 @@ pub fn generate(state: Option<State>) -> String {
                 }
             } @else {
                 @let task = Task::from_ref(&repo, &branch) {
-                    (render_task(&task, task.changes(&repo)))
+                    (render_task(&repo, &task, task.changes(&repo)))
                 }
             }
             tasks {
@@ -129,7 +129,7 @@ pub fn generate(state: Option<State>) -> String {
                     }
                 }
                 @for task in tasks {
-                    (render_task(&task, task.changes(&repo)))
+                    (render_task(&repo, &task, task.changes(&repo)))
                 }
             }
             log {
@@ -153,7 +153,7 @@ pub fn generate(state: Option<State>) -> String {
                             @let mut message = commit.message().unwrap().split("---\n") {
                                 message (message.next().unwrap())
                                 @for task in Task::from_commit(&repo, &branch.shorthand().unwrap(), &commit) {
-                                    (render_task(&task, task.changes(&repo)))
+                                    (render_task(&repo, &task, task.changes(&repo)))
                                 }
                             }
                         }
@@ -272,17 +272,26 @@ fn diff(changes: Diff) -> Vec<PreEscaped<String>> {
     result.into_inner()
 }
 
-fn render_task(task: &Task, changes: Vec<(String, Option<String>, String)>) -> PreEscaped<String> {
+fn render_task(repo: &Repository, task: &Task, changes: Vec<(String, Option<String>, String)>) -> PreEscaped<String> {
+    let status = Yaml::String(String::from("Status"));
+    let status = task.get(&repo, &status);
+
     html!(task {
         name (task.name)
-        @for (name, before, value) in changes {
+        @if let Some(status) = status {
             property {
-                name (name)
-                @if let Some(before) = before {
-                    before (before)
-                }
-                value (value)
+                name "Status"
+                value (status.as_str().unwrap());
             }
         }
+        //@for (name, before, value) in changes {
+        //    property {
+        //        name (name)
+        //        @if let Some(before) = before {
+        //            before (before)
+        //        }
+        //        value (value)
+        //    }
+        //}
     })
 }
