@@ -23,11 +23,11 @@ Specification:
   Inference: format!("{}#{}", controller, action)
 
 Sprint:
-  DependsOn: Epic
+  Required: Epic
   Type: Task
 
 Epic:
-  DependsOn: Project
+  Required: Project
   Type: Task
 
 Project:
