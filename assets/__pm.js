@@ -174,10 +174,12 @@
         this.classList.add('dropped');
         var form = DOM.querySelector('#__pm__commit');
         var task = DOM.querySelector("#__pm__commit__task");
+        var drag = DOM.querySelector("#__pm__commit__dragged");
         var name = (this.dataset.propertyName || this.parentElement.dataset.propertyName);
         var field = form.querySelector("*[data-name='"+name+"']");
         if (field) {
             task.value = dragging ? dragging.dataset.name : '';
+            drag.checked = true;
             field.value = (this.dataset.propertyValue || this.parentElement.dataset.propertyValue);
             serialize(form, event);
             dragging = false;

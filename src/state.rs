@@ -22,7 +22,8 @@ pub struct State {
     pub property: Vec<Property>,
     pub diff: Vec<String>,
     pub save_update: Option<String>,
-    pub new_task: Option<String>
+    pub new_task: Option<String>,
+    pub dragged: Option<String>
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -52,7 +53,8 @@ impl State {
             property: vec![],
             save_update: None,
             new_task: None,
-            filter: None
+            filter: None,
+            dragged: None
         }
     }
 
@@ -80,22 +82,17 @@ impl State {
             if self.task != last.task {
                 let repo = Repository::discover(".").unwrap();
                 println!("----- SWITCHING TASKS -----");
-                println!("{}Saving {:?}{}", color::Fg(color::Red), last, color::Fg(color::Reset));
-                last.save_update(repo, rng);
-                // if the status has changed, we can safely assume
+                // if the status has changed, we can't safely assume
                 // the new task was dragged into the property.
-                let mut dragged = true;
-                {
-                    let last_status = last.property.iter().find(|p| p.name == "Status");
-                    let self_status = self.property.iter().find(|p| p.name == "Status");
-                    if last_status.is_some() && self_status.is_some() && last_status.unwrap() == self_status.unwrap() {
-                        dragged = false;
-                    }
-                }
-                if dragged {
+                if self.dragged.is_some() {
+                    last.save_update(repo, rng);
                     println!("\nDRAGGED\n");
                     self.reset_with_status();
                 } else {
+                    let switching_to_task = self.task.clone();
+                    self.task = last.task.clone();
+                    self.save_update(repo, rng);
+                    self.task = switching_to_task;
                     self.reset();
                 }
             } else {
@@ -112,6 +109,7 @@ impl State {
     }
 
     fn save_update(&mut self, repo: Repository, rng: &mut rand::ThreadRng) {
+        println!("{}Saving {:?}{}", color::Fg(color::Red), self, color::Fg(color::Reset));
         let branch = repo.find_branch(&self.task, BranchType::Local);
         let head = match branch {
             Ok(branch) => branch.into_reference(),

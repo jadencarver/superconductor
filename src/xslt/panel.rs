@@ -15,6 +15,7 @@ pub fn panel_xslt() -> String {
                         style type="text/css" (css)
                         style type="text/css" "@import url('//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/styles/agate.min.css');"
                         div#__pm__task {
+                            input type="checkbox" id="__pm__commit__dragged" name="dragged" value="true" {}
                             input type="hidden" id="__pm__commit__task" name="task" value="{/state/task/name}" {}
                             ul#__pm__commits {
                                 xsl:apply-templates select="/state/log/commit" {}
