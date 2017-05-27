@@ -1,11 +1,8 @@
 use std::path::Path;
 use git2::Repository;
-use git2::Reference;
-use git2::Commit;
-use git2::Index;
-use git2::{Object, ObjectType};
+use git2::ObjectType;
 use git2::BranchType;
-use rand::{Rng, ThreadRng};
+use rand::Rng;
 use termion::color;
 use rand;
 
@@ -38,7 +35,7 @@ pub struct Filter {
     pub value: String
 }
 
-enum StateError {
+pub enum StateError {
 }
 
 impl State {
@@ -75,7 +72,7 @@ impl State {
     }
 
     pub fn apply(&mut self, mut last_state: Option<State>, rng: &mut rand::ThreadRng) -> Result<State, StateError> {
-        let mut new_last_state = self.clone();
+        let new_last_state = self.clone();
         if let Some(ref mut last) = last_state {
             println!("{}{:?}{}", color::Fg(color::LightBlack), last, color::Fg(color::Reset));
             println!("{:?}", self);
@@ -131,10 +128,10 @@ impl State {
         }
         let message = format!("{}\n{}", self.message, yaml);
 
-        index.read(false);
+        index.read(false).unwrap();
         let tree_oid = index.write_tree().unwrap();
         let tree = repo.find_tree(tree_oid).unwrap();
-        repo.commit(Some(&head.name().unwrap_or("HEAD")), &author, &author, &message, &tree, &[&commit.as_commit().unwrap()]);
+        repo.commit(Some(&head.name().unwrap_or("HEAD")), &author, &author, &message, &tree, &[&commit.as_commit().unwrap()]).unwrap();
         println!("  {}Saved changes to {}{} {:?}", color::Fg(color::LightRed), self.task, color::Fg(color::Reset), self);
         if self.new_task.is_some() {
             let num = rng.gen::<u16>();

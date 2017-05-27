@@ -1,6 +1,5 @@
 use std;
 use std::thread;
-use std::thread::JoinHandle;
 use std::time::Duration;
 use termion::color;
 use termion::clear;
@@ -59,7 +58,7 @@ pub fn connect(connection: Connection<WebSocketStream, WebSocketStream>) {
     client.send_message(&message).unwrap();
 
     let (tx, rx) = channel::<NotifierMessage>();
-    let (mut sender, mut receiver) = client.split();
+    let (sender, mut receiver) = client.split();
     let notifier = thread::spawn(move || start_notifier(rx, sender));
     let txc = tx.clone();
     let monitor = thread::spawn(move || start_monitor(txc));
@@ -67,14 +66,14 @@ pub fn connect(connection: Connection<WebSocketStream, WebSocketStream>) {
         let message: WebMessage = message.unwrap_or(WebMessage::close());
         match message.opcode {
             WebMessageType::Close => {
-                tx.send(NotifierMessage::WebMessage(message));
+                tx.send(NotifierMessage::WebMessage(message)).unwrap();
                 break;
             },
             _ => tx.send(NotifierMessage::WebMessage(message))
-        };
+        }.unwrap();
     }
-    monitor.join();
-    notifier.join();
+    monitor.join().unwrap();
+    notifier.join().unwrap();
 }
 
 fn start_monitor(tx: Sender<NotifierMessage>) {
@@ -99,10 +98,10 @@ fn start_monitor(tx: Sender<NotifierMessage>) {
             }
         }
         if !changes.is_empty() {
-            tx.send(NotifierMessage::FsEvent(changes.pop().unwrap()));
+            tx.send(NotifierMessage::FsEvent(changes.pop().unwrap())).unwrap();
         }
     }
-    observer.join();
+    observer.join().unwrap();
 }
 
 
@@ -135,8 +134,8 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
                     }
                 }
             },
-            NotifierMessage::FsEvent(event) => {
-                let message = WebMessage::text(generate(last_state.clone()));
+            NotifierMessage::FsEvent(_event) => {
+                let message = WebMessage::ping(vec![]);
                 sender.send_message(&message).unwrap();
             }
         }

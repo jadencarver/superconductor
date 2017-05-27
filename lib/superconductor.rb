@@ -6,8 +6,9 @@ module Superconductor
   autoload :Documentation, 'superconductor/documentation'
   autoload :VERSION, 'superconductor/version'
 
+  target = ENV['TARGET'] || 'release'
   extend Fiddle::Importer
-  dlload File.expand_path('../../target/debug/libsuperconductor.dylib', __FILE__)
+  dlload File.expand_path("../../target/#{target}/libsuperconductor.dylib", __FILE__)
   extern "char* panel_js()"
   extern "char* panel_xslt()"
   extern "void start()"

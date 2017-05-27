@@ -20,7 +20,6 @@ use rand::Rng;
 extern crate termion;
 
 extern crate git2;
-use git2::Repository;
 
 pub static XML: &'static str = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
 

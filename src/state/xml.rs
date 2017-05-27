@@ -8,11 +8,10 @@ use std::io::prelude::*;
 
 extern crate git2;
 use self::git2::Repository;
-use self::git2::Reference;
 use self::git2::StatusOptions;
 use self::git2::Delta;
 use self::git2::BranchType;
-use self::git2::{Diff, DiffFormat, DiffDelta, DiffHunk, DiffLine, DiffBinary};
+use self::git2::{Diff, DiffDelta, DiffHunk, DiffLine, DiffBinary};
 use git2::ObjectType;
 
 extern crate md5;
@@ -20,11 +19,11 @@ extern crate chrono;
 use maud::PreEscaped;
 use self::chrono::{TimeZone, FixedOffset};
 
-use yaml_rust::{Yaml, YamlLoader};
+use yaml_rust::Yaml;
 
 extern crate base64;
 
-use self::base64::{encode, decode};
+use self::base64::encode;
 
 pub fn generate(state: Option<State>) -> String {
     let repo = Repository::discover(".").unwrap();
@@ -33,17 +32,17 @@ pub fn generate(state: Option<State>) -> String {
     let head = repo.head().unwrap();
     let head_tree_obj = head.peel(ObjectType::Tree).unwrap();
     let head_tree = head_tree_obj.as_tree().unwrap();
-    let head_commit_obj = head.peel(ObjectType::Commit).unwrap();
-    let head_commit = head_commit_obj.as_commit().unwrap();
+    //let head_commit_obj = head.peel(ObjectType::Commit).unwrap();
+    //let head_commit = head_commit_obj.as_commit().unwrap();
     let changes = repo.diff_tree_to_index(Some(&head_tree), None, None).unwrap();
 
     let branches = repo.branches(Some(BranchType::Local)).unwrap().filter_map(|b|b.ok());
-    let all_tasks: Vec<Task> = branches.filter_map(|(branch, branch_type)| {
-        let task = Task::from_ref(&repo, branch.get());
+    let all_tasks: Vec<Task> = branches.filter_map(|(branch, _)| {
+        let task = Task::from_ref(branch.get());
         if let Some(ref state) = state {
-            if (task.name != state.task) { Some(task) } else { None }
+            if task.name != state.task { Some(task) } else { None }
         } else {
-            if (!branch.is_head()) { Some(task) } else { None }
+            if !branch.is_head() { Some(task) } else { None }
         }
     }).collect();
     let mut tasks = vec![];
@@ -69,7 +68,6 @@ pub fn generate(state: Option<State>) -> String {
         tasks = all_tasks.iter().map(|t|t).collect();
     }
 
-    let mut rev = &head;
     let branch = if let Some(state) = state.clone() {
         repo.find_branch(&state.task, BranchType::Local).unwrap_or(repo.find_branch("master", BranchType::Local).unwrap()).into_reference()
     } else {
@@ -80,7 +78,7 @@ pub fn generate(state: Option<State>) -> String {
     let mut revwalk = repo.revwalk().unwrap();
     revwalk.set_sorting(git2::SORT_REVERSE);
     revwalk.push(branch.target().unwrap()).unwrap();
-    if (branch.shorthand().unwrap() != "master") {
+    if branch.shorthand().unwrap() != "master" {
         revwalk.hide_ref("refs/heads/master").unwrap();
     }
 
@@ -98,8 +96,8 @@ pub fn generate(state: Option<State>) -> String {
             }
             @if let Some(state) = state.clone() {
                 message (state.message)
-                @if (state.property.len() == 0) {
-                    @let task = Task::from_ref(&repo, &branch) {
+                @if state.property.len() == 0 {
+                    @let task = Task::from_ref(&branch) {
                         (render_task(&repo, &task, task.changes(&repo)))
                     }
                 } @else {
@@ -114,7 +112,7 @@ pub fn generate(state: Option<State>) -> String {
                     }
                 }
             } @else {
-                @let task = Task::from_ref(&repo, &branch) {
+                @let task = Task::from_ref(&branch) {
                     (render_task(&repo, &task, task.changes(&repo)))
                 }
             }
@@ -134,7 +132,7 @@ pub fn generate(state: Option<State>) -> String {
                 }
             }
             log {
-                @for (i, rev) in revwalk.enumerate() {
+                @for (_, rev) in revwalk.enumerate() {
                     @let commit = repo.find_commit(rev.unwrap()).unwrap() {
                         commit {
                             id (commit.id())
@@ -153,7 +151,7 @@ pub fn generate(state: Option<State>) -> String {
                             }
                             @let mut message = commit.message().unwrap().split("---\n") {
                                 message (message.next().unwrap())
-                                @for task in Task::from_commit(&repo, &branch.shorthand().unwrap(), &commit) {
+                                @for task in Task::from_commit(&branch.shorthand().unwrap(), &commit) {
                                     (render_task(&repo, &task, task.changes(&repo)))
                                 }
                             }
@@ -235,8 +233,8 @@ pub fn generate(state: Option<State>) -> String {
 }
 
 fn diff(changes: Diff) -> Vec<PreEscaped<String>> {
-    let mut result = RefCell::new(vec![]);
-    changes.foreach(&mut |delta: DiffDelta, i: f32| {
+    let result = RefCell::new(vec![]);
+    changes.foreach(&mut |delta: DiffDelta, _: f32| {
         result.borrow_mut().push(html!(
             @if let Some(path) = delta.new_file().path() {
                 label (path.to_str().unwrap_or("[invalid]"))
@@ -258,7 +256,7 @@ fn diff(changes: Diff) -> Vec<PreEscaped<String>> {
             ));
         }
         true
-    }), None, Some(&mut |delta: DiffDelta, hunk: Option<DiffHunk>, line: DiffLine| {
+    }), None, Some(&mut |_: DiffDelta, _: Option<DiffHunk>, line: DiffLine| {
         let class = match line.origin() {
             '+' | '>' => "add",
             '-' | '<' => "sub",
@@ -269,11 +267,11 @@ fn diff(changes: Diff) -> Vec<PreEscaped<String>> {
             span class=(class) (String::from_utf8_lossy(&line.content()))
         ));
         true
-    }));
+    })).unwrap();
     result.into_inner()
 }
 
-fn render_task(repo: &Repository, task: &Task, changes: Vec<(String, Option<String>, String)>) -> PreEscaped<String> {
+fn render_task(repo: &Repository, task: &Task, _changes: Vec<(String, Option<String>, String)>) -> PreEscaped<String> {
     let status = Yaml::String(String::from("Status"));
     let estimate = Yaml::String(String::from("Estimate"));
     let status = task.get(&repo, &status);
