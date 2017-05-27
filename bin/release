@@ -1,0 +1,5 @@
+#!/bin/bash
+export RUST_BACKTRACE=1
+set -e
+cargo rustc --release -- -A overflowing-literals
+rackup

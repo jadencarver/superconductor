@@ -27,7 +27,6 @@ pub static XML: &'static str = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
 mod state;
 mod xslt;
 mod server;
-mod payload;
 mod task;
 
 #[no_mangle]

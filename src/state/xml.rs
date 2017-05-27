@@ -1,6 +1,7 @@
 use state::State;
 use task::Task;
 
+use termion::color;
 use std::cell::RefCell;
 use std::fs::File;
 use std::io::prelude::*;
@@ -229,7 +230,7 @@ pub fn generate(state: Option<State>) -> String {
             }
         }
     }.into_string();
-    println!("Payload Size: {}", payload.len());
+    println!("  {}Sent payload of size: {}{}", color::Fg(color::LightGreen), payload.len(), color::Fg(color::Reset));
     payload
 }
 

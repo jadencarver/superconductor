@@ -2,6 +2,9 @@ use std;
 use std::thread;
 use std::thread::JoinHandle;
 use std::time::Duration;
+use termion::color;
+use termion::clear;
+use termion::cursor;
 use rand;
 
 use websocket::{WebSocketStream, Server};
@@ -13,7 +16,7 @@ use websocket::message::Type as WebMessageType;
 use websocket::server::Connection;
 use websocket::header::WebSocketProtocol;
 
-use payload;
+use state::generate;
 use state::State;
 
 extern crate fsevent;
@@ -52,7 +55,7 @@ pub fn connect(connection: Connection<WebSocketStream, WebSocketStream>) {
     }
 
     let mut client = response.send().unwrap();
-    let message = WebMessage::text(payload::generate(None));
+    let message = WebMessage::text(generate(None));
     client.send_message(&message).unwrap();
 
     let (tx, rx) = channel::<NotifierMessage>();
@@ -84,15 +87,12 @@ fn start_monitor(tx: Sender<NotifierMessage>) {
     });
     loop {
         let event = rx.recv().unwrap();
-        thread::sleep(Duration::from_millis(500));
-        let mut changes = vec![];
+        thread::sleep(Duration::from_millis(250));
+        let mut changes = vec![event];
         loop {
             if let Ok(event) = rx.try_recv() {
                 if (event.flag.contains(ITEM_MODIFIED) || event.flag.contains(ITEM_CREATED) || event.flag.contains(ITEM_REMOVED)) && (!event.path.contains(".git") || !event.path.contains(".lock")) {
-                    println!("Registered {:?}", event);
                     changes.push(event);
-                } else {
-                    //println!("Ignored {:?}", event);
                 }
             } else {
                 break;
@@ -123,20 +123,20 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
                     },
                     _ => {
                         let payload = String::from_utf8_lossy(message.payload.as_ref());
-                        println!("\n\n{}\n\n", payload);
+                        println!("\n\n{}{}{}{}{}", clear::All, cursor::Goto(1, 1), color::Fg(color::White), payload, color::Fg(color::Reset));
                         let mut state: State = xml::from_str(&payload).unwrap();
 
                         last_state = state.apply(last_state, &mut rng).ok();
-
-                        let message = WebMessage::text(payload::generate(Some(state)));
+                        let message = WebMessage::text(generate(Some(state)));
                         sender.send_message(&message).unwrap();
-                        thread::sleep(Duration::from_millis(500));
+
+                        thread::sleep(Duration::from_millis(250));
                         flush(&rx);
                     }
                 }
             },
             NotifierMessage::FsEvent(event) => {
-                let message = WebMessage::text(payload::generate(last_state.clone()));
+                let message = WebMessage::text(generate(last_state.clone()));
                 sender.send_message(&message).unwrap();
             }
         }
@@ -144,7 +144,10 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
 }
 
 fn flush<T>(channel: &Receiver<T>) {
-    while let Ok(message) = channel.try_recv() {
-        print!("FLUSHED");
+    let mut flushed: i32 = 0;
+    while channel.try_recv().is_ok() {
+        flushed += 1;
     }
+    let plural = if flushed != 1 { 's' } else { ' ' };
+    println!("  {}Flushed {} event{}{}", color::Fg(color::Yellow), flushed, plural, color::Fg(color::Reset));
 }

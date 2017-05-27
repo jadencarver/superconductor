@@ -79,14 +79,13 @@ impl State {
         if let Some(ref mut last) = last_state {
             println!("{}{:?}{}", color::Fg(color::LightBlack), last, color::Fg(color::Reset));
             println!("{:?}", self);
+            println!("▶ ");
             if self.task != last.task {
                 let repo = Repository::discover(".").unwrap();
-                println!("----- SWITCHING TASKS -----");
-                // if the status has changed, we can't safely assume
-                // the new task was dragged into the property.
+                println!("  {}Task changing{}  {} => {}", color::Fg(color::LightYellow), color::Fg(color::Reset), last.task, self.task);
                 if self.dragged.is_some() {
+                    println!("  {}Saving last state due to dragging{}", color::Fg(color::LightGreen), color::Fg(color::Reset));
                     last.save_update(repo, rng);
-                    println!("\nDRAGGED\n");
                     self.reset_with_status();
                 } else {
                     let switching_to_task = self.task.clone();
@@ -96,7 +95,7 @@ impl State {
                     self.reset();
                 }
             } else {
-                println!("----- UPDATING TASK -----");
+                println!("  {}Updating task {}{}", color::Fg(color::LightGreen), self.task, color::Fg(color::Reset));
                 self.apply_index();
 
                 if self.save_update.is_some() || self.new_task.is_some() {
@@ -109,7 +108,6 @@ impl State {
     }
 
     fn save_update(&mut self, repo: Repository, rng: &mut rand::ThreadRng) {
-        println!("{}Saving {:?}{}", color::Fg(color::Red), self, color::Fg(color::Reset));
         let branch = repo.find_branch(&self.task, BranchType::Local);
         let head = match branch {
             Ok(branch) => branch.into_reference(),
@@ -137,10 +135,11 @@ impl State {
         let tree_oid = index.write_tree().unwrap();
         let tree = repo.find_tree(tree_oid).unwrap();
         repo.commit(Some(&head.name().unwrap_or("HEAD")), &author, &author, &message, &tree, &[&commit.as_commit().unwrap()]);
+        println!("  {}Saved changes to {}{} {:?}", color::Fg(color::LightRed), self.task, color::Fg(color::Reset), self);
         if self.new_task.is_some() {
             let num = rng.gen::<u16>();
             let new_task = format!("{:X}", num);
-            println!("creating branch {}", new_task);
+            println!("  {}Creating task {}{}", color::Fg(color::LightBlue), new_task, color::Fg(color::Reset));
             if let Ok(master_branch) = repo.find_branch("master", BranchType::Local) {
                 let master = master_branch.into_reference();
                 let commit_obj = master.peel(ObjectType::Commit).unwrap();
