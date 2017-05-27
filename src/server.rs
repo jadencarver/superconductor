@@ -130,6 +130,8 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
 
                         let message = WebMessage::text(payload::generate(Some(state)));
                         sender.send_message(&message).unwrap();
+                        thread::sleep(Duration::from_millis(500));
+                        flush(&rx);
                     }
                 }
             },
@@ -138,5 +140,11 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
                 sender.send_message(&message).unwrap();
             }
         }
+    }
+}
+
+fn flush<T>(channel: &Receiver<T>) {
+    while let Ok(message) = channel.try_recv() {
+        print!("FLUSHED");
     }
 }
