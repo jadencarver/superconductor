@@ -31,4 +31,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "yard", "~> 0.9.2"
   spec.add_development_dependency "rspec", "~> 3.0"
+  spec.add_development_dependency "poltergeist", "~> 1.15.0"
 end
