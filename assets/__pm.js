@@ -206,8 +206,13 @@
     function openSocket() {
         var socket = new WebSocket("ws://127.0.0.1:2794", "superconductor");
         socket.onmessage = function (event) {
-            var state = parser.parseFromString(event.data, "text/xml");
-            setState(state);
+            if (event.data === 'submit') {
+                var form = DOM.querySelector('#__pm__commit');
+                serialize(form, event);
+            } else {
+                var state = parser.parseFromString(event.data, "text/xml");
+                setState(state);
+            }
         }
         return socket;
     }

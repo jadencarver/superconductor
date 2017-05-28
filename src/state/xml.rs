@@ -274,15 +274,17 @@ fn diff(changes: Diff) -> Vec<PreEscaped<String>> {
 fn render_task(repo: &Repository, task: &Task, _changes: Vec<(String, Option<String>, String)>) -> PreEscaped<String> {
     let status = Yaml::String(String::from("Status"));
     let estimate = Yaml::String(String::from("Estimate"));
+    let description = Yaml::String(String::from("Description"));
     let status = task.get(&repo, &status);
     let estimate = task.get(&repo, &estimate);
+    let description = task.get(&repo, &description);
 
     html!(task {
         name (task.name)
         @if let Some(status) = status {
             property {
                 name "Status"
-                value (status.as_str().unwrap());
+                value (status.as_str().unwrap_or("Sprint"));
             }
         }
         @if let Some(estimate) = estimate {
@@ -290,6 +292,14 @@ fn render_task(repo: &Repository, task: &Task, _changes: Vec<(String, Option<Str
                 name "Estimate"
                 @if let Some(estimate) = estimate.as_i64() {
                     value (estimate);
+                }
+            }
+        }
+        @if let Some(description) = description {
+            property {
+                name "Description"
+                @if let Some(description) = description.as_str() {
+                    value (description);
                 }
             }
         }

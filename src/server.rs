@@ -27,6 +27,8 @@ use std::sync::mpsc::Receiver;
 
 use serde_xml as xml;
 
+const HEARTBEAT: u64 = 250;
+
 #[derive(Debug)]
 enum NotifierMessage<'a> {
     WebMessage(WebMessage<'a>),
@@ -86,7 +88,7 @@ fn start_monitor(tx: Sender<NotifierMessage>) {
     });
     loop {
         let event = rx.recv().unwrap();
-        thread::sleep(Duration::from_millis(250));
+        thread::sleep(Duration::from_millis(HEARTBEAT));
         let mut changes = vec![event];
         loop {
             if let Ok(event) = rx.try_recv() {
@@ -123,19 +125,19 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
                     _ => {
                         let payload = String::from_utf8_lossy(message.payload.as_ref());
                         println!("\n\n{}{}{}{}{}", clear::All, cursor::Goto(1, 1), color::Fg(color::White), payload, color::Fg(color::Reset));
-                        let mut state: State = xml::from_str(&payload).unwrap();
+                        let mut state: State = xml::from_str(&payload).unwrap_or(last_state.clone().unwrap_or(State::blank()));
 
                         last_state = state.apply(last_state, &mut rng).ok();
                         let message = WebMessage::text(generate(Some(state)));
                         sender.send_message(&message).unwrap();
 
-                        thread::sleep(Duration::from_millis(250));
+                        thread::sleep(Duration::from_millis(HEARTBEAT));
                         flush(&rx);
                     }
                 }
             },
             NotifierMessage::FsEvent(_event) => {
-                let message = WebMessage::ping(vec![]);
+                let message = WebMessage::text("submit");
                 sender.send_message(&message).unwrap();
             }
         }
