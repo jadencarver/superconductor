@@ -98,6 +98,7 @@ impl State {
                 if self.save_update.is_some() || self.new_task.is_some() {
                     let repo = Repository::discover(".").unwrap();
                     self.save_update(repo, rng);
+                    self.reset();
                 }
             }
         }
