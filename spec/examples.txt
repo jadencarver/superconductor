@@ -1,5 +1,0 @@
-example_id                                      | status | run_time        |
------------------------------------------------ | ------ | --------------- |
-./spec/integration/task_spec.rb[1:1]            | passed | 6.68 seconds    |
-./spec/superconductor/middleware_spec.rb[1:1:1] | passed | 0.00373 seconds |
-./spec/superconductor_spec.rb[1:1]              | passed | 0.00016 seconds |

@@ -17,14 +17,14 @@ module IntegrationSpec::Screenshots
     match do |page|
       [
         ["spec/integration/screenshots/#{name}.png", "Desktop", 2880/2, 1800/2 ],
-        ["spec/integration/screenshots/#{name}_ipad.png", "iPad Portrait", 768, 1024],
-        ["spec/integration/screenshots/#{name}_iphone6plus.png", "iPhone 6+", 414, 736 ],
-        ["spec/integration/screenshots/#{name}_iphone5.png", "iPhone 5", 320, 568 ],
+        #["spec/integration/screenshots/#{name}_ipad.png", "iPad Portrait", 768, 1024],
+        #["spec/integration/screenshots/#{name}_iphone6plus.png", "iPhone 6+", 414, 736 ],
+        #["spec/integration/screenshots/#{name}_iphone5.png", "iPhone 5", 320, 568 ],
       ].inject(0) do |accum, (path, name, width, height)|
         term_width = (width/height.to_f * (18 * 2.33)).ceil
         # break if config.accum + term_width > ANSI::Terminal.terminal_width # overflow: hidden;
         accum = 0 and puts if accum + term_width > ANSI::Terminal.terminal_width # overflow: wrap;
-        page.driver.resize(width, height)
+        #page.driver.resize(width, height)
 
         page.save_screenshot path
         print ANSI.up(19) + ANSI.right(accum) if accum > 0
