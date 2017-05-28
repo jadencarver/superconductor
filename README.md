@@ -2,6 +2,8 @@
 
 Superconductor is a Workflow and Project Management tool
 
+![Superconductor](spec/integration/screenshots/task-by_status.png)
+
 ## Installation
 
 Add this line to your application's Gemfile:
