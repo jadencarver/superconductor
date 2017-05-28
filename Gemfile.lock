@@ -8,6 +8,7 @@ GEM
   specs:
     addressable (2.5.1)
       public_suffix (~> 2.0, >= 2.0.2)
+    ansi (1.5.0)
     capybara (2.14.0)
       addressable
       mime-types (>= 1.16)
@@ -56,6 +57,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  ansi (~> 1.5.0)
   bundler (~> 1.12)
   poltergeist (~> 1.15.0)
   rake (~> 10.0)
