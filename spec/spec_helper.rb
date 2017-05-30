@@ -16,6 +16,11 @@
 # users commonly want.
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
+
+tmp = File.join(Dir.pwd, 'tmp')
+dummy = File.join(tmp, 'dummy')
+ENV["GIT_DIR"] = File.join(dummy, '.git')
+
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
@@ -96,4 +101,11 @@ RSpec.configure do |config|
   # test failures related to randomization by passing the same `--seed` value
   # as the one that triggered the failure.
   Kernel.srand config.seed
+
+  config.before :each do
+    `rm -rf tmp/dummy`
+    Dir.mkdir(tmp) unless Dir.exist?(tmp)
+    Dir.mkdir(dummy)
+  end
+
 end

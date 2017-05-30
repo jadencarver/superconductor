@@ -1,10 +1,11 @@
 use state::State;
 use task::Task;
 
-use termion::color;
 use std::cell::RefCell;
 use std::fs::File;
 use std::io::prelude::*;
+use std::env;
+use termion::color;
 
 extern crate git2;
 use self::git2::Repository;
@@ -26,14 +27,38 @@ extern crate base64;
 use self::base64::encode;
 
 pub fn generate(state: Option<State>) -> String {
-    let repo = Repository::discover(".").unwrap();
+    let repo = match Repository::open_from_env() {
+        Ok(repo) => repo,
+        Err(_) => Repository::init(env::var("GIT_DIR").unwrap_or(String::from("."))).unwrap()
+    };
+    println!("Generating from repo: {:?}", repo.path());
     let config = repo.config().unwrap();
+    
+    // If there is no master branch, start the setup
+    if repo.find_branch("master", BranchType::Local).is_err() {
+        return html! {
+            state {
+                setup "1"
+                @if let Some(state) = state {
+                    message (state.message)
+                    task {
+                        name "master"
+                        @for property in state.property {
+                            property {
+                                name (property.name)
+                                value (property.value)
+                            }
+                        }
+                    }
+                }
+                (properties())
+            }
+        }.into_string()
+    }
 
     let head = repo.head().unwrap();
     let head_tree_obj = head.peel(ObjectType::Tree).unwrap();
     let head_tree = head_tree_obj.as_tree().unwrap();
-    //let head_commit_obj = head.peel(ObjectType::Commit).unwrap();
-    //let head_commit = head_commit_obj.as_commit().unwrap();
     let changes = repo.diff_tree_to_index(Some(&head_tree), None, None).unwrap();
 
     let branches = repo.branches(Some(BranchType::Local)).unwrap().filter_map(|b|b.ok());
@@ -159,40 +184,7 @@ pub fn generate(state: Option<State>) -> String {
                     }
                 }
             }
-            properties {
-                property {
-                    name "Status"
-                    options {
-                        option "Sprint"
-                        option "In Progress"
-                        option "In Review"
-                        option "Blocked"
-                        option "Done"
-                    }
-                }
-                property {
-                    name "Estimate"
-                }
-                property {
-                    name "Developer"
-                    value "Jaden Carver <jaden.carver@gmail.com>"
-                    options {
-                        option value="Jaden Carver <jaden.carver@gmail.com>" "Jaden Carver"
-                        option value="Bob Dole <bdole69@gmail.com>" "Bob Dole"
-                    }
-                }
-                property {
-                    name "Manager"
-                    value "Jaden Carver <jaden.carver@gmail.com>"
-                    options {
-                        option value="Jaden Carver <jaden.carver@gmail.com>" "Jaden Carver"
-                        option value="Bob Dole <bdole69@gmail.com>" "Bob Dole"
-                    }
-                }
-                property {
-                    name "Description"
-                }
-            }
+            (properties())
             changes {
                 @if let Ok(delta) = changes.stats() {
                     @if delta.files_changed() + delta.insertions() + delta.deletions() > 0 {
@@ -313,4 +305,43 @@ fn render_task(repo: &Repository, task: &Task, _changes: Vec<(String, Option<Str
         //    }
         //}
     })
+}
+
+fn properties() -> PreEscaped<String> {
+    html! {
+        properties {
+            property {
+                name "Status"
+                options {
+                    option "Sprint"
+                    option "In Progress"
+                    option "In Review"
+                    option "Blocked"
+                    option "Done"
+                }
+            }
+            property {
+                name "Estimate"
+            }
+            property {
+                name "Developer"
+                value "Jaden Carver <jaden.carver@gmail.com>"
+                options {
+                    option value="Jaden Carver <jaden.carver@gmail.com>" "Jaden Carver"
+                    option value="Bob Dole <bdole69@gmail.com>" "Bob Dole"
+                }
+            }
+            property {
+                name "Manager"
+                value "Jaden Carver <jaden.carver@gmail.com>"
+                options {
+                    option value="Jaden Carver <jaden.carver@gmail.com>" "Jaden Carver"
+                    option value="Bob Dole <bdole69@gmail.com>" "Bob Dole"
+                }
+            }
+            property {
+                name "Description"
+            }
+        }
+    }
 }

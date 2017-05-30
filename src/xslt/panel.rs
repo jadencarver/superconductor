@@ -70,6 +70,11 @@ pub fn panel_xslt() -> String {
                             }
                         }
                         xsl:choose {
+                            xsl:when test="/state/setup" {
+                                div.setup {
+                                    h1 "Superconductor"
+                                }
+                            }
                             xsl:when test="/state/diffs/*" {
                                 xsl:apply-templates select="/state/diffs" {}
                             }

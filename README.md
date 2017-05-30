@@ -33,6 +33,15 @@ In your `config/environments/development.rb` file, add {Superconductor::Middlewa
 config.middleware.insert_before(ActionDispatch::DebugExceptions, Superconductor::Middleware)
 ```
 
+### Rack
+
+```
+require 'superconductor'
+
+use Superconductor::Middleware
+run MyApp
+```
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/jadencarver/superconductor.

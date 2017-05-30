@@ -77,8 +77,9 @@ impl State {
             println!("{}{:?}{}", color::Fg(color::LightBlack), last, color::Fg(color::Reset));
             println!("{:?}", self);
             println!("▶ ");
+            let repo = Repository::open_from_env().unwrap();
+            println!("Applying to repo: {:?}", repo.path());
             if self.task != last.task {
-                let repo = Repository::discover(".").unwrap();
                 println!("  {}Task changing{}  {} => {}", color::Fg(color::LightYellow), color::Fg(color::Reset), last.task, self.task);
                 if self.dragged.is_some() {
                     println!("  {}Saving last state due to dragging{}", color::Fg(color::LightGreen), color::Fg(color::Reset));
@@ -93,10 +94,9 @@ impl State {
                 }
             } else {
                 println!("  {}Updating task {}{}", color::Fg(color::LightGreen), self.task, color::Fg(color::Reset));
-                self.apply_index();
+                //self.apply_index(&repo);
 
                 if self.save_update.is_some() || self.new_task.is_some() {
-                    let repo = Repository::discover(".").unwrap();
                     self.save_update(repo, rng);
                     self.reset();
                 }
@@ -106,15 +106,6 @@ impl State {
     }
 
     fn save_update(&mut self, repo: Repository, rng: &mut rand::ThreadRng) {
-        let branch = repo.find_branch(&self.task, BranchType::Local);
-        let head = match branch {
-            Ok(branch) => branch.into_reference(),
-            _ => repo.head().unwrap()
-        };
-        let commit = head.peel(ObjectType::Commit).unwrap();
-        let mut index = repo.index().unwrap();
-
-        let author = repo.signature().unwrap();
         let mut yaml = String::new();
         {
             // Constructing the properties YAML
@@ -124,15 +115,30 @@ impl State {
             for property in self.property.clone() {
                 properties.insert(Yaml::String(property.name), Yaml::String(property.value));
             }
-            tasks.insert(Yaml::String(String::from(head.shorthand().unwrap_or("master"))), Yaml::Hash(properties));
+            tasks.insert(Yaml::String(self.task.clone()), Yaml::Hash(properties));
             emitter.dump(&Yaml::Hash(tasks)).unwrap();
         }
         let message = format!("{}\n{}", self.message, yaml);
 
+        let mut index = repo.index().unwrap();
         index.read(false).unwrap();
+        let author = repo.signature().unwrap();
         let tree_oid = index.write_tree().unwrap();
         let tree = repo.find_tree(tree_oid).unwrap();
-        repo.commit(Some(&head.name().unwrap_or("HEAD")), &author, &author, &message, &tree, &[&commit.as_commit().unwrap()]).unwrap();
+
+        let branch = repo.find_branch(&self.task, BranchType::Local);
+        match branch {
+            Ok(branch) => {
+                let head = branch.into_reference();
+                let commit = head.peel(ObjectType::Commit).unwrap();
+                repo.commit(Some(&head.name().unwrap()), &author, &author, &message, &tree, &[&commit.as_commit().unwrap()]).unwrap();
+            }
+            Err(_) => {
+                println!("Initial Commit");
+                repo.commit(Some("refs/heads/master"), &author, &author, &message, &tree, &[]).unwrap();
+            }
+        };
+
         println!("  {}Saved changes to {}{} {:?}", color::Fg(color::LightRed), self.task, color::Fg(color::Reset), self);
         if self.new_task.is_some() {
             let num = rng.gen::<u16>();
@@ -149,8 +155,7 @@ impl State {
         }
     }
 
-    fn apply_index(&self) {
-        let repo = Repository::discover(".").unwrap();
+    fn apply_index(&self, repo: &Repository) {
         let branch = repo.find_branch(&self.task, BranchType::Local);
         let head = match branch {
             Ok(branch) => branch.into_reference(),
