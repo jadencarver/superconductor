@@ -129,8 +129,10 @@ impl State {
                 let mut yaml = String::new();
                 let task = Task::from_ref(&head);
                 self.convert_to_yaml(&mut yaml, &repo, Some(task));
-                let message = format!("{}\n{}", self.message, yaml);
-                repo.commit(Some(&head.name().unwrap()), &author, &author, &message, &tree, &[&commit.as_commit().unwrap()]).unwrap();
+                if self.message.len() > 0 || yaml.len() > 0 {
+                    let message = format!("{}\n{}", self.message, yaml);
+                    repo.commit(Some(&head.name().unwrap()), &author, &author, &message, &tree, &[&commit.as_commit().unwrap()]).unwrap();
+                }
             }
             Err(_) => {
                 println!("Initial Commit");
@@ -166,20 +168,16 @@ impl State {
         for property in self.property.clone() {
             let name = Yaml::String(property.name);
             let new_value = Yaml::String(property.value);
-            println!("  Evaluating changes for {:?} using {:?}", name, task);
             if let Some(ref task) = task {
                 if let Some(old_value) = task.get(&repo, &name) {
-                    println!("  Old Value: {:?}", old_value);
                     if old_value != new_value {
-                        println!("  Changed {:?} => {:?}", old_value, new_value);
                         properties.insert(name, new_value);
+                    } else {
                     }
                 } else {
-                    println!("  New Property {:?} = {:?}", name, new_value);
                     properties.insert(name, new_value);
                 }
             } else {
-                println!("  Initial Property {:?} = {:?}", name, new_value);
                 properties.insert(name, new_value);
             }
         }
