@@ -74,23 +74,60 @@ impl Task {
         }
     }
 
+    pub fn parent(&self, repo: &Repository) -> Option<Task> {
+        if let Some(commit_oid) = self.commit {
+            let commit = repo.find_commit(commit_oid).unwrap();
+            let parent = commit.parents().next().unwrap();
+            let mut tasks = Task::from_commit(&self.name, &parent);
+            tasks.retain(|c| c.name == self.name);
+            tasks.pop()
+        } else {
+            None
+        }
+    }
+
     pub fn changes(&self, repo: &Repository) -> Vec<(String, Option<String>, String)> {
         let mut changes = vec![];
-        if let Some(_commit_oid) = self.commit {
-            let properties = ["Status","Estimate","Developer","Description"];
-            for property in properties.iter() {
-                let prop = Yaml::String(String::from(*property));
-                if let Some(value) = self.get(&repo, &prop) {
-                    let after = match value {
-                        Yaml::String(ref s) => s.clone(),
-                        Yaml::Integer(i) => format!("{}", i),
-                        Yaml::Boolean(b) => format!("{}", b),
-                        _ => String::from("[unknown]")
-                    };
-                    changes.push((String::from(*property), None, after));
+        for (key, value) in self.changes.clone() {
+            let after = match value {
+                Yaml::String(ref s) => s.clone(),
+                Yaml::Integer(i) => format!("{}", i),
+                Yaml::Boolean(b) => format!("{}", b),
+                _ => String::from("[unknown]")
+            };
+            let before = if let Some(parent) = self.parent(&repo) {
+                match parent.get(&repo, &key) {
+                    Some(value) => {
+                        match value {
+                            Yaml::String(ref s) => Some(s.clone()),
+                            Yaml::Integer(i) => Some(format!("{}", i)),
+                            Yaml::Boolean(b) => Some(format!("{}", b)),
+                            _ => None
+                        }
+                    },
+                    None => None
                 }
+            } else { None };
+            changes.push((String::from(key.as_str().unwrap()), before, after));
+        };
+        changes
+    }
+
+    pub fn properties(&self, repo: &Repository) -> Vec<(String, Option<String>, String)> {
+        let mut changes = vec![];
+        let properties = ["Status","Estimate","Developer","Description"];
+        for property in properties.iter() {
+            let prop = Yaml::String(String::from(*property));
+            if let Some(value) = self.get(&repo, &prop) {
+                let after = match value {
+                    Yaml::String(ref s) => s.clone(),
+                    Yaml::Integer(i) => format!("{}", i),
+                    Yaml::Boolean(b) => format!("{}", b),
+                    _ => String::from("[unknown]")
+                };
+                changes.push((String::from(*property), None, after));
             }
-        }
+        };
         changes
     }
 }

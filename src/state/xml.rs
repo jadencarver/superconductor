@@ -126,7 +126,7 @@ pub fn generate(state: Option<State>) -> String {
                 message (state.message)
                 @if state.property.len() == 0 {
                     @let task = Task::from_ref(&branch) {
-                        (render_task(&repo, &task, task.changes(&repo)))
+                        (render_task(&repo, &task, task.properties(&repo)))
                     }
                 } @else {
                     task {
@@ -141,7 +141,7 @@ pub fn generate(state: Option<State>) -> String {
                 }
             } @else {
                 @let task = Task::from_ref(&branch) {
-                    (render_task(&repo, &task, task.changes(&repo)))
+                    (render_task(&repo, &task, task.properties(&repo)))
                 }
             }
             tasks {
@@ -156,7 +156,7 @@ pub fn generate(state: Option<State>) -> String {
                     }
                 }
                 @for task in tasks {
-                    (render_task(&repo, &task, task.changes(&repo)))
+                    (render_task(&repo, &task, task.properties(&repo)))
                 }
             }
             log {
@@ -266,47 +266,18 @@ fn diff(changes: Diff) -> Vec<PreEscaped<String>> {
     result.into_inner()
 }
 
-fn render_task(repo: &Repository, task: &Task, _changes: Vec<(String, Option<String>, String)>) -> PreEscaped<String> {
-    let status = Yaml::String(String::from("Status"));
-    let estimate = Yaml::String(String::from("Estimate"));
-    let description = Yaml::String(String::from("Description"));
-    let status = task.get(&repo, &status);
-    let estimate = task.get(&repo, &estimate);
-    let description = task.get(&repo, &description);
-
+fn render_task(repo: &Repository, task: &Task, changes: Vec<(String, Option<String>, String)>) -> PreEscaped<String> {
     html!(task {
         name (task.name)
-        @if let Some(status) = status {
+        @for (name, before, value) in changes {
             property {
-                name "Status"
-                value (status.as_str().unwrap_or("Sprint"));
-            }
-        }
-        @if let Some(estimate) = estimate {
-            property {
-                name "Estimate"
-                @if let Some(estimate) = estimate.as_i64() {
-                    value (estimate);
+                name (name)
+                @if let Some(before) = before {
+                    before (before)
                 }
+                value (value)
             }
         }
-        @if let Some(description) = description {
-            property {
-                name "Description"
-                @if let Some(description) = description.as_str() {
-                    value (description);
-                }
-            }
-        }
-        //@for (name, before, value) in changes {
-        //    property {
-        //        name (name)
-        //        @if let Some(before) = before {
-        //            before (before)
-        //        }
-        //        value (value)
-        //    }
-        //}
     })
 }
 
