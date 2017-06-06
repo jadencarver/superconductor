@@ -94,7 +94,7 @@ impl State {
                 }
             } else {
                 println!("  {}Updating task {}{}", color::Fg(color::LightGreen), self.task, color::Fg(color::Reset));
-                //self.apply_index(&repo);
+                self.apply_index(&repo);
 
                 if self.save_update.is_some() || self.new_task.is_some() {
                     self.save_update(repo, rng);
