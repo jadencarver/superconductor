@@ -73,11 +73,11 @@ impl State {
 
     pub fn apply(&mut self, mut last_state: Option<State>, rng: &mut rand::ThreadRng) -> Result<State, StateError> {
         let new_last_state = self.clone();
+        let repo = Repository::open_from_env().unwrap();
         if let Some(ref mut last) = last_state {
             println!("{}{:?}{}", color::Fg(color::LightBlack), last, color::Fg(color::Reset));
             println!("{:?}", self);
             println!("▶ ");
-            let repo = Repository::open_from_env().unwrap();
             println!("Applying to repo: {:?}", repo.path());
             if self.task != last.task {
                 println!("  {}Task changing{}  {} => {}", color::Fg(color::LightYellow), color::Fg(color::Reset), last.task, self.task);
@@ -100,6 +100,13 @@ impl State {
                     self.save_update(repo, rng);
                     self.reset();
                 }
+            }
+        } else {
+            let head = repo.head().unwrap();
+            let task = head.shorthand().unwrap();
+            if self.task != task {
+                println!("  Changing task with no last state, will reset");
+                self.reset();
             }
         }
         Ok(new_last_state)
