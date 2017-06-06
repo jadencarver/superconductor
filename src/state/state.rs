@@ -107,17 +107,7 @@ impl State {
 
     fn save_update(&mut self, repo: Repository, rng: &mut rand::ThreadRng) {
         let mut yaml = String::new();
-        {
-            // Constructing the properties YAML
-            let mut tasks = Hash::new();
-            let mut properties = Hash::new();
-            let mut emitter = YamlEmitter::new(&mut yaml);
-            for property in self.property.clone() {
-                properties.insert(Yaml::String(property.name), Yaml::String(property.value));
-            }
-            tasks.insert(Yaml::String(self.task.clone()), Yaml::Hash(properties));
-            emitter.dump(&Yaml::Hash(tasks)).unwrap();
-        }
+        self.convert_to_yaml(&mut yaml);
         let message = format!("{}\n{}", self.message, yaml);
 
         let mut index = repo.index().unwrap();
@@ -153,6 +143,18 @@ impl State {
                 self.reset();
             }
         }
+    }
+
+    // Constructing the properties YAML from State
+    fn convert_to_yaml(&self, mut yaml: &mut String) {
+        let mut tasks = Hash::new();
+        let mut properties = Hash::new();
+        let mut emitter = YamlEmitter::new(&mut yaml);
+        for property in self.property.clone() {
+            properties.insert(Yaml::String(property.name), Yaml::String(property.value));
+        }
+        tasks.insert(Yaml::String(self.task.clone()), Yaml::Hash(properties));
+        emitter.dump(&Yaml::Hash(tasks)).unwrap();
     }
 
     fn apply_index(&self, repo: &Repository) {

@@ -94,10 +94,13 @@ pub fn generate(state: Option<State>) -> String {
     }
 
     let branch = if let Some(state) = state.clone() {
-        repo.find_branch(&state.task, BranchType::Local).unwrap_or(repo.find_branch("master", BranchType::Local).unwrap()).into_reference()
+        if let Ok(branch) = repo.find_branch(&state.task, BranchType::Local) {
+            branch.into_reference()
+        } else {
+            head
+        }
     } else {
-        println!("did not find specified branch, using master");
-        repo.find_branch("master", BranchType::Local).unwrap().into_reference()
+        head
     };
 
     let mut revwalk = repo.revwalk().unwrap();
