@@ -6,6 +6,8 @@ use rand::Rng;
 use termion::color;
 use rand;
 
+use task::Task;
+
 use yaml_rust::yaml::Hash;
 use yaml_rust::{Yaml, YamlEmitter};
 
@@ -113,10 +115,6 @@ impl State {
     }
 
     fn save_update(&mut self, repo: Repository, rng: &mut rand::ThreadRng) {
-        let mut yaml = String::new();
-        self.convert_to_yaml(&mut yaml);
-        let message = format!("{}\n{}", self.message, yaml);
-
         let mut index = repo.index().unwrap();
         index.read(false).unwrap();
         let author = repo.signature().unwrap();
@@ -128,10 +126,17 @@ impl State {
             Ok(branch) => {
                 let head = branch.into_reference();
                 let commit = head.peel(ObjectType::Commit).unwrap();
+                let mut yaml = String::new();
+                let task = Task::from_ref(&head);
+                self.convert_to_yaml(&mut yaml, &repo, Some(task));
+                let message = format!("{}\n{}", self.message, yaml);
                 repo.commit(Some(&head.name().unwrap()), &author, &author, &message, &tree, &[&commit.as_commit().unwrap()]).unwrap();
             }
             Err(_) => {
                 println!("Initial Commit");
+                let mut yaml = String::new();
+                self.convert_to_yaml(&mut yaml, &repo, None);
+                let message = format!("{}\n{}", self.message, yaml);
                 repo.commit(Some("refs/heads/master"), &author, &author, &message, &tree, &[]).unwrap();
             }
         };
@@ -153,15 +158,35 @@ impl State {
     }
 
     // Constructing the properties YAML from State
-    fn convert_to_yaml(&self, mut yaml: &mut String) {
+    fn convert_to_yaml(&self, mut yaml: &mut String, repo: &Repository, task: Option<Task>) {
+        println!("  Converting State to YAML");
         let mut tasks = Hash::new();
         let mut properties = Hash::new();
         let mut emitter = YamlEmitter::new(&mut yaml);
         for property in self.property.clone() {
-            properties.insert(Yaml::String(property.name), Yaml::String(property.value));
+            let name = Yaml::String(property.name);
+            let new_value = Yaml::String(property.value);
+            println!("  Evaluating changes for {:?} using {:?}", name, task);
+            if let Some(ref task) = task {
+                if let Some(old_value) = task.get(&repo, &name) {
+                    println!("  Old Value: {:?}", old_value);
+                    if old_value != new_value {
+                        println!("  Changed {:?} => {:?}", old_value, new_value);
+                        properties.insert(name, new_value);
+                    }
+                } else {
+                    println!("  New Property {:?} = {:?}", name, new_value);
+                    properties.insert(name, new_value);
+                }
+            } else {
+                println!("  Initial Property {:?} = {:?}", name, new_value);
+                properties.insert(name, new_value);
+            }
         }
-        tasks.insert(Yaml::String(self.task.clone()), Yaml::Hash(properties));
-        emitter.dump(&Yaml::Hash(tasks)).unwrap();
+        if !properties.is_empty() {
+            tasks.insert(Yaml::String(self.task.clone()), Yaml::Hash(properties));
+            emitter.dump(&Yaml::Hash(tasks)).unwrap();
+        }
     }
 
     fn apply_index(&self, repo: &Repository) {

@@ -5,6 +5,7 @@ extern crate git2;
 use self::git2::{Repository, ObjectType};
 use self::git2::{Commit, Reference, Oid};
 
+#[derive(Debug)]
 pub struct Task {
     pub name: String,
     commit: Option<Oid>,
@@ -17,7 +18,9 @@ impl Task {
         let commit = commit_obj.as_commit().unwrap();
         let name = reference.shorthand().unwrap_or("master");
         let mut tasks = Task::from_commit(&name, &commit);
+        println!("  Tasks in commit: {:?}", tasks);
         tasks.retain(|c| c.name == name);
+        println!("  Retained: {:?}", tasks);
         tasks.pop().unwrap_or(Task {
             name: String::from(name),
             changes: Hash::new(),
