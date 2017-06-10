@@ -24,13 +24,13 @@ extern crate git2;
 pub static XML: &'static str = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
 
 mod state;
-mod xslt;
+mod view;
 mod server;
 mod task;
 
 #[no_mangle]
 pub extern "C" fn panel_xslt() -> *mut c_char {
-    CString::new(xslt::panel_xslt()).unwrap().into_raw()
+    CString::new(view::panel_xslt()).unwrap().into_raw()
 }
 
 #[no_mangle]

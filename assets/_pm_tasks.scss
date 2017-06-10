@@ -102,6 +102,20 @@
     padding-bottom: 1em;
     width: 100pt;
 
+    &:before {
+      content: '';
+      display: block;
+      width: 100pt;
+      min-height: 0;
+      //transition: min-height 100ms;
+    }
+
+    &.droppable {
+      &:before {
+        min-height: 50pt;
+      }
+    }
+
     .task {
       cursor: pointer;
       width: 100pt;
@@ -193,28 +207,4 @@
     }
   }
 
-  .droppable {
-    margin: 0;
-    &::after {
-      content: '';
-      display: block;
-      height: 90pt;
-      width: 100pt;
-      margin: 0.7em 0 0 0;
-      background-color: darken($color0, 10%);
-      border-radius: 3pt;
-    }
-  }
-
-  .droppable > * {
-  }
-
-  .dropped {
-    margin-top: 110pt;
-    transition: margin-top 250ms;
-  }
-
-  .dropped::after {
-    display: none;
-  }
 }

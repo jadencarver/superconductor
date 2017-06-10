@@ -125,11 +125,13 @@
     DOM.addEventListener('dragstart', function (event) {
         dragging = event.target;
         event.dataTransfer.setData('text/plain', null);
-        var dropTargets = DOM.querySelectorAll('.tiles > li, .tiles');
+        setTimeout(function() {
+            dragging.style.display = 'none';
+        }, 1);
+        var dropTargets = DOM.querySelectorAll('.tiles > li');//, .tiles');
         for (dropTarget of dropTargets) {
             if (dropTarget === event.target) continue;
             dropTarget.addEventListener('dragenter', dragEnter);
-            dropTarget.addEventListener('dragleave', dragLeave);
             dropTarget.addEventListener('dragover', isDropTarget);
             dropTarget.addEventListener('drop', dragDropped);
         };
@@ -137,11 +139,10 @@
 
     DOM.addEventListener('dragend', function (event) {
         dragging = null;
-        var dropTargets = DOM.querySelectorAll('.tiles > li, .tiles');
+        var dropTargets = DOM.querySelectorAll('.tiles > li')//, .tiles');
         for (dropTarget of dropTargets) {
             if (dropTarget === event.target) continue;
             dropTarget.removeEventListener('dragenter', dragEnter);
-            dropTarget.removeEventListener('dragleave', dragLeave);
             dropTarget.removeEventListener('dragover', isDropTarget);
             dropTarget.removeEventListener('drop', dragDropped);
         };
@@ -150,18 +151,12 @@
     //////////////////////////////////////////////////////////////////////////////////////////////////
 
     function dragEnter(event) {
-        console.log(dragEnter);
         if (dragging !== this) {
+            if (dropping) dropping.classList.remove('droppable');
             this.classList.add('droppable');
             dropping = this;
             event.preventDefault;
         }
-    }
-
-    function dragLeave(event) {
-        console.log('dragLeave');
-        this.classList.remove('droppable');
-        event.preventDefault;
     }
 
     function isDropTarget(event) {
@@ -208,8 +203,8 @@
     function openSocket() {
         var socket = new WebSocket("ws://127.0.0.1:2794", "superconductor");
         socket.onmessage = function (event) {
-            if (event.data === 'submit') {
-                var form = DOM.querySelector('#__pm__commit');
+            var form = DOM.querySelector('#__pm__commit');
+            if (event.data === 'submit' && form) {
                 serialize(form, event);
             } else {
                 var state = parser.parseFromString(event.data, "text/xml");

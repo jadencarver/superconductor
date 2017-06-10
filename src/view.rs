@@ -159,23 +159,35 @@ pub fn panel_xslt() -> String {
                 }
             }
             xsl:template match="task" name="task" {
-                xsl:variable name="ordinal" select="property[name='Ordinal']/value" {}
-                xsl:param name="previous" {}
+                xsl:variable name="ordinal" {
+                    xsl:choose {
+                        xsl:when test="property[name='Ordinal']/value != ''" {
+                            xsl:value-of select="property[name='Ordinal']/value" {}
+                        }
+                        xsl:otherwise {
+                            "0"
+                        }
+                    }
+                }
+                xsl:variable name="previous" {
+                    xsl:for-each select="key('task-status', property[name='Status']/value)/property[name='Ordinal'][number(value) < $ordinal]/value" {
+                        xsl:sort select="." data-type="number" order="descending" {}
+                        xsl:if test="position() = 1" {
+                            xsl:value-of select="." {}
+                        }
+                    }
+                }
                 xsl:variable name="next" {
                     xsl:choose {
                         xsl:when test="not($previous) or $previous = ''" {
-                            xsl:value-of select="count(.)+1" {}
-                        }
-                        xsl:when test="not($ordinal) or $ordinal = ''" {
-                            xsl:value-of select="$previous+1" {}
+                            xsl:value-of select="$ordinal div 2" {}
                         }
                         xsl:otherwise {
-                            "evaluated"
                             xsl:value-of select="$previous+(number(format-number($ordinal - $previous, '###0.0###;#')) div 2)" {}
                         }
                     }
                 }
-                li data-property-name="Ordinal" data-property-value="{$next}" data-ordinal="{$ordinal}" data-previous="{$previous}" {
+                li data-property-name="Ordinal" data-property-value="{$next}" {
                     xsl:element name="div" {
                         xsl:attribute name="draggable" "true"
                         xsl:attribute name="tabindex" "99"
@@ -204,8 +216,7 @@ pub fn panel_xslt() -> String {
                     }
                 }
             }
-            xsl:template name="tiles" {
-            }
+            xsl:key name="task-status" match="/state/task|/state/tasks/task" use="property[name='Status']/value" {}
             xsl:template match="/state/tasks" {
                 xsl:choose {
                     xsl:when test="filter" {
@@ -222,55 +233,18 @@ pub fn panel_xslt() -> String {
                         }
                     }
                     xsl:otherwise {
-                        xsl:variable name="options" select="/state/properties/property[name='Status']/options"
-                        xsl:variable name="count" select="count($options)" {}
-                        xsl:for-each select="1 to $count" {
-                            xsl:call-template name="tiles" {
-                                xsl:with-param name="options" select="" {}
-                            }
-                        }
-
-
-                        xsl:for-each select="" {
-                            ul.tiles data-property-name="Status" data-property-value="" {
+                        xsl:for-each select="/state/properties/property[name='Status']/options/option" {
+                            xsl:variable name="status" select="./text()" {}
+                            ul.tiles data-property-name="Status" data-property-value="{.}" {
                                 header {
-                                    button type="submit" name="filter" data-name="Status" data-value="Sprint" { "Sprint" }
+                                    button type="submit" name="filter" data-name="Status" data-value="{.}" {
+                                        xsl:value-of select="." {}
+                                    }
                                 }
-                                xsl:apply-templates select="(/state/task|./task)[not(property)]|(/state/task|./task)[property[name='Status']/value='Sprint']" {
+                                xsl:for-each select="key('task-status', $status)" {
                                     xsl:sort select="property[name='Ordinal']/value" data-type="number" {}
+                                    xsl:call-template name="task" {}
                                 }
-                            }
-                        }
-                        ul.tiles data-property-name="Status" data-property-value="In Progress" {
-                            header {
-                                button type="submit" name="filter" data-name="Status" data-value="In Progress" { "In Progress" }
-                            }
-                            xsl:apply-templates select="(/state/task|./task)[property[name='Status']/value='In Progress']" {
-                                xsl:sort select="property[name='Ordinal']/value" data-type="number" {}
-                            }
-                        }
-                        ul.tiles data-property-name="Status" data-property-value="In Review" {
-                            header {
-                                button type="submit" name="filter" data-name="Status" data-value="In Review" { "In Review" }
-                            }
-                            xsl:apply-templates select="(/state/task|./task)[property[name='Status']/value='In Review']" {
-                                xsl:sort select="property[name='Ordinal']/value" data-type="number" {}
-                            }
-                        }
-                        ul.tiles data-property-name="Status" data-property-value="Blocked" {
-                            header {
-                                button type="submit" name="filter" data-name="Status" data-value="Blocked" { "Blocked" }
-                            }
-                            xsl:apply-templates select="(/state/task|./task)[property[name='Status']/value='Blocked']" {
-                                xsl:sort select="property[name='Ordinal']/value" data-type="number" {}
-                            }
-                        }
-                        ul.tiles data-property-name="Status" data-property-value="Done" {
-                            header {
-                                button type="submit" name="filter" data-name="Status" data-value="Done" { "Done" }
-                            }
-                            xsl:apply-templates select="(/state/task|./task)[property[name='Status']/value='Done']" {
-                                xsl:sort select="property[name='Ordinal']/value" data-type="number" {}
                             }
                         }
                     }
