@@ -1,6 +1,7 @@
 use state::State;
 use task::Task;
 
+use std;
 use std::cell::RefCell;
 use std::fs::File;
 use std::io::prelude::*;
@@ -93,14 +94,19 @@ pub fn generate(state: Option<State>) -> String {
         tasks = all_tasks.iter().map(|t|t).collect();
     }
 
-    let branch = if let Some(state) = state.clone() {
-        if let Ok(branch) = repo.find_branch(&state.task, BranchType::Local) {
-            branch.into_reference()
-        } else {
-            head
-        }
-    } else {
-        head
+    tasks.sort_by(|a, b| {
+        let ordinal = Yaml::from_str("Ordinal");
+        let ord_a = a.get(&repo, &ordinal).unwrap_or(Yaml::Real(String::from("1.0"))).as_f64().unwrap_or(1.0);
+        let ord_b = b.get(&repo, &ordinal).unwrap_or(Yaml::Real(String::from("1.0"))).as_f64().unwrap_or(1.0);
+        ord_a.partial_cmp(&ord_b).unwrap()
+    });
+
+    let branch = match state.clone() {
+        Some(state) => match repo.find_branch(&state.task, BranchType::Local) {
+            Ok(branch) => branch.into_reference(),
+            Err(_) => head
+        },
+        None => head
     };
 
     let mut revwalk = repo.revwalk().unwrap();
@@ -293,6 +299,10 @@ fn properties() -> PreEscaped<String> {
                     option "Blocked"
                     option "Done"
                 }
+            }
+            property {
+                name "Ordinal"
+                value "1.0"
             }
             property {
                 name "Estimate"

@@ -92,6 +92,7 @@ impl Task {
             let after = match value {
                 Yaml::String(ref s) => s.clone(),
                 Yaml::Integer(i) => format!("{}", i),
+                Yaml::Real(i) => format!("{}", i),
                 Yaml::Boolean(b) => format!("{}", b),
                 _ => String::from("[unknown]")
             };
@@ -101,6 +102,7 @@ impl Task {
                         match value {
                             Yaml::String(ref s) => Some(s.clone()),
                             Yaml::Integer(i) => Some(format!("{}", i)),
+                            Yaml::Real(i) => Some(format!("{}", i)),
                             Yaml::Boolean(b) => Some(format!("{}", b)),
                             _ => None
                         }
@@ -115,13 +117,14 @@ impl Task {
 
     pub fn properties(&self, repo: &Repository) -> Vec<(String, Option<String>, String)> {
         let mut changes = vec![];
-        let properties = ["Status","Estimate","Developer","Description"];
+        let properties = ["Ordinal","Status","Estimate","Developer","Description"];
         for property in properties.iter() {
             let prop = Yaml::String(String::from(*property));
             if let Some(value) = self.get(&repo, &prop) {
                 let after = match value {
                     Yaml::String(ref s) => s.clone(),
                     Yaml::Integer(i) => format!("{}", i),
+                    Yaml::Real(i) => format!("{}", i),
                     Yaml::Boolean(b) => format!("{}", b),
                     _ => String::from("[unknown]")
                 };

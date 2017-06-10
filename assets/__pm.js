@@ -165,7 +165,6 @@
     }
 
     function isDropTarget(event) {
-        console.log('isDropTarget');
         event.preventDefault();
     };
 
@@ -175,16 +174,19 @@
         var form = DOM.querySelector('#__pm__commit');
         var task = DOM.querySelector("#__pm__commit__task");
         var drag = DOM.querySelector("#__pm__commit__dragged");
-        var name = (this.dataset.propertyName || this.parentElement.dataset.propertyName);
-        var field = form.querySelector("*[data-name='"+name+"']");
-        if (field) {
-            task.value = dragging ? dragging.dataset.name : '';
-            drag.checked = true;
-            field.value = (this.dataset.propertyValue || this.parentElement.dataset.propertyValue);
-            serialize(form, event);
-            dragging = false;
-            event.preventDefault();
-        }
+        closest(event.target, function(element) {
+            if (!element.dataset) return false;
+            var name = element.dataset.propertyName;
+            var field = form.querySelector("*[data-name='"+name+"']");
+            if (field) {
+                task.value = dragging ? dragging.dataset.name : '';
+                drag.checked = true;
+                field.value = element.dataset.propertyValue;
+            }
+        });
+        serialize(form, event);
+        dragging = false;
+        event.preventDefault();
     };
 
     function loadProcessor() {
