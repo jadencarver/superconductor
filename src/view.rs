@@ -9,6 +9,7 @@ pub fn panel_xslt() -> String {
         xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" {
             xsl:output method="html" indent="yes" {}
 
+            // BEGINS FORM  ------------------
             xsl:template match="/" {
                 div#__pm__panel {
                     form#__pm__commit method="post" name="commit" {
@@ -158,6 +159,61 @@ pub fn panel_xslt() -> String {
                     }
                 }
             }
+
+            // BEGINS TASKS  ------------------
+            xsl:key name="task-status" match="/state/task|/state/tasks/task" use="property[name='Status']/value" {}
+
+            xsl:template match="/state/tasks" {
+                xsl:choose {
+                    xsl:when test="filter" {
+                        input type="hidden" name="filter" data-name="{filter/name}" data-value="{filter/value}" {}
+                        ul.list {
+                            header {
+                                button type="submit" name="filter" {
+                                    xsl:value-of select="filter/value" {}
+                                }
+                            }
+                            xsl:apply-templates select="/state/task|./task" {
+                                xsl:sort select="property[name='Ordinal']/value" {}
+                            }
+                        }
+                    }
+                    xsl:otherwise {
+                        xsl:for-each select="/state/properties/property[name='Status']/options/option" {
+                            xsl:variable name="status" select="./text()" {}
+                            xsl:variable name="max" {
+                                xsl:for-each select="key('task-status', $status)/property[name='Ordinal']/value" {
+                                    xsl:sort select="." data-type="number" order="descending" {}
+                                        xsl:if test="position() = 1" {
+                                            xsl:value-of select="." {}
+                                        }
+                                }
+                            }
+                            xsl:variable name="next" {
+                                xsl:choose {
+                                    xsl:when test="not($max) or string(number($max)) = 'NaN'" { "1" }
+                                    xsl:otherwise {
+                                        xsl:value-of select="$max + 1" {}
+                                    }
+                                }
+                            }
+                            ul.tiles data-property-name="Status" data-property-value="{.}" {
+                                div.column data-property-name="Ordinal" data-property-value="{$next}" {
+                                    header {
+                                        button type="submit" name="filter" data-name="Status" data-value="{.}" {
+                                            xsl:value-of select="." {}
+                                        }
+                                    }
+                                    xsl:for-each select="key('task-status', $status)" {
+                                        xsl:sort select="property[name='Ordinal']/value" data-type="number" {}
+                                        xsl:call-template name="task" {}
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             xsl:template match="task" name="task" {
                 xsl:variable name="ordinal" {
                     xsl:choose {
@@ -165,7 +221,7 @@ pub fn panel_xslt() -> String {
                             xsl:value-of select="property[name='Ordinal']/value" {}
                         }
                         xsl:otherwise {
-                            "0"
+                            "1"
                         }
                     }
                 }
@@ -187,7 +243,7 @@ pub fn panel_xslt() -> String {
                         }
                     }
                 }
-                li data-property-name="Ordinal" data-property-value="{$next}" {
+                li class="task" data-property-name="Ordinal" data-property-value="{$next}" {
                     xsl:element name="div" {
                         xsl:attribute name="draggable" "true"
                         xsl:attribute name="tabindex" "99"
@@ -210,46 +266,15 @@ pub fn panel_xslt() -> String {
                         }
                         xsl:if test="property[name='Estimate']/value != ''" {
                             div.task__property--estimate {
-                                xsl:copy-of select="property[name='Ordinal']/value" {}
+                                xsl:copy-of select="property[name='Estimate']/value" {}
                             }
                         }
                     }
                 }
             }
-            xsl:key name="task-status" match="/state/task|/state/tasks/task" use="property[name='Status']/value" {}
-            xsl:template match="/state/tasks" {
-                xsl:choose {
-                    xsl:when test="filter" {
-                        input type="hidden" name="filter" data-name="{filter/name}" data-value="{filter/value}" {}
-                        ul.list {
-                            header {
-                                button type="submit" name="filter" {
-                                    xsl:value-of select="filter/value" {}
-                                }
-                            }
-                            xsl:apply-templates select="/state/task|./task" {
-                                xsl:sort select="property[name='Ordinal']/value" {}
-                            }
-                        }
-                    }
-                    xsl:otherwise {
-                        xsl:for-each select="/state/properties/property[name='Status']/options/option" {
-                            xsl:variable name="status" select="./text()" {}
-                            ul.tiles data-property-name="Status" data-property-value="{.}" {
-                                header {
-                                    button type="submit" name="filter" data-name="Status" data-value="{.}" {
-                                        xsl:value-of select="." {}
-                                    }
-                                }
-                                xsl:for-each select="key('task-status', $status)" {
-                                    xsl:sort select="property[name='Ordinal']/value" data-type="number" {}
-                                    xsl:call-template name="task" {}
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+
+
+            // BEGINS LOGS  ------------------
             xsl:template match="/state/log/commit" {
                 li {
                     xsl:if test="./preceding-sibling::commit[1]/user/email=user/email and ./preceding-sibling::commit[1]/timestamp - timestamp > -7200" {

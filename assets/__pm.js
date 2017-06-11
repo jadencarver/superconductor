@@ -122,13 +122,15 @@
 
     var dragging;
     var dropping;
+    var droppables = '.tiles .column, .tiles .task';
+
     DOM.addEventListener('dragstart', function (event) {
         dragging = event.target;
         event.dataTransfer.setData('text/plain', null);
         setTimeout(function() {
             dragging.style.display = 'none';
         }, 1);
-        var dropTargets = DOM.querySelectorAll('.tiles > li');//, .tiles');
+        var dropTargets = DOM.querySelectorAll(droppables);
         for (dropTarget of dropTargets) {
             if (dropTarget === event.target) continue;
             dropTarget.addEventListener('dragenter', dragEnter);
@@ -139,7 +141,7 @@
 
     DOM.addEventListener('dragend', function (event) {
         dragging = null;
-        var dropTargets = DOM.querySelectorAll('.tiles > li')//, .tiles');
+        var dropTargets = DOM.querySelectorAll(droppables);
         for (dropTarget of dropTargets) {
             if (dropTarget === event.target) continue;
             dropTarget.removeEventListener('dragenter', dragEnter);
@@ -169,11 +171,13 @@
         var form = DOM.querySelector('#__pm__commit');
         var task = DOM.querySelector("#__pm__commit__task");
         var drag = DOM.querySelector("#__pm__commit__dragged");
+        var blacklist = [];
         closest(event.target, function(element) {
             if (!element.dataset) return false;
             var name = element.dataset.propertyName;
             var field = form.querySelector("*[data-name='"+name+"']");
-            if (field) {
+            if (field && blacklist.indexOf(name) === -1) {
+                blacklist.push(name);
                 task.value = dragging ? dragging.dataset.name : '';
                 drag.checked = true;
                 field.value = element.dataset.propertyValue;

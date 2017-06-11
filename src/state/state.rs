@@ -67,7 +67,13 @@ impl State {
 
     pub fn reset_with_status(&mut self) {
         self.message = String::new();
-        self.property = self.property.iter().filter_map(|p| if p.name == "Status" { Some(p.clone()) } else { None }).collect();
+        self.property = self.property.iter().filter_map(|p| {
+            match &*p.name {
+                "Status" => Some(p.clone()),
+                "Ordinal" => Some(p.clone()),
+                _ => None
+            }
+        }).collect();
         self.include = vec![];
         self.save_update = None;
         self.new_task = None;
