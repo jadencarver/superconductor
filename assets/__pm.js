@@ -89,7 +89,7 @@
     });
 
     var menu;
-    DOM.addEventListener('contextmenu', function(event) {
+    function contextMenu(event) {
         if (menu) closeMenu();
         menu = document.createElement('menu');
         menu.id = '__pm__context-menu';
@@ -118,17 +118,26 @@
         }
         setTimeout(function() { root.addEventListener('click', closeMenu); }, 10);
         event.preventDefault();
+    };
+    DOM.addEventListener('contextmenu', contextMenu);
+    DOM.addEventListener('mousedown', function(event) {
+        console.log('mousedown', event);
+        if (event.button === 1 || event.metaKey) {
+            contextMenu(event)
+            event.preventDefault();
+        }
     });
 
     var dragging;
-    var dropping;
-    var droppables = '.tiles .column, .tiles .task';
+    var droppingTile;
+    var droppingColumn;
+    var droppables = '.tiles .column, .tiles .tile';
 
     DOM.addEventListener('dragstart', function (event) {
         dragging = event.target;
         event.dataTransfer.setData('text/plain', null);
         setTimeout(function() {
-            dragging.style.display = 'none';
+            dragging.parentElement.style.display = 'none';
         }, 1);
         var dropTargets = DOM.querySelectorAll(droppables);
         for (dropTarget of dropTargets) {
@@ -153,12 +162,20 @@
     //////////////////////////////////////////////////////////////////////////////////////////////////
 
     function dragEnter(event) {
-        if (dragging !== this) {
-            if (dropping) dropping.classList.remove('droppable');
-            this.classList.add('droppable');
-            dropping = this;
-            event.preventDefault;
+        if (this.classList.contains('column')) {
+            if (droppingColumn && droppingColumn !== this) {
+                droppingColumn.classList.remove('droppable')
+            }
+            droppingColumn = this;
+        } else if (this.classList.contains('tile')) {
+            if (droppingTile && droppingTile !== this) {
+                droppingTile.classList.remove('droppable')
+            }
+            droppingTile = this;
         }
+        if (droppingColumn) droppingColumn.classList.add('droppable');
+        if (droppingTile) droppingTile.classList.add('droppable');
+        event.preventDefault();
     }
 
     function isDropTarget(event) {
@@ -166,13 +183,11 @@
     };
 
     function dragDropped(event) {
-        console.log('dragDropped');
-        this.classList.add('dropped');
         var form = DOM.querySelector('#__pm__commit');
         var task = DOM.querySelector("#__pm__commit__task");
         var drag = DOM.querySelector("#__pm__commit__dragged");
         var blacklist = [];
-        closest(event.target, function(element) {
+        closest(this, function(element) {
             if (!element.dataset) return false;
             var name = element.dataset.propertyName;
             var field = form.querySelector("*[data-name='"+name+"']");

@@ -243,7 +243,11 @@ pub fn panel_xslt() -> String {
                         }
                     }
                 }
-                li class="task" data-property-name="Ordinal" data-property-value="{$next}" {
+                xsl:variable name="class" {
+                    "tile "
+                    xsl:value-of select="concat('tile--status-', translate(property[name='Status']/value, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ', 'abcdefghijklmnopqrstuvwxyz-'))" {}
+                }
+                li class="{$class}" data-property-name="Ordinal" data-property-value="{$next}" {
                     xsl:element name="div" {
                         xsl:attribute name="draggable" "true"
                         xsl:attribute name="tabindex" "99"
@@ -252,8 +256,7 @@ pub fn panel_xslt() -> String {
                         }
                         xsl:attribute name="class" {
                             " task "
-                            xsl:if test="/state/task/name = name" " selected "
-                            xsl:value-of select="concat('task--status-', translate(property[name='Status']/value, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ', 'abcdefghijklmnopqrstuvwxyz-'))" {}
+                            xsl:if test="/state/task/name = name" { " selected " }
                         }
                         xsl:attribute name="data-name" {
                             xsl:value-of select="name" {}

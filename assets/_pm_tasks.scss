@@ -100,23 +100,22 @@
 
   ul.tiles .column {
     height: 100%;
+    &.droppable {
+      button {
+        background-color: darken($color0, 10%);
+      }
+    }
   }
 
-  ul.tiles li {
+  ul.tiles li.tile {
     padding-bottom: 1em;
     width: 100pt;
 
-    &:before {
-      content: '';
-      display: block;
-      width: 100pt;
-      min-height: 0;
-      //transition: min-height 100ms;
-    }
-
     &.droppable {
       &:before {
-        min-height: 50pt;
+        content: '';
+        display: block;
+        min-height: 108pt;
       }
     }
 
@@ -166,7 +165,7 @@
       height: 5em;
     }
 
-    .task--status-blocked {
+    &.tile--status-blocked > .task {
       box-shadow: inset 3pt 0pt 0pt darken($color1, 5%);
 
       &.selected {
@@ -175,8 +174,13 @@
       }
     }
 
-    .task--status-done, .task--status-sprint {
-        height: 45pt;
+    &.tile--status-done.droppable, .tile--status-sprint.droppable {
+      &::before {
+        min-height: 53pt;
+      }
+    }
+    &.tile--status-done > .task, .tile--status-sprint > .task {
+      height: 45pt;
     }
 
     .task--name {
