@@ -1,0 +1,21 @@
+scss_files: 'assets/*.scss'
+
+linters:
+  HexNotation:
+    style: uppercase
+  LeadingZero:
+    style: include_zero
+  SpaceAfterPropertyColon:
+    style: at_least_once_space
+  QualifyingElement:
+    allow_element_with_class: true
+    allow_element_with_attribute: true
+  NestingDepth:
+    ignore_parent_selectors: true
+    max_depth: 4
+  SelectorDepth:
+    max_depth: 4
+  IdSelector:
+    enabled: false
+  SelectorFormat:
+    convention: hyphenated_BEM

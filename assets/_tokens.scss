@@ -1,48 +1,56 @@
 @import 'colors';
 
-$r: 0.4em;
 .token {
-  white-space: nowrap;
+  $r: 0.4em;
+  $color-base: #FFF;
+
+  color: $color-base;
+  font-weight: bold;
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 100%;
-  color: white;
-  font-weight: bold;
+  white-space: nowrap;
 
   > span {
     background-color: $color3;
+    border: solid $color4 1pt;
+    border-width: 1pt 0;
     font-size: 0.85em;
     line-height: 1em;
     padding: 0.2em 0.5em;
     text-shadow: 0 0 1pt darken($color3, 50%);
-    border: solid $color4 1pt;
-    border-width: 1pt 0;
     vertical-align: 15%;
   }
+
   > span:first-child {
     border-radius: $r 0 0 $r;
     border-width: 1pt 0 1pt 1pt;
   }
+
   > span:last-child {
     border-radius: 0 $r $r 0;
     border-width: 1pt 1pt 1pt 0;
   }
+
   > span:first-child:last-child {
-    border-radius: $r $r $r $r;
+    border-radius: $r;
     border-width: 1pt;
   }
+
   .token--positive {
     background-color: $color2;
     text-shadow: 0 0 1pt darken($color2, 50%);
   }
+
   .token--negative {
     background-color: $color1;
     text-shadow: 0 0 1pt darken($color1, 50%);
   }
+
   .token--neutral {
     background-color: $color4;
+    color: darken($color-base, 25%);
     text-shadow: 0 0 1pt darken($color4, 50%);
-    color: darken(white, 25%);
   }
 
 }

@@ -1,6 +1,5 @@
 @import 'colors';
 
-
 #__pm__panel {
   header {
     margin: 0 10pt;
@@ -65,14 +64,14 @@
 
     .task__property--estimate {
       background-color: $color3;
-      color: $color0;
       border-radius: 50%;
-      width: 2em;
+      color: $color0;
       height: 2em;
       font-weight: bold;
       line-height: 2em;
       text-align: center;
-      margin-top: 0.25em
+      margin-top: 0.25em;
+      width: 2em;
     }
 
     .task--name {
@@ -111,12 +110,15 @@
     padding-bottom: 1em;
     width: 100pt;
 
-    &.droppable {
-      &:before {
-        content: '';
-        display: block;
-        min-height: 108pt;
-      }
+    &::before {
+      content: '';
+      min-height: 0;
+      transition: min-height 250ms;
+    }
+
+    &.droppable::before {
+      display: block;
+      min-height: 108pt;
     }
 
     .task {

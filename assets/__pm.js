@@ -143,6 +143,7 @@
         for (dropTarget of dropTargets) {
             if (dropTarget === event.target) continue;
             dropTarget.addEventListener('dragenter', dragEnter);
+            dropTarget.addEventListener('dragleave', dragLeave);
             dropTarget.addEventListener('dragover', isDropTarget);
             dropTarget.addEventListener('drop', dragDropped);
         };
@@ -167,6 +168,10 @@
                 droppingColumn.classList.remove('droppable')
             }
             droppingColumn = this;
+            if (droppingTile && !this.contains(droppingTile)) {
+                droppingTile.classList.remove('droppable');
+                droppingTile = false;
+            }
         } else if (this.classList.contains('tile')) {
             if (droppingTile && droppingTile !== this) {
                 droppingTile.classList.remove('droppable')
@@ -176,6 +181,9 @@
         if (droppingColumn) droppingColumn.classList.add('droppable');
         if (droppingTile) droppingTile.classList.add('droppable');
         event.preventDefault();
+    }
+
+    function dragLeave(event) {
     }
 
     function isDropTarget(event) {

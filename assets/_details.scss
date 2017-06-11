@@ -24,6 +24,7 @@ fieldset.details {
 
     &:focus {
       outline: -webkit-focus-ring-color auto 5px;
+
       &::before {
         transform: translate(1pt, 0);
       }

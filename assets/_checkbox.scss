@@ -2,48 +2,55 @@
 
 input[type="checkbox"] {
   display: none;
+
   + label {
-    position: relative;
     cursor: pointer;
+    position: relative;
+
     &::before {
-      display: inline-block;
-      vertical-align: middle;
-      content: '';
       background-color: $color0;
-      width: 1em;
-      height: 1em;
       border: solid 1px $color4;
-      text-align: right;
-      margin-right: 0.25em;
       border-radius: 1pt;
+      content: '';
+      display: inline-block;
+      height: 1em;
+      margin-right: 0.25em;
+      text-align: right;
+      vertical-align: middle;
+      width: 1em;
     }
+
     &:hover {
       &::before {
         background-color: darken($color0, 5%);
       }
     }
   }
+
   &:checked + label {
-    &:after {
-      font-family: "Lucida Console", monospace;
+    &::after {
       content: '✔';
-      text-align: center;
-      position: absolute;
-      width: 1.1em;
-      line-height: 1.4em;
+      font-family: "Lucida Console", monospace;
       left: 0;
+      line-height: 1.4em;
+      position: absolute;
+      text-align: center;
       top: 0;
+      width: 1.1em;
     }
   }
+
   &.delete {
     + label {
       color: $color1;
     }
+
     &:checked + label {
-      &:before {
+      &::before {
         background-color: $color1;
       }
-      &:after {
+
+      &::after {
         color: $color0;
         content: '✖';
       }
