@@ -81,6 +81,8 @@ pub fn generate(state: Option<State>) -> String {
                 tasks = all_tasks.iter().filter(|task| {
                     match task.get(&repo, &filter_name) {
                         Some(ref value) if *value == filter_by_value => true,
+                        Some(ref value) if *value == Yaml::Null => true,
+                        None => true,
                         _ => false
                     }
                 }).collect();

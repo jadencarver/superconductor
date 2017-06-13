@@ -38,10 +38,11 @@
     list-style-type: none;
     margin: 0;
     padding: 3em 5pt 5pt;
-    width: 67%;
+    width: 33%;
+    float: left;
 
     header {
-      width: calc(67% - 5pt);
+      width: calc(33% - 5pt);
     }
 
     .task {

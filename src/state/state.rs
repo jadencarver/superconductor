@@ -161,6 +161,9 @@ impl State {
                 repo.branch(&new_task, &commit, false).unwrap();
                 self.task = new_task;
                 self.reset();
+                println!("  State reset: {:?}", self);
+            } else {
+                panic!("Unable to find master branch from which to fork!");
             }
         }
     }
@@ -173,12 +176,14 @@ impl State {
         let mut emitter = YamlEmitter::new(&mut yaml);
         for property in self.property.clone() {
             let name = Yaml::String(property.name);
-            let new_value = Yaml::String(property.value);
+            let new_value = match &*property.value {
+                "" => Yaml::Null,
+                _ => Yaml::String(property.value)
+            };
             if let Some(ref task) = task {
                 if let Some(old_value) = task.get(&repo, &name) {
                     if old_value != new_value {
                         properties.insert(name, new_value);
-                    } else {
                     }
                 } else {
                     properties.insert(name, new_value);

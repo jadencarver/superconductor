@@ -35,10 +35,10 @@ impl Task {
                 for yaml in loader.iter() {
                     if let Some(hash) = yaml.as_hash() {
                         for (key, values) in hash {
-                            if let Some(_key) = key.as_str() {
+                            if let Some(key) = key.as_str() {
                                 if let Some(values) = values.as_hash() {
                                     tasks.push(Task {
-                                        name: String::from(name),
+                                        name: String::from(key),
                                         changes: values.clone(),
                                         commit: Some(commit.id())
                                     });
@@ -94,6 +94,7 @@ impl Task {
                 Yaml::Integer(i) => format!("{}", i),
                 Yaml::Real(i) => format!("{}", i),
                 Yaml::Boolean(b) => format!("{}", b),
+                Yaml::Null => format!(""),
                 _ => String::from("[unknown]")
             };
             let before = if let Some(parent) = self.parent(&repo) {
@@ -104,6 +105,7 @@ impl Task {
                             Yaml::Integer(i) => Some(format!("{}", i)),
                             Yaml::Real(i) => Some(format!("{}", i)),
                             Yaml::Boolean(b) => Some(format!("{}", b)),
+                            Yaml::Null => Some(format!("")),
                             _ => None
                         }
                     },
@@ -126,6 +128,7 @@ impl Task {
                     Yaml::Integer(i) => format!("{}", i),
                     Yaml::Real(i) => format!("{}", i),
                     Yaml::Boolean(b) => format!("{}", b),
+                    Yaml::Null => format!(""),
                     _ => String::from("[unknown]")
                 };
                 changes.push((String::from(*property), None, after));
