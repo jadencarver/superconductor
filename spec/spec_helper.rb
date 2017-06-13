@@ -108,4 +108,11 @@ RSpec.configure do |config|
     Dir.mkdir(dummy)
   end
 
+  config.before(:each) do |example|
+    if defined?(page) # page is not defined on non-JS tests
+      Capybara.reset_sessions!
+      page.driver.restart
+    end
+  end
+
 end

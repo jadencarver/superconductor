@@ -1,3 +1,5 @@
+require 'ansi'
+
 module IntegrationSpec
   module Screenshots
     extend RSpec::Matchers::DSL
@@ -33,10 +35,10 @@ module IntegrationSpec
       printf ANSI.clear_line + "\n"
       match do |page|
         [
-          ["#{name.parameterize}_iphone5.png", "iPhone 5", 320, 568 ],
-          ["#{name.parameterize}_iphone6plus.png", "iPhone 6+", 414, 736 ],
-          ["#{name.parameterize}_ipad.png", "iPad Portrait", 768, 1024],
-          ["#{name.parameterize}.png", "Desktop", 2880/2, 1800/2 ],
+          ["#{name}_iphone5.png", "iPhone 5", 320, 568 ],
+          ["#{name}_iphone6plus.png", "iPhone 6+", 414, 736 ],
+          ["#{name}_ipad.png", "iPad Portrait", 768, 1024],
+          ["#{name}.png", "Desktop", 2880/2, 1800/2 ],
         ].inject(0) do |accum, (filename, caption, width, height)|
 
           path = "#{PATH}/#{filename}"

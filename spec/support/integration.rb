@@ -1,12 +1,12 @@
 require 'capybara/rspec'
-#require 'capybara/poltergeist'
+require 'capybara/poltergeist'
 require 'superconductor'
 require 'yard'
 
 module IntegrationSpec
   autoload :Screenshots, 'support/integration/screenshots'
 
-  #Capybara.javascript_driver = :poltergeist
+  Capybara.javascript_driver = :poltergeist
 
   Capybara.app = Rack::Builder.app do
     use Superconductor::Middleware
