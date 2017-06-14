@@ -127,7 +127,7 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
                         println!("\n\n{}{}{}{}{}", clear::All, cursor::Goto(1, 1), color::Fg(color::White), payload, color::Fg(color::Reset));
                         let mut state: State = xml::from_str(&payload).unwrap_or(last_state.clone().unwrap_or(State::blank()));
 
-                        last_state = state.apply(last_state, &mut rng).ok();
+                        last_state = state.apply(last_state, &mut rng).unwrap();
                         let message = WebMessage::text(generate(Some(state)));
                         sender.send_message(&message).unwrap();
 

@@ -303,7 +303,7 @@
                 }
             }
         }
-        console.log(request);
+        console.log('serialize', request);
         socket.send(serializer.serializeToString(request));
         root.classList.add('blocking')
     }

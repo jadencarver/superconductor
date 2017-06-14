@@ -92,6 +92,7 @@ pub fn panel_xslt() -> String {
                         xsl:when test="name = 'Status'" {
                             dt { label for="__pm__commit__properties--status" "Status" }
                             dd.select tabindex="1" {
+                                xsl:value-of select="/state/task/property[name[text()='Status']]/value" {}
                                 select id="__pm__commit__properties--status" name="property" data-name="Status" {
                                     option value="" {}
                                     xsl:apply-templates "options/option" {}
@@ -173,7 +174,7 @@ pub fn panel_xslt() -> String {
                                     xsl:value-of select="filter/value" {}
                                 }
                             }
-                            xsl:apply-templates select="(/state/task|./task)[not(property[name='Status']/value='')]" {
+                            xsl:apply-templates select="(/state/task|./task)[property[name='Status'] and not(property[name='Status']/value='')]" {
                                 xsl:sort select="property[name='Ordinal']/value" {}
                             }
                         }
@@ -183,7 +184,7 @@ pub fn panel_xslt() -> String {
                                     "Backlog"
                                 }
                             }
-                            xsl:apply-templates select="(/state/task|./task)[property[name='Status']/value='']" {
+                            xsl:apply-templates select="(/state/task|./task)[not(property[name='Status']) or property[name='Status']/value='']" {
                                 xsl:sort select="property[name='Ordinal']/value" {}
                             }
                         }

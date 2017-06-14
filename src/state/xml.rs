@@ -1,7 +1,6 @@
 use state::State;
 use task::Task;
 
-use std;
 use std::cell::RefCell;
 use std::fs::File;
 use std::io::prelude::*;

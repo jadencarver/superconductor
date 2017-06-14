@@ -37,6 +37,7 @@ pub struct Filter {
     pub value: String
 }
 
+#[derive(Debug)]
 pub enum StateError {
 }
 
@@ -79,7 +80,7 @@ impl State {
         self.new_task = None;
     }
 
-    pub fn apply(&mut self, mut last_state: Option<State>, rng: &mut rand::ThreadRng) -> Result<State, StateError> {
+    pub fn apply(&mut self, mut last_state: Option<State>, rng: &mut rand::ThreadRng) -> Result<Option<State>, StateError> {
         let new_last_state = self.clone();
         let repo = Repository::open_from_env().unwrap();
         if let Some(ref mut last) = last_state {
@@ -107,6 +108,10 @@ impl State {
                 if self.save_update.is_some() || self.new_task.is_some() {
                     self.save_update(repo, rng);
                     self.reset();
+                    self.filter = Some(Filter {
+                        name: String::from("Status"), value: String::from("Sprint")
+                    });
+                    //return Ok(None);
                 }
             }
         } else {
@@ -117,7 +122,7 @@ impl State {
                 self.reset();
             }
         }
-        Ok(new_last_state)
+        Ok(Some(new_last_state))
     }
 
     fn save_update(&mut self, repo: Repository, rng: &mut rand::ThreadRng) {

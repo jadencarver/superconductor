@@ -177,12 +177,12 @@
       }
     }
 
-    &.tile--status-done.droppable, .tile--status-sprint.droppable {
+    &.tile--status-done.droppable, &.tile--status-sprint.droppable {
       &::before {
         min-height: 53pt;
       }
     }
-    &.tile--status-done > .task, .tile--status-sprint > .task {
+    &.tile--status-done > .task, &.tile--status-sprint > .task {
       height: 45pt;
     }
 
