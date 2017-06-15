@@ -2,59 +2,57 @@
 
 #__pm__panel {
   header {
-    margin: 0 10pt;
-    font-weight: 400;
-    font-weight: bold;
     background-color: $color0;
-    position: fixed;
+    font-weight: 400;
     line-height: 2em;
     margin: 0;
+    position: fixed;
+    top: 0;
     width: 100%;
-    top: 0px;
     z-index: 1;
 
     button {
+      border: 0;
       width: calc(100% - 5pt);
-      border: none;
     }
 
     &:after {
+      background-color: $color0;
       content: '';
-      width: 15pt;
-      height: 100%;
       display: block;
+      height: 100%;
+      left: 100%;
       position: fixed;
       top: 0;
-      left: 100%;
-      background-color: $color0;
+      width: 15pt;
     }
   }
 }
 
-
 #__pm__panel {
   ul.list {
+    float: left;
     font-size: 0.8em;
     list-style-type: none;
     margin: 0;
     padding: 3em 5pt 5pt;
     width: 33%;
-    float: left;
 
     header {
       width: calc(33% - 5pt);
     }
 
     .task {
-      display: flex;
-      margin-top: 1pt;
       background-color: $white;
       border: solid darken($white, 25%) 1pt;
+      display: flex;
+      margin-top: 1pt;
       padding: 0 5pt;
 
-      &:focus, &.selected {
+      &:focus,
+      &.selected {
         border-color: $color2;
-        box-shadow: inset 3pt 0pt 0pt $color3;
+        box-shadow: inset 3pt 0 0 $color3;
         outline: none;
       }
     }
@@ -67,32 +65,43 @@
       background-color: $color3;
       border-radius: 50%;
       color: $color0;
-      height: 2em;
       font-weight: bold;
+      height: 2em;
       line-height: 2em;
-      text-align: center;
       margin-top: 0.25em;
+      text-align: center;
       width: 2em;
     }
 
-    .task--name {
+    .task__name {
       font-weight: bold;
       width: 100pt;
     }
+  }
+
+  ul.list--backlog {
+
+    .task.selected {
+      border-color: $color3;
+      border-width: 2pt;
+      height: 50pt;
+    }
+
   }
 }
 
 #__pm__panel {
   ul.tiles {
-    font-size: 0.8em;
-    margin: 0 5pt;
-    list-style-type: none;
-    padding: 3.25em 0 0 0;
     float: left;
-    width: 115pt;
-    overflow-y: auto;
+    font-size: 0.8em;
     height: 100%;
     line-height: 1.25em;
+    list-style-type: none;
+    margin: 0 5pt;
+    overflow-y: auto;
+    padding: 3.25em 0 0;
+    width: 115pt;
+
     header {
       width: 105pt;
     }
@@ -100,6 +109,7 @@
 
   ul.tiles .column {
     height: 100%;
+
     &.droppable {
       button {
         background-color: darken($color0, 10%);
@@ -160,29 +170,32 @@
 
     .tiles__tile--head {
       border-color: $color2;
-      box-shadow: inset 0pt -3pt 0pt $color2;
+      box-shadow: inset 0 -3pt 0 $color2;
     }
 
     .remote {
-      box-shadow: inset 0pt -3pt 0pt $color1;
+      box-shadow: inset 0 -3pt 0 $color1;
       height: 5em;
     }
 
     &.tile--status-blocked > .task {
-      box-shadow: inset 3pt 0pt 0pt darken($color1, 5%);
+      box-shadow: inset 3pt 0 0 darken($color1, 5%);
 
       &.selected {
         border-color: $color1;
-        box-shadow: inset 3pt 0pt 0pt $color1;
+        box-shadow: inset 3pt 0 0 $color1;
       }
     }
 
-    &.tile--status-done.droppable, &.tile--status-sprint.droppable {
+    &.tile--status-done.droppable,
+    &.tile--status-sprint.droppable {
       &::before {
         min-height: 53pt;
       }
     }
-    &.tile--status-done > .task, &.tile--status-sprint > .task {
+
+    &.tile--status-done > .task,
+    &.tile--status-sprint > .task {
       height: 45pt;
     }
 

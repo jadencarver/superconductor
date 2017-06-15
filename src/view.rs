@@ -89,6 +89,12 @@ pub fn panel_xslt() -> String {
             xsl:template match="/state/properties/property" {
                 div.property {
                     xsl:choose {
+                        xsl:when test="name = 'Project'" {
+                            dt { label for="__pm__commit__properties--project" "Project" }
+                            dd.input {
+                                input type="text" id="__pm__commit__properties--project" name="property" data-name="Project" value="{/state/task/property[name[text()='Project']]/value}" {}
+                            }
+                        }
                         xsl:when test="name = 'Status'" {
                             dt { label for="__pm__commit__properties--status" "Status" }
                             dd.select tabindex="1" {
@@ -178,7 +184,7 @@ pub fn panel_xslt() -> String {
                                 xsl:sort select="property[name='Ordinal']/value" {}
                             }
                         }
-                        ul.list {
+                        ul.list.list--backlog {
                             header {
                                 button type="submit" name="filter" {
                                     "Backlog"
@@ -272,7 +278,7 @@ pub fn panel_xslt() -> String {
                         xsl:attribute name="data-name" {
                             xsl:value-of select="name" {}
                         }
-                        div class="task--name" {
+                        div class="task__name" {
                             xsl:value-of select="name" {}
                         }
                         div.task__property--description {

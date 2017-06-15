@@ -14,6 +14,7 @@ use self::git2::Delta;
 use self::git2::BranchType;
 use self::git2::{Diff, DiffDelta, DiffHunk, DiffLine, DiffBinary};
 use git2::ObjectType;
+use state::Filter;
 
 extern crate md5;
 extern crate chrono;
@@ -51,7 +52,7 @@ pub fn generate(state: Option<State>) -> String {
                         }
                     }
                 }
-                (properties())
+                (project())
             }
         }.into_string()
     }
@@ -70,30 +71,38 @@ pub fn generate(state: Option<State>) -> String {
             if !branch.is_head() { Some(task) } else { None }
         }
     }).collect();
-    let mut tasks = vec![];
-
-    if let Some(ref state) = state {
-        if let Some(ref filter) = state.filter {
-            if filter.name != "" {
-                let filter_name = Yaml::String(filter.name.clone());
-                let filter_by_value = Yaml::String(filter.value.clone());
-                tasks = all_tasks.iter().filter(|task| {
-                    match task.get(&repo, &filter_name) {
-                        Some(ref value) if *value == filter_by_value => true,
-                        Some(ref value) if *value == Yaml::Null => true,
-                        None => true,
-                        _ => false
-                    }
-                }).collect();
-            } else {
-                tasks = all_tasks.iter().map(|t|t).collect();
-            }
-        } else {
-            tasks = all_tasks.iter().map(|t|t).collect();
+    
+    // Set Filters
+    let filter: Option<Filter> = match all_tasks.is_empty() {
+        true => Some(Filter {
+            name: String::from("Status"),
+            value: String::from("Sprint")
+        }),
+        false => match state {
+            Some(ref state) => match state.filter {
+                Some(ref filter) => state.filter.clone(),
+                None => None,
+            },
+            None => None
         }
-    } else {
-        tasks = all_tasks.iter().map(|t|t).collect();
-    }
+    };
+
+    // Apply Filters
+    let mut tasks: Vec<&Task> = match filter {
+        Some(ref filter) => {
+            let filter_name = Yaml::String(filter.name.clone());
+            let filter_by_value = Yaml::String(filter.value.clone());
+            all_tasks.iter().filter(|task| {
+                match task.get(&repo, &filter_name) {
+                    Some(ref value) if *value == filter_by_value => true,
+                    Some(ref value) if *value == Yaml::Null => true,
+                    None => true,
+                    _ => false
+                }
+            }).collect()
+        },
+        None => all_tasks.iter().map(|t|t).collect()
+    };
 
     tasks.sort_by(|a, b| {
         let ordinal = Yaml::from_str("Ordinal");
@@ -109,6 +118,8 @@ pub fn generate(state: Option<State>) -> String {
         },
         None => head
     };
+
+    let task = Task::from_ref(&branch);
 
     let mut revwalk = repo.revwalk().unwrap();
     revwalk.set_sorting(git2::SORT_REVERSE);
@@ -147,18 +158,14 @@ pub fn generate(state: Option<State>) -> String {
                     }
                 }
             } @else {
-                @let task = Task::from_ref(&branch) {
-                    (render_task(&repo, &task, task.properties(&repo)))
-                }
+                (render_task(&repo, &task, task.properties(&repo)))
             }
             tasks {
-                @if let Some(state) = state {
-                    @if let Some(filter) = state.filter {
-                        @if filter.name != "" {
-                            filter {
-                                name (filter.name)
-                                value (filter.value)
-                            }
+                @if let Some(filter) = filter {
+                    @if filter.name != "" {
+                        filter {
+                            name (filter.name)
+                            value (filter.value)
                         }
                     }
                 }
@@ -194,7 +201,11 @@ pub fn generate(state: Option<State>) -> String {
                     }
                 }
             }
-            (properties())
+            @if task.name == "master" {
+                (project())
+            } @else {
+                (properties())
+            }
             changes {
                 @if let Ok(delta) = changes.stats() {
                     @if delta.files_changed() + delta.insertions() + delta.deletions() > 0 {
@@ -314,6 +325,37 @@ fn properties() -> PreEscaped<String> {
                 options {
                     option value="Jaden Carver <jaden.carver@gmail.com>" "Jaden Carver"
                     option value="Bob Dole <bdole69@gmail.com>" "Bob Dole"
+                }
+            }
+            property {
+                name "Manager"
+                value "Jaden Carver <jaden.carver@gmail.com>"
+                options {
+                    option value="Jaden Carver <jaden.carver@gmail.com>" "Jaden Carver"
+                    option value="Bob Dole <bdole69@gmail.com>" "Bob Dole"
+                }
+            }
+            property {
+                name "Description"
+            }
+        }
+    }
+}
+
+fn project() -> PreEscaped<String> {
+    html! {
+        properties {
+            property {
+                name "Project"
+            }
+            property {
+                name "Status"
+                options {
+                    option "Sprint"
+                    option "In Progress"
+                    option "In Review"
+                    option "Blocked"
+                    option "Done"
                 }
             }
             property {
