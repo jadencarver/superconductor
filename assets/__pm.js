@@ -63,7 +63,7 @@
         var debounceRoot = root;
         setTimeout(function() {
             if (root === debounceRoot) serialize(event.target.form, event);
-        }, event.target.tagName === "TEXTAREA" ? 250 : 0);
+        }, event.target.tagName === "TEXTAREA" ? 100 : 0);
     });
 
     DOM.addEventListener('keyup', function (event) {

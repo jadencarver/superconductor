@@ -83,7 +83,6 @@
 
     .task.selected {
       border-color: $color3;
-      border-width: 2pt;
       height: 50pt;
     }
 
@@ -199,7 +198,7 @@
       height: 45pt;
     }
 
-    .task--name {
+    .task__name {
       font-weight: bold;
       display: block;
       overflow: hidden;

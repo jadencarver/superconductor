@@ -1,4 +1,6 @@
+require 'pry'
 require 'ansi'
+require 'mini_magick'
 
 module IntegrationSpec
   module Screenshots
@@ -30,23 +32,44 @@ module IntegrationSpec
     end
     alias_method :tk, :take_screenshot
 
-    matcher :take_screenshot_of do |name|
+    matcher :look_like do |name|
       passed = true
       printf ANSI.clear_line + "\n"
-      match do |page|
+      match do |page_or_element|
+        if page_or_element.is_a?(Capybara::Node::Element)
+          element = page_or_element
+          page = page_or_element.session
+        else
+          page = page_or_element
+        end
         [
-          ["#{name}_iphone5.png", "iPhone 5", 320, 568 ],
-          ["#{name}_iphone6plus.png", "iPhone 6+", 414, 736 ],
-          ["#{name}_ipad.png", "iPad Portrait", 768, 1024],
+          #["#{name}_iphone5.png", "iPhone 5", 320, 568 ],
+          #["#{name}_iphone6plus.png", "iPhone 6+", 414, 736 ],
+          #["#{name}_ipad.png", "iPad Portrait", 768, 1024],
           ["#{name}.png", "Desktop", 2880/2, 1800/2 ],
         ].inject(0) do |accum, (filename, caption, width, height)|
 
           path = "#{PATH}/#{filename}"
           term_width = (width/height.to_f * (SIZE * 2.1)).ceil
           break if !WRAP && accum + term_width > ANSI::Terminal.terminal_width
-          page.driver.resize(width, height)
+          #page.driver.resize(width, height)
 
-          page.save_screenshot Rails.root.join(path)
+          page.save_screenshot path
+
+          if element
+            crop = page.evaluate_script(<<-JS)
+              document.evaluate(
+                '#{element.path}',
+                document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null
+              ).singleNodeValue.getBoundingClientRect()
+            JS
+            screenshot = MiniMagick::Image.open(path)
+            screenshot.crop "%{width}x%{height}+%{left}+%{top}" % crop.inject({}) { |h,(k,v)| h[k.to_sym]=v; h }
+            screenshot.write path
+          else
+            page.save_screenshot full_path
+          end
+
           git_status = tracked_screenshots[path]
 
           if git_status && git_status[1] != `git hash-object #{path}`.chomp
@@ -56,10 +79,10 @@ module IntegrationSpec
             system("git cat-file blob #{git_status[1]} | compare - #{path} tmp/capybara/diff_#{filename}")
             system("git cat-file blob #{git_status[1]} | convert -delay 150 -resize x300 -loop 0 - -background Orange label:'After' -gravity Center -append #{path} tmp/capybara/diff_#{filename} tmp/capybara/diff_#{filename}.gif")
 
-            data = Base64.encode64(Rails.root.join("tmp/capybara/diff_#{filename}.gif").read)
+            data = Base64.encode64(File.read("tmp/capybara/diff_#{filename}.gif"))
           else
             # GOOD
-            data = Base64.encode64(Rails.root.join(path).read)
+            data = Base64.encode64(File.read(path))
           end
 
           print ANSI.up(SIZE+1) + ANSI.right(accum) if accum > 0

@@ -81,8 +81,8 @@
     }
     #__pm__commit__message {
       height: 2.4em;
-      transition: height 250ms ease-in-out;
-      &:focus { height: calc(50% - 2.5em); }
+      transition: height 100ms ease-in-out;
+      &:focus { height: calc(25% - 2.5em); }
     }
   }
 

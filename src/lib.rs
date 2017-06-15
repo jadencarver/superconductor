@@ -63,7 +63,7 @@ pub extern "C" fn panel_js() -> *mut c_char {
             //highlight.setAttribute('src', '//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/highlight.min.js');
             //document.body.appendChild(highlight);
             PM = document.createElement('script');
-            PM.setAttribute('src', '/__pm.js');
+            PM.setAttribute('src', '/assets/__pm.js');
             document.body.appendChild(PM);
         }" }
     };
