@@ -5,9 +5,10 @@ RSpec.feature 'Managing tasks' do
 
   it 'displays tasks by status', js: true do
     visit '/docs/file/README.md'
-    #page.evaluate_script("$('#__pm')[0].getBoundingClientRect();")
-    panel = page.find('#__pm__panel')
-    expect(panel).to look_like('tasks-by_status')
+    fill_in 'Project', with: 'Your Next Project'
+    fill_in 'Description', with: 'Lorem Ipsum'
+    expect(page.find('#__pm__panel')).to look_like('tasks-by_status')
+    click_button 'New Task'
   end
 
 end

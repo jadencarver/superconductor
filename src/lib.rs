@@ -23,6 +23,7 @@ extern crate git2;
 
 pub static XML: &'static str = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
 
+
 mod state;
 mod view;
 mod server;
@@ -80,7 +81,13 @@ pub extern fn cleanup(s: *mut c_char) {
 
 #[cfg(test)]
 mod tests {
+    use std::env;
+    use std::process::Command;
+
     #[test]
     fn it_works() {
+        env::set_var("TARGET",  "debug");
+        env::set_var("GIT_DIR", "tmp/dummy/.git");
+        let rspec = Command::new("rspec").arg("spec/integration").status().unwrap();
     }
 }

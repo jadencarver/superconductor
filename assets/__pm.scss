@@ -185,8 +185,9 @@
 
     img {
       display: block;
-      margin: 1em auto;
+      margin: 1em 0;
       max-height: 100%;
+      max-width: calc(100% - 1em);
     }
 
     pre {
@@ -247,7 +248,7 @@
 
       code {
         $bound: darken($color4, 10%);
-        background-color: $color1;
+        background-color: $color4;
         //background-image: -webkit-linear-gradient(left, $color4, $color4 80em, $bound 80.1em, $bound);
         background-image:         linear-gradient(left, $color4, $color4 80em, $bound 80.1em, $bound);
         color: $color0;

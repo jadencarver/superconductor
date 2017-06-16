@@ -82,7 +82,7 @@ impl State {
 
     pub fn apply(&mut self, mut last_state: Option<State>, rng: &mut rand::ThreadRng) -> Result<Option<State>, StateError> {
         let new_last_state = self.clone();
-        let repo = Repository::open_from_env().unwrap();
+        let repo = Repository::open_from_env().unwrap_or(Repository::init(".").unwrap());
         if let Some(ref mut last) = last_state {
             println!("{}{:?}{}", color::Fg(color::LightBlack), last, color::Fg(color::Reset));
             println!("{:?}", self);
@@ -92,12 +92,12 @@ impl State {
                 println!("  {}Task changing{}  {} => {}", color::Fg(color::LightYellow), color::Fg(color::Reset), last.task, self.task);
                 if self.dragged.is_some() {
                     println!("  {}Saving last state due to dragging{}", color::Fg(color::LightGreen), color::Fg(color::Reset));
-                    last.save_update(repo, rng);
+                    last.save_update(&repo, rng);
                     self.reset_with_status();
                 } else {
                     let switching_to_task = self.task.clone();
                     self.task = last.task.clone();
-                    self.save_update(repo, rng);
+                    self.save_update(&repo, rng);
                     self.task = switching_to_task;
                     self.reset();
                 }
@@ -106,7 +106,7 @@ impl State {
                 self.apply_index(&repo);
 
                 if self.save_update.is_some() || self.new_task.is_some() {
-                    self.save_update(repo, rng);
+                    self.save_update(&repo, rng);
                     self.reset();
                     self.filter = Some(Filter {
                         name: String::from("Status"), value: String::from("Sprint")
@@ -125,7 +125,7 @@ impl State {
         Ok(Some(new_last_state))
     }
 
-    fn save_update(&mut self, repo: Repository, rng: &mut rand::ThreadRng) {
+    fn save_update(&mut self, repo: &Repository, rng: &mut rand::ThreadRng) {
         let mut index = repo.index().unwrap();
         index.read(false).unwrap();
         let author = repo.signature().unwrap();

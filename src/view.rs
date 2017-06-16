@@ -73,7 +73,8 @@ pub fn panel_xslt() -> String {
                         xsl:choose {
                             xsl:when test="/state/setup" {
                                 div.setup {
-                                    h1 "Superconductor"
+                                    h1 "Setup Instructions"
+                                    p "Begin by entering your project name, and selecting the appropriate properties."
                                 }
                             }
                             xsl:when test="/state/diffs/*" {
