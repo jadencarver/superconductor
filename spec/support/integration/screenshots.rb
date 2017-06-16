@@ -26,7 +26,7 @@ module IntegrationSpec
         else width = term_width
         end
 
-        data = Base64.encode64(Rails.root.join(path).read)
+        data = Base64.encode64(File.read(path))
         puts "\n#{ANSI.right(term_width/2-width/2)}\033]1337;File=;inline=1;width=#{width}:#{data}\a\n\n"
       end
     end
