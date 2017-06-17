@@ -10,13 +10,22 @@
     position: sticky;
     top: 0;
     z-index: -1;
+
     .property {
-      display: flex;
       margin-bottom: 1em;
+
+      &.property--inline {
+        display: flex;
+
+        textarea {
+          height: 5em;
+        }
+      }
+
       dt {
-        float: left;
         min-width: 8em;
       }
+
       dd {
         width: 100%;
       }
@@ -25,22 +34,24 @@
 
   #__pm__commit {
     display: block;
-    overflow: auto;
     height: 100%;
+    overflow: auto;
   }
 
   #__pm__new_commit {
-    position: relative;
-    min-height: 3em;
-    line-height: 3em;
     background-color: $color0;
+    line-height: 3em;
+    min-height: 3em;
+    position: relative;
+
     ul#__pm__new_commit__actions {
       display: flex;
-      position: absolute;
-      top: 0;
-      right: 0;
       list-style-type: none;
+      position: absolute;
+      right: 0;
+      top: 0;
     }
+
     input[type='submit'] {
       margin-left: 5pt;
     }

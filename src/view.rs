@@ -90,15 +90,17 @@ pub fn panel_xslt() -> String {
                 }
             }
             xsl:template match="/state/properties/property" {
-                div.property {
-                    xsl:choose {
-                        xsl:when test="name = 'Project'" {
+                xsl:choose {
+                    xsl:when test="name = 'Project'" {
+                        div.property.property--inline {
                             dt { label for="__pm__commit__properties--project" "Project" }
                             dd.input {
                                 input type="text" id="__pm__commit__properties--project" name="property" data-name="Project" value="{/state/task/property[name[text()='Project']]/value}" {}
                             }
                         }
-                        xsl:when test="name = 'Status'" {
+                    }
+                    xsl:when test="name = 'Status'" {
+                        div.property.property--inline {
                             dt { label for="__pm__commit__properties--status" "Status" }
                             dd.select tabindex="1" {
                                 xsl:value-of select="/state/task/property[name[text()='Status']]/value" {}
@@ -108,7 +110,9 @@ pub fn panel_xslt() -> String {
                                 }
                             }
                         }
-                        xsl:when test="name = 'Developer'" {
+                    }
+                    xsl:when test="name = 'Developer'" {
+                        div.property.property--inline {
                             dt { label for="__pm__commit__properties--developer" "Developer" }
                             dd.select {
                                 input type="text" id="__pm__commit__properties--developer" value="{/state/task/property[name[text()='Developer']]/value}" {}
@@ -117,7 +121,9 @@ pub fn panel_xslt() -> String {
                                 }
                             }
                         }
-                        xsl:when test="name = 'Manager'" {
+                    }
+                    xsl:when test="name = 'Manager'" {
+                        div.property.property--inline {
                             dt { label for="__pm__commit__properties--owner" "Manager" }
                             dd.select {
                                 input type="text" id="__pm__commit__properties--manager" value="{/state/task/property[name[text()='Manager']]/value}" {}
@@ -126,7 +132,9 @@ pub fn panel_xslt() -> String {
                                 }
                             }
                         }
-                        xsl:when test="name = 'Description'" {
+                    }
+                    xsl:when test="name = 'Description'" {
+                        div.property {
                             dt { label for="__pm__commit__properties--description" "Description" }
                             dd {
                                 textarea id="__pm__commit__properties--description" name="property" data-name="Description" {
@@ -134,13 +142,17 @@ pub fn panel_xslt() -> String {
                                 }
                             }
                         }
-                        xsl:when test="name = 'Estimate'" {
+                    }
+                    xsl:when test="name = 'Estimate'" {
+                        div.property.property--inline {
                             dt { label for="__pm__commit__properties--estimate" "Estimate" }
                             dd.input {
                                 input type="range" id="__pm__commit__properties--estimate" name="property" data-name="Estimate" value="{/state/task/property[name[text()='Estimate']]/value}" {}
                             }
                         }
-                        xsl:otherwise {
+                    }
+                    xsl:otherwise {
+                        div.property {
                             xsl:variable name="name" select="name/text()" {}
                             xsl:variable name="value" select="/state/task/property[name[text() = $name]]/value" {}
                             input type="hidden" name="property" data-name="{name}" value="{$value}" {}

@@ -56,7 +56,7 @@ pub fn connect(connection: Connection<WebSocketStream, WebSocketStream>) {
         }
     }
 
-    let mut client = response.send().unwrap();
+    let client = response.send().unwrap();
 
     let (tx, rx) = channel::<NotifierMessage>();
     let (sender, mut receiver) = client.split();
