@@ -108,20 +108,24 @@ impl State {
                 if self.save_update.is_some() || self.new_task.is_some() {
                     self.save_update(&repo, rng);
                     self.reset();
-                    self.filter = Some(Filter {
-                        name: String::from("Status"), value: String::from("Sprint")
-                    });
-                    return Ok(None);
+                    if self.new_task.is_some() {
+                        self.filter = Some(Filter {
+                            name: String::from("Status"), value: String::from("Sprint")
+                        });
+                        return Ok(None);
+                    }
                 }
             }
         } else {
             if self.save_update.is_some() || self.new_task.is_some() {
                 self.save_update(&repo, rng);
                 self.reset();
-                self.filter = Some(Filter {
-                    name: String::from("Status"), value: String::from("Sprint")
-                });
-                return Ok(None);
+                if self.new_task.is_some() {
+                    self.filter = Some(Filter {
+                        name: String::from("Status"), value: String::from("Sprint")
+                    });
+                    return Ok(None);
+                }
             }
         }
         Ok(Some(new_last_state))
