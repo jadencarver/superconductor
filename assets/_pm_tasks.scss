@@ -50,6 +50,7 @@
       background-color: $color-blocked;
       box-shadow: inset 0 1em 0.15em lighten($color-blocked, 10%);
       border: solid 1px darken($color-blocked, 10%);
+      color: $color-base;
     }
   }
 
@@ -66,7 +67,7 @@
       background-color: $color-backlog;
       box-shadow: inset 0 1em 0.15em lighten($color-backlog, 3%);
       border: solid 1px darken($color-backlog, 5%);
-      color: #FFF;
+      color: $color-base;
     }
   }
 
