@@ -25,6 +25,8 @@ use std::sync::mpsc::channel;
 use std::sync::mpsc::Sender;
 use std::sync::mpsc::Receiver;
 
+use git2::Repository;
+
 use serde_xml as xml;
 
 const HEARTBEAT: u64 = 250;
@@ -61,8 +63,10 @@ pub fn connect(connection: Connection<WebSocketStream, WebSocketStream>) {
     let (tx, rx) = channel::<NotifierMessage>();
     let (sender, mut receiver) = client.split();
     let notifier = thread::spawn(move || start_notifier(rx, sender));
-    let txc = tx.clone();
-    let monitor = thread::spawn(move || start_monitor(txc));
+    let monitor_tx = tx.clone();
+    let monitor = thread::spawn(move || start_monitor(monitor_tx));
+    let updater_tx = tx.clone();
+    let updater = thread::spawn(move || start_updater(updater_tx));
     for message in receiver.incoming_messages() {
         let message: WebMessage = message.unwrap_or(WebMessage::close());
         match message.opcode {
@@ -140,6 +144,17 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
                 sender.send_message(&message).unwrap();
             }
         }
+    }
+}
+
+fn start_updater(tx: Sender<NotifierMessage>) {
+    loop {
+        thread::sleep(Duration::from_secs(300));
+        let repo = Repository::open_from_env().unwrap_or(Repository::init(".").unwrap());
+        if let Ok(mut origin) = repo.find_remote("origin") {
+            println!("Updating from remote...");
+            origin.fetch(&["master"], None, None);
+        };
     }
 }
 
