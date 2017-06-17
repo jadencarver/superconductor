@@ -57,16 +57,20 @@ pub fn connect(connection: Connection<WebSocketStream, WebSocketStream>) {
     }
 
     let mut client = response.send().unwrap();
-    let message = WebMessage::text(generate(None));
-    client.send_message(&message).unwrap();
 
     let (tx, rx) = channel::<NotifierMessage>();
     let (sender, mut receiver) = client.split();
     let notifier = thread::spawn(move || start_notifier(rx, sender));
+
+    let message = WebMessage::text(generate(None));
+    tx.send(NotifierMessage::WebMessage(message)).unwrap();
+
     let monitor_tx = tx.clone();
     let monitor = thread::spawn(move || start_monitor(monitor_tx));
+
     let updater_tx = tx.clone();
     let updater = thread::spawn(move || start_updater(updater_tx));
+
     for message in receiver.incoming_messages() {
         let message: WebMessage = message.unwrap_or(WebMessage::close());
         match message.opcode {
@@ -77,6 +81,7 @@ pub fn connect(connection: Connection<WebSocketStream, WebSocketStream>) {
             _ => tx.send(NotifierMessage::WebMessage(message))
         }.unwrap();
     }
+
     monitor.join().unwrap();
     notifier.join().unwrap();
     updater.join().unwrap();
