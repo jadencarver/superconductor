@@ -64,7 +64,7 @@
     border-bottom-width: 1px;
   }
 
-  $grey: darken($white, 25%);
+  $grey: darken($color-base, 25%);
 
   textarea,
   input[type=text],
@@ -148,7 +148,7 @@
 
     &:hover {
       background-color: $color3;
-      color: $white;
+      color: $color-base;
     }
 
     &.warning {
@@ -157,7 +157,7 @@
 
     &.warning:hover {
       background-color: $color1;
-      color: $white;
+      color: $color-base;
     }
   }
 

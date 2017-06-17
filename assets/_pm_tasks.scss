@@ -43,8 +43,8 @@
     }
 
     .task {
-      background-color: $white;
-      border: solid darken($white, 25%) 1pt;
+      background-color: $color-base;
+      border: solid darken($color-base, 25%) 1pt;
       margin-top: 1pt;
       padding: 0 5pt;
       overflow: auto;
@@ -141,11 +141,11 @@
       width: 100pt;
       height: 100pt;
       background-color: $color0;
-      border: solid 1px darken($white, 20%);
+      border: solid 1px darken($color-base, 20%);
       border-radius: 3pt;
-      padding: 0 5pt 0 1em;
+      padding: 0 5pt 0 calc(1em + 5pt);
       margin: 0;
-      box-shadow: inset 3pt 0pt 0pt $white;
+      box-shadow: inset 3pt 0pt 0pt $color-base;
       overflow: hidden;
       text-overflow: ellipsis;
       position: relative;
@@ -155,7 +155,7 @@
         border-color: $color2;
         margin-top: -0.1em;
         margin-bottom: 0.1em;
-        background-color: $white;
+        background-color: $color-base;
         box-shadow: inset 3pt 0pt 0pt $color3;
         outline: none;
       }
@@ -165,10 +165,10 @@
         display: block;
         position: absolute;
         bottom: 0; height: 50%;
-        left: 5pt; right: 0;
-        background: rgba(255,255,255,0.5);
-        background: -webkit-linear-gradient(top, rgba($color0,0), rgba($color0,1));
-        background:         linear-gradient(top, rgba($color0,0), rgba($color0,1));
+        left: 8pt; right: 0;
+        background: rgba($color-base,0.5);
+        background: -webkit-linear-gradient(top, rgba($color-base,0), rgba($color-base,0.75));
+        background:         linear-gradient(top, rgba($color-base,0), rgba($color-base,0.75));
       }
     }
 
@@ -203,15 +203,23 @@
       height: 45pt;
     }
 
+    &.tile--status-sprint       > .task { box-shadow: inset 6pt 0 0 $color-sprint, inset 7pt 0 0 darken($color-sprint, 10%); }
+    &.tile--status-in-progress  > .task { box-shadow: inset 6pt 0 0 $color-in-progress, inset 7pt 0 0 darken($color-in-progress, 10%); }
+    &.tile--status-in-review    > .task { box-shadow: inset 6pt 0 0 $color-in-review, inset 7pt 0 0 darken($color-in-review, 10%); }
+    &.tile--status-blocked      > .task { box-shadow: inset 6pt 0 0 $color-blocked, inset 7pt 0 0 darken($color-blocked, 10%); }
+    &.tile--status-done         > .task { box-shadow: inset 6pt 0 0 $color-done, inset 7pt 0 0 darken($color-done, 10%); }
+
     .task__name {
       font-weight: bold;
+      font-size: 1.1em;
       display: block;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
       line-height: 2em;
-      border-bottom: dotted 1px darken($white, 20%);
+      border-bottom: dotted 1px darken($color-base, 20%);
       margin-bottom: 0.5em;
+      letter-spacing: 0.1em;
     }
 
     .task__property--description {
