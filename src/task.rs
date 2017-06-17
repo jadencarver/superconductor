@@ -17,16 +17,10 @@ impl Task {
         let commit_obj = reference.peel(ObjectType::Commit).unwrap();
         let commit = commit_obj.as_commit().unwrap();
         let name = reference.shorthand().unwrap_or("master");
-        let mut tasks = Task::from_commit(&name, &commit);
-        tasks.retain(|c| c.name == name);
-        tasks.pop().unwrap_or(Task {
-            name: String::from(name),
-            changes: Hash::new(),
-            commit: None
-        })
+        Task::from_commit(&name, &commit)
     }
 
-    pub fn from_commit(name: &str, commit: &Commit) -> Vec<Task> {
+    pub fn from_commit(name: &str, commit: &Commit) -> Task {
         let mut messages = commit.message().unwrap().split("---\n");
         let _message = messages.next().unwrap();
         let mut tasks = vec![];
@@ -49,7 +43,12 @@ impl Task {
                 }
             }
         };
-        tasks
+        tasks.retain(|c| c.name == name);
+        tasks.pop().unwrap_or(Task {
+            name: String::from(name),
+            commit: Some(commit.id()),
+            changes: Hash::new()
+        })
     }
 
     pub fn get(&self, repo: &Repository, property: &Yaml) -> Option<Yaml> {
@@ -57,17 +56,8 @@ impl Task {
             Some(value.clone())
         } else if let Some(commit) = self.commit {
             let commit = repo.find_commit(commit).expect("Unable to find commit!");
-            let mut parents = vec![];
-            let mut candidates = vec![];
-            for parent in commit.parents() {
-                let mut tasks = Task::from_commit(&self.name, &parent);
-                parents.append(&mut tasks);
-            }
-            for parent in parents.iter() {
-                if let Some(value) = parent.get(&repo, property) {
-                    candidates.push(value);
-                }
-            }
+            let parents = commit.parents().map(|parent| Task::from_commit(&self.name, &parent));
+            let mut candidates: Vec<Yaml> = parents.filter_map(|task| task.get(&repo, property)).collect();
             candidates.pop()
         } else {
             None
@@ -78,9 +68,7 @@ impl Task {
         if let Some(commit_oid) = self.commit {
             let commit = repo.find_commit(commit_oid).unwrap();
             if let Some(parent) = commit.parents().next() {
-                let mut tasks = Task::from_commit(&self.name, &parent);
-                tasks.retain(|c| c.name == self.name);
-                tasks.pop()
+                Some(Task::from_commit(&self.name, &parent))
             } else { None }
         } else { None }
     }
@@ -91,24 +79,27 @@ impl Task {
             let after = match value {
                 Yaml::String(ref s) => s.clone(),
                 Yaml::Integer(i) => format!("{}", i),
-                Yaml::Real(i) => format!("{}", i),
+                Yaml::Real(ref i) => format!("{}", i),
                 Yaml::Boolean(b) => format!("{}", b),
                 Yaml::Null => format!(""),
                 _ => String::from("[unknown]")
             };
             let before = if let Some(parent) = self.parent(&repo) {
                 match parent.get(&repo, &key) {
-                    Some(value) => {
-                        match value {
-                            Yaml::String(ref s) => Some(s.clone()),
-                            Yaml::Integer(i) => Some(format!("{}", i)),
-                            Yaml::Real(i) => Some(format!("{}", i)),
-                            Yaml::Boolean(b) => Some(format!("{}", b)),
-                            Yaml::Null => Some(format!("")),
-                            _ => None
+                    Some(before_value) => {
+                        if before_value == value {
+                            None
+                        } else {
+                            match before_value {
+                                Yaml::String(ref s) => Some(s.clone()),
+                                Yaml::Integer(i) => Some(format!("{}", i)),
+                                Yaml::Real(i) => Some(format!("{}", i)),
+                                Yaml::Boolean(b) => Some(format!("{}", b)),
+                                Yaml::Null => Some(format!("")),
+                                _ => None
+                            }
                         }
-                    },
-                    None => None
+                    }, _ => None
                 }
             } else { None };
             changes.push((String::from(key.as_str().unwrap()), before, after));
