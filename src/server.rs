@@ -35,8 +35,7 @@ enum NotifierMessage<'a> {
     FsEvent(FsEvent)
 }
 
-pub fn start(port: Option<i32>) -> Result<Server<'static>, std::io::Error> {
-    let port = port.unwrap_or(2794);
+pub fn start(port: i32) -> Result<Server<'static>, std::io::Error> {
     let host = format!("127.0.0.1:{}", port);
     Server::bind(host)
 }

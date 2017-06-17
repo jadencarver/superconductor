@@ -35,13 +35,14 @@ pub extern "C" fn panel_xslt() -> *mut c_char {
 }
 
 #[no_mangle]
-pub extern "C" fn start() {
-    let mut _server = server::start(None);
+pub extern "C" fn start() -> i32 {
+    let mut port = 2794;
+    let mut _server = server::start(port);
     if _server.is_err() {
         println!("Failed to connect on default websocket port");
         let mut rng = rand::thread_rng();
-        let port = 2794 + rng.gen::<i32>() % 10;
-        _server = server::start(Some(port));
+        port = port + rng.gen::<i32>() % 10;
+        _server = server::start(port);
     }
     match _server {
         Ok(server) => {
@@ -53,10 +54,11 @@ pub extern "C" fn start() {
         },
         _ => println!("Unable to start websocket server")
     };
+    port
 }
 
 #[no_mangle]
-pub extern "C" fn panel_js() -> *mut c_char {
+pub extern "C" fn panel_js(port: i32) -> *mut c_char {
     let markup = html! {
         script { "
         if (window === window.top) {
@@ -65,6 +67,7 @@ pub extern "C" fn panel_js() -> *mut c_char {
             //document.body.appendChild(highlight);
             PM = document.createElement('script');
             PM.setAttribute('src', '/assets/__pm.js');
+            PM.port = " (port) ";
             document.body.appendChild(PM);
         }" }
     };

@@ -3,7 +3,7 @@ require 'superconductor'
 module Superconductor
   class Middleware
 
-    Superconductor.start();
+    PORT = Superconductor.start();
 
     def initialize(app)
       @app = app
@@ -57,7 +57,7 @@ module Superconductor
         body << res
       end
       if headers["Content-Type"] == 'text/html'
-        panel_js = Superconductor.panel_js
+        panel_js = Superconductor.panel_js(PORT)
         panel_js.free = Superconductor[:cleanup]
         headers.delete('Content-Length')
         body << panel_js.to_s

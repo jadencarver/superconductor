@@ -9,9 +9,9 @@ module Superconductor
   target = ENV['TARGET'] || 'release'
   extend Fiddle::Importer
   dlload File.expand_path("../../target/#{target}/libsuperconductor.dylib", __FILE__)
-  extern "char* panel_js()"
+  extern "char* panel_js(int)"
   extern "char* panel_xslt()"
-  extern "void start()"
+  extern "int start()"
 
   #extern "unsigned char u8_return_test()"
   #extern "short i16_return_test()"
