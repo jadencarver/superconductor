@@ -2,7 +2,7 @@
 
 Superconductor is a Workflow and Project Management tool
 
-![Superconductor](spec/integration/screenshots/tasks-by_status.png)
+![Superconductor](spec/integration/screenshots/tasks-setup.png)
 
 ## Installation
 
