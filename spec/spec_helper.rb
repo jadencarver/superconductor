@@ -103,7 +103,6 @@ RSpec.configure do |config|
   Kernel.srand config.seed
 
   config.before(:each) do
-    puts "Cleaning dummy folder in spec_helper"
     `rm -rf tmp/dummy`
     Dir.mkdir('tmp') unless Dir.exist?('tmp')
     Dir.mkdir(File.join('tmp','dummy'))
