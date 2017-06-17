@@ -203,11 +203,25 @@
       height: 45pt;
     }
 
-    &.tile--status-sprint       > .task { box-shadow: inset 6pt 0 0 $color-sprint, inset 7pt 0 0 darken($color-sprint, 10%); }
-    &.tile--status-in-progress  > .task { box-shadow: inset 6pt 0 0 $color-in-progress, inset 7pt 0 0 darken($color-in-progress, 10%); }
-    &.tile--status-in-review    > .task { box-shadow: inset 6pt 0 0 $color-in-review, inset 7pt 0 0 darken($color-in-review, 10%); }
-    &.tile--status-blocked      > .task { box-shadow: inset 6pt 0 0 $color-blocked, inset 7pt 0 0 darken($color-blocked, 10%); }
-    &.tile--status-done         > .task { box-shadow: inset 6pt 0 0 $color-done, inset 7pt 0 0 darken($color-done, 10%); }
+    &.tile--status-sprint > .task {
+      box-shadow: inset 6pt 0 0 $color-sprint,      inset calc(6pt + 1px) 0 0 darken($color-sprint, 10%);
+    }
+
+    &.tile--status-in-progress > .task {
+      box-shadow: inset 6pt 0 0 $color-in-progress, inset calc(6pt + 1px) 0 0 darken($color-in-progress, 10%);
+    }
+
+    &.tile--status-in-review > .task {
+      box-shadow: inset 6pt 0 0 $color-in-review,   inset calc(6pt + 1px) 0 0 darken($color-in-review, 10%);
+    }
+
+    &.tile--status-blocked > .task {
+      box-shadow: inset 6pt 0 0 $color-blocked,     inset calc(6pt + 1px) 0 0 darken($color-blocked, 10%);
+    }
+
+    &.tile--status-done > .task {
+      box-shadow: inset 6pt 0 0 $color-done,        inset calc(6pt + 1px) 0 0 darken($color-done, 10%);
+    }
 
     .task__name {
       font-weight: bold;
