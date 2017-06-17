@@ -1,6 +1,7 @@
 @import 'colors';
 
 #__pm__panel {
+
   header {
     background-color: $color0;
     font-weight: 400;
@@ -12,8 +13,8 @@
     z-index: 1;
 
     button {
-      border: 0;
       width: calc(100% - 5pt);
+      border: solid darken($color0, 5%) 1pt;
     }
 
     &:after {
@@ -27,6 +28,49 @@
       width: 15pt;
     }
   }
+
+  //.tasks--status-in-progress {
+  //  header button {
+  //    background-color: $color-in-progress;
+  //    box-shadow: inset 0 1em 0.15em lighten($color-in-progress, 3%);
+  //    border: solid 1px darken($color-in-progress, 5%);
+  //  }
+  //}
+
+  //.tasks--status-in-review {
+  //  header button {
+  //    background-color: $color-in-review;
+  //    box-shadow: inset 0 1em 0.15em lighten($color-in-review, 20%);
+  //    border: solid 1px darken($color-in-review, 10%);
+  //  }
+  //}
+
+  //.tasks--status-blocked {
+  //  header button {
+  //    background-color: $color-blocked;
+  //    box-shadow: inset 0 1em 0.15em lighten($color-blocked, 10%);
+  //    border: solid 1px darken($color-blocked, 10%);
+  //    color: $color-base;
+  //  }
+  //}
+
+  //.tasks--status-done {
+  //  header button {
+  //    background-color: $color-done;
+  //    box-shadow: inset 0 1em 0.15em lighten($color-done, 10%);
+  //    border: solid 1px darken($color-done, 5%);
+  //  }
+  //}
+
+  //.tasks--backlog {
+  //  header button {
+  //    background-color: $color-backlog;
+  //    box-shadow: inset 0 1em 0.15em lighten($color-backlog, 3%);
+  //    border: solid 1px darken($color-backlog, 5%);
+  //    color: $color-base;
+  //  }
+  //}
+
 }
 
 #__pm__panel {
@@ -84,14 +128,6 @@
       float: left;
     }
   }
-
-  ul.list--backlog {
-
-    .task.selected {
-      border-color: $color3;
-    }
-
-  }
 }
 
 #__pm__panel {
@@ -115,8 +151,8 @@
     height: 100%;
 
     &.droppable {
-      button {
-        background-color: darken($color0, 10%);
+      header button {
+        box-shadow: inset 0 0.5em 0.15em rgba($color-base, 0.5);
       }
     }
   }
@@ -151,7 +187,8 @@
       position: relative;
       background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAADCAYAAABWKLW/AAAADklEQVQImWNgQAAp3AwABaMAT0kwJI8AAAAASUVORK5CYII=);
 
-      &:focus, &.selected {
+      &:focus,
+      &.selected {
         border-color: $color3;
         margin-top: -1pt;
         margin-bottom: 1pt;
@@ -170,16 +207,6 @@
         background: -webkit-linear-gradient(top, rgba($color-base,0), rgba($color-base,0.75));
         background:         linear-gradient(top, rgba($color-base,0), rgba($color-base,0.75));
       }
-    }
-
-    .tiles__tile--head {
-      border-color: $color2;
-      box-shadow: inset 0 -3pt 0 $color2;
-    }
-
-    .remote {
-      box-shadow: inset 0 -3pt 0 $color1;
-      height: 5em;
     }
 
     &.tile--status-done.droppable,

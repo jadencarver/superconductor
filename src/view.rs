@@ -189,7 +189,11 @@ pub fn panel_xslt() -> String {
                 xsl:choose {
                     xsl:when test="filter" {
                         input type="hidden" name="filter" data-name="{filter/name}" data-value="{filter/value}" {}
-                        ul.list {
+                        xsl:variable name="class" {
+                            xsl:value-of select="concat('tasks--status-', translate(filter/value, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ', 'abcdefghijklmnopqrstuvwxyz-'))" {}
+                            " list"
+                        }
+                        ul class="{$class}" {
                             header {
                                 button type="submit" name="filter" {
                                     xsl:value-of select="filter/value" {}
@@ -199,7 +203,7 @@ pub fn panel_xslt() -> String {
                                 xsl:sort select="property[name='Ordinal']/value" {}
                             }
                         }
-                        ul.list.list--backlog {
+                        ul.tasks--backlog.list {
                             header {
                                 button type="submit" name="filter" {
                                     "Backlog"
@@ -229,7 +233,11 @@ pub fn panel_xslt() -> String {
                                     }
                                 }
                             }
-                            ul.tiles data-property-name="Status" data-property-value="{.}" {
+                            xsl:variable name="class" {
+                                xsl:value-of select="concat('tasks--status-', translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ', 'abcdefghijklmnopqrstuvwxyz-'))" {}
+                                " tiles"
+                            }
+                            ul class="{$class}" data-property-name="Status" data-property-value="{.}" {
                                 div.column data-property-name="Ordinal" data-property-value="{$next}" {
                                     header {
                                         button type="submit" name="filter" data-name="Status" data-value="{.}" {

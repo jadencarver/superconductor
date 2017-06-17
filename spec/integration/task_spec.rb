@@ -20,7 +20,7 @@ RSpec.feature 'Tasks' do
     fill_in 'message', with: 'Initial commit'
     expect(panel).to look_like('tasks-setup')
     click_button 'Save Update'
-    expect(panel).to have_css('.list--backlog')
+    expect(panel).to have_css('.tasks--backlog')
   end
 
   def create_a_new_task status
