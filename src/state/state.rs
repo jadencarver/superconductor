@@ -88,7 +88,7 @@ impl State {
             println!("{:?}", self);
             println!("▶ ");
             println!("Applying to repo: {:?}", repo.path());
-            if self.task != last.task {
+            if self.task != last.task && last.new_task.is_none() {
                 println!("  {}Task changing{}  {} => {}", color::Fg(color::LightYellow), color::Fg(color::Reset), last.task, self.task);
                 if self.dragged.is_some() {
                     println!("  {}Saving last state due to dragging{}", color::Fg(color::LightGreen), color::Fg(color::Reset));
@@ -107,21 +107,11 @@ impl State {
 
                 if self.save_update.is_some() || self.new_task.is_some() {
                     self.save_update(&repo, rng);
-                    self.reset();
-                    self.filter = Some(Filter {
-                        name: String::from("Status"), value: String::from("Sprint")
-                    });
-                    return Ok(None);
                 }
             }
         } else {
             if self.save_update.is_some() || self.new_task.is_some() {
                 self.save_update(&repo, rng);
-                self.reset();
-                self.filter = Some(Filter {
-                    name: String::from("Status"), value: String::from("Sprint")
-                });
-                return Ok(None);
             }
         }
         Ok(Some(new_last_state))
@@ -169,6 +159,9 @@ impl State {
                 repo.branch(&new_task, &commit, false).unwrap();
                 self.task = new_task;
                 self.reset();
+                self.filter = Some(Filter {
+                    name: String::from("Status"), value: String::from("Sprint")
+                });
                 println!("  State reset: {:?}", self);
             } else {
                 panic!("Unable to find master branch from which to fork!");

@@ -79,6 +79,7 @@ pub fn connect(connection: Connection<WebSocketStream, WebSocketStream>) {
     }
     monitor.join().unwrap();
     notifier.join().unwrap();
+    updater.join().unwrap();
 }
 
 fn start_monitor(tx: Sender<NotifierMessage>) {
@@ -103,7 +104,9 @@ fn start_monitor(tx: Sender<NotifierMessage>) {
             }
         }
         if !changes.is_empty() {
-            tx.send(NotifierMessage::FsEvent(changes.pop().unwrap())).unwrap();
+            if tx.send(NotifierMessage::FsEvent(changes.pop().unwrap())).is_err() {
+                break;
+            };
         }
     }
     observer.join().unwrap();

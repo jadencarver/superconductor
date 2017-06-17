@@ -118,7 +118,7 @@ impl Task {
 
     pub fn properties(&self, repo: &Repository) -> Vec<(String, Option<String>, String)> {
         let mut changes = vec![];
-        let properties = ["Ordinal","Status","Estimate","Developer","Description"];
+        let properties = ["Ordinal","Status","Project","Estimate","Developer","Description"];
         for property in properties.iter() {
             let prop = Yaml::String(String::from(*property));
             if let Some(value) = self.get(&repo, &prop) {

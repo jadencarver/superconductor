@@ -45,9 +45,9 @@
     .task {
       background-color: $white;
       border: solid darken($white, 25%) 1pt;
-      display: flex;
       margin-top: 1pt;
       padding: 0 5pt;
+      overflow: auto;
 
       &:focus,
       &.selected {
@@ -58,7 +58,11 @@
     }
 
     .task__property--description {
-      flex-grow: 1;
+      float: left;
+      width: calc(100% - 7em);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .task__property--estimate {
@@ -71,11 +75,13 @@
       margin-top: 0.25em;
       text-align: center;
       width: 2em;
+      float: right;
     }
 
     .task__name {
       font-weight: bold;
-      width: 100pt;
+      width: 5em;
+      float: left;
     }
   }
 
@@ -83,7 +89,6 @@
 
     .task.selected {
       border-color: $color3;
-      height: 50pt;
     }
 
   }

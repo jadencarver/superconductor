@@ -162,7 +162,9 @@ pub fn generate(state: Option<State>) -> String {
                     }
                 }
             } @else {
-                (render_task(&repo, &task, task.properties(&repo)))
+                @let task = Task::from_ref(&branch) {
+                    (render_task(&repo, &task, task.properties(&repo)))
+                }
             }
             tasks {
                 @if let Some(filter) = filter {
