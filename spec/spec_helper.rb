@@ -102,17 +102,18 @@ RSpec.configure do |config|
   # as the one that triggered the failure.
   Kernel.srand config.seed
 
-  config.before :each do
+  config.before(:each) do
+    puts "Cleaning dummy folder in spec_helper"
     `rm -rf tmp/dummy`
-    Dir.mkdir(tmp) unless Dir.exist?(tmp)
-    Dir.mkdir(dummy)
+    Dir.mkdir('tmp') unless Dir.exist?('tmp')
+    Dir.mkdir(File.join('tmp','dummy'))
   end
 
-  config.before(:each) do |example|
-    if defined?(page) # page is not defined on non-JS tests
-      Capybara.reset_sessions!
-      page.driver.restart
-    end
-  end
+  #config.before(:each) do |example|
+  #  if defined?(page) # page is not defined on non-JS tests
+  #    Capybara.reset_sessions!
+  #    page.driver.restart
+  #  end
+  #end
 
 end

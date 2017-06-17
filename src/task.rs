@@ -77,13 +77,12 @@ impl Task {
     pub fn parent(&self, repo: &Repository) -> Option<Task> {
         if let Some(commit_oid) = self.commit {
             let commit = repo.find_commit(commit_oid).unwrap();
-            let parent = commit.parents().next().unwrap();
-            let mut tasks = Task::from_commit(&self.name, &parent);
-            tasks.retain(|c| c.name == self.name);
-            tasks.pop()
-        } else {
-            None
-        }
+            if let Some(parent) = commit.parents().next() {
+                let mut tasks = Task::from_commit(&self.name, &parent);
+                tasks.retain(|c| c.name == self.name);
+                tasks.pop()
+            } else { None }
+        } else { None }
     }
 
     pub fn changes(&self, repo: &Repository) -> Vec<(String, Option<String>, String)> {

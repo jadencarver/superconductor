@@ -18,10 +18,12 @@ pub fn panel_xslt() -> String {
                         div#__pm__task {
                             input type="checkbox" id="__pm__commit__dragged" name="dragged" value="true" {}
                             input type="hidden" id="__pm__commit__task" name="task" value="{/state/task/name}" {}
-                            ul#__pm__commits {
-                                xsl:apply-templates select="/state/log/commit" {}
+                            xsl:if test="/state/log/commit" {
+                                ul#__pm__commits {
+                                    xsl:apply-templates select="/state/log/commit" {}
+                                }
+                                hr {}
                             }
-                            hr {}
                             dl.properties {
                                 xsl:apply-templates select="/state/properties/property" {}
                             }

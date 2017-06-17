@@ -127,7 +127,7 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
                     },
                     _ => {
                         let payload = String::from_utf8_lossy(message.payload.as_ref());
-                        println!("\n\n{}{}{}{}{}", clear::All, cursor::Goto(1, 1), color::Fg(color::White), payload, color::Fg(color::Reset));
+                        //println!("\n\n{}{}{}{}{}", clear::All, cursor::Goto(1, 1), color::Fg(color::White), payload, color::Fg(color::Reset));
                         let mut state: State = xml::from_str(&payload).unwrap_or(last_state.clone().unwrap_or(State::blank()));
 
                         last_state = state.apply(last_state, &mut rng).unwrap();
@@ -140,8 +140,8 @@ fn start_notifier(rx: Receiver<NotifierMessage>, mut sender: WebClientSender<Web
                 }
             },
             NotifierMessage::FsEvent(_event) => {
-                let message = WebMessage::text("submit");
-                sender.send_message(&message).unwrap();
+                //let message = WebMessage::text("submit");
+                //sender.send_message(&message).unwrap();
             }
         }
     }

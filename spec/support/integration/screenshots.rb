@@ -67,7 +67,7 @@ module IntegrationSpec
             screenshot.crop "%{width}x%{height}+%{left}+%{top}" % crop.inject({}) { |h,(k,v)| h[k.to_sym]=v; h }
             screenshot.write path
           else
-            page.save_screenshot full_path
+            page.save_screenshot path
           end
 
           git_status = tracked_screenshots[path]

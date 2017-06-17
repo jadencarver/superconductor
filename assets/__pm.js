@@ -62,7 +62,9 @@
     DOM.addEventListener('change', function (event) {
         var debounceRoot = root;
         setTimeout(function() {
-            if (root === debounceRoot) serialize(event.target.form, event);
+            if (root === debounceRoot) {
+                serialize(event.target.form, event);
+            }
         }, event.target.tagName === "TEXTAREA" ? 100 : 0);
     });
 
@@ -121,7 +123,6 @@
     };
     DOM.addEventListener('contextmenu', contextMenu);
     DOM.addEventListener('mousedown', function(event) {
-        console.log('mousedown', event);
         if (event.button === 1 || event.metaKey) {
             contextMenu(event)
             event.preventDefault();
@@ -242,7 +243,7 @@
     }
 
     function serialize(form, event) {
-        //if (root.classList.contains('blocking')) return false;
+        if (root.classList.contains('blocking')) return false;
         var serializer = new XMLSerializer();
         var request = document.implementation.createDocument(null, form.name);
         var message = request.children[0];
@@ -305,13 +306,13 @@
         }
         console.log('serialize', request);
         socket.send(serializer.serializeToString(request));
-        //root.classList.add('blocking')
+        root.classList.add('blocking')
     }
 
     var restoreState;
     function setState(state) {
         console.log(state);
-        //root.classList.remove('blocking')
+        root.classList.remove('blocking')
         if (dragging) return restoreState = state;
         if (restoreState) state = restoreState;
         var open, fragment = processor.transformToFragment(state, document);

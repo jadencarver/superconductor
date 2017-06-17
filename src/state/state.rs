@@ -111,15 +111,17 @@ impl State {
                     self.filter = Some(Filter {
                         name: String::from("Status"), value: String::from("Sprint")
                     });
-                    //return Ok(None);
+                    return Ok(None);
                 }
             }
         } else {
-            let head = repo.head().unwrap();
-            let task = head.shorthand().unwrap();
-            if self.task != task {
-                println!("  Changing task with no last state, will reset");
+            if self.save_update.is_some() || self.new_task.is_some() {
+                self.save_update(&repo, rng);
                 self.reset();
+                self.filter = Some(Filter {
+                    name: String::from("Status"), value: String::from("Sprint")
+                });
+                return Ok(None);
             }
         }
         Ok(Some(new_last_state))
@@ -128,6 +130,7 @@ impl State {
     fn save_update(&mut self, repo: &Repository, rng: &mut rand::ThreadRng) {
         let mut index = repo.index().unwrap();
         index.read(false).unwrap();
+
         let author = repo.signature().unwrap();
         let tree_oid = index.write_tree().unwrap();
         let tree = repo.find_tree(tree_oid).unwrap();
@@ -150,7 +153,7 @@ impl State {
                 let mut yaml = String::new();
                 self.convert_to_yaml(&mut yaml, &repo, None);
                 let message = format!("{}\n{}", self.message, yaml);
-                repo.commit(Some("refs/heads/master"), &author, &author, &message, &tree, &[]).unwrap();
+                repo.commit(Some("HEAD"), &author, &author, &message, &tree, &[]).unwrap();
             }
         };
 
@@ -207,7 +210,10 @@ impl State {
         let branch = repo.find_branch(&self.task, BranchType::Local);
         let head = match branch {
             Ok(branch) => branch.into_reference(),
-            _ => repo.head().unwrap()
+            _ => match repo.head() {
+                Ok(head) => head,
+                _ => return // cannot apply index without a reference
+            }
         };
         let commit = head.peel(ObjectType::Commit).unwrap();
         let mut index = repo.index().unwrap();

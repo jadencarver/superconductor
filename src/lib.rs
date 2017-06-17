@@ -91,6 +91,11 @@ mod tests {
     fn it_works() {
         env::set_var("TARGET",  "debug");
         env::set_var("GIT_DIR", "tmp/dummy/.git");
-        let rspec = Command::new("rspec").arg("spec/integration").status().unwrap();
+
+        let rspec = Command::new("rspec")
+            .arg("spec/integration")
+            .status().expect("Failed to execute rspec");
+
+        assert!(rspec.success(), "rspec reported failing tests");
     }
 }

@@ -51,6 +51,10 @@ pub fn generate(state: Option<State>) -> String {
                             }
                         }
                     }
+                } @else {
+                    task {
+                        name "master"
+                    }
                 }
                 (project())
             }
@@ -80,8 +84,8 @@ pub fn generate(state: Option<State>) -> String {
         }),
         false => match state {
             Some(ref state) => match state.filter {
-                Some(ref filter) => state.filter.clone(),
-                None => None,
+                Some(ref filter) if filter.name != "" => state.filter.clone(),
+                _ => None,
             },
             None => None
         }

@@ -3,8 +3,6 @@ require 'capybara/rspec'
 require 'superconductor'
 require 'yard'
 
-ENV['GIT_DIR'] = ENV['PWD'] + '/tmp/dummy'
-
 module IntegrationSpec
   autoload :Screenshots, 'support/integration/screenshots'
 
