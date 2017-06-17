@@ -194,7 +194,7 @@ pub fn panel_xslt() -> String {
                                 }
                             }
                             xsl:apply-templates select="(/state/task|./task)[not(property[name='Status']) or property[name='Status']/value='']" {
-                                xsl:sort select="property[name='Ordinal']/value" {}
+                                xsl:sort select="name" {}
                             }
                         }
                     }
