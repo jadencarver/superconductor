@@ -152,9 +152,9 @@
       background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAADCAYAAABWKLW/AAAADklEQVQImWNgQAAp3AwABaMAT0kwJI8AAAAASUVORK5CYII=);
 
       &:focus, &.selected {
-        border-color: $color2;
-        margin-top: -0.1em;
-        margin-bottom: 0.1em;
+        border-color: $color3;
+        margin-top: -1pt;
+        margin-bottom: 1pt;
         background-color: $color-base;
         box-shadow: inset 3pt 0pt 0pt $color3;
         outline: none;
@@ -180,15 +180,6 @@
     .remote {
       box-shadow: inset 0 -3pt 0 $color1;
       height: 5em;
-    }
-
-    &.tile--status-blocked > .task {
-      box-shadow: inset 3pt 0 0 darken($color1, 5%);
-
-      &.selected {
-        border-color: $color1;
-        box-shadow: inset 3pt 0 0 $color1;
-      }
     }
 
     &.tile--status-done.droppable,

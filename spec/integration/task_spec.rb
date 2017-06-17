@@ -1,4 +1,5 @@
 require 'support/integration'
+require 'faker'
 
 RSpec.feature 'Tasks' do
   include IntegrationSpec::Screenshots
@@ -26,6 +27,7 @@ RSpec.feature 'Tasks' do
     puts "New Task: #{status}"
     click_button 'New Task'
     find('#__pm__commit__properties--status option', text: status).select_option
+    fill_in 'Description', with: Faker::Hacker.say_something_smart
     sleep
   end
 

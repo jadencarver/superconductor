@@ -36,4 +36,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "capybara-screenshot", "~> 0.3.3"
   spec.add_development_dependency "ansi", "~> 1.5.0"
   spec.add_development_dependency "mini_magick", "~> 4.7.1"
+  spec.add_development_dependency "faker", "~> 1.7.3"
 end
