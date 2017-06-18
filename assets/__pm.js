@@ -420,5 +420,5 @@
         root.classList.add('open');
     };
 
-    PM.open();
+    //PM.open();
 })(window, PM);

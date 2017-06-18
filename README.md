@@ -1,11 +1,13 @@
 # Superconductor
 
-Superconductor is a Workflow and Project Management tool
-
-![Superconductor](spec/integration/screenshots/tasks-by_status.png)
+Superconductor is a Workflow and Project Management tool.
 
 It is written in `rust-lang/rust` and you currently have to compile the dylib manually.
 Install `rust-lang/rust` and `rust-lang/cargo` and then run `./bin/start`.
+
+To compile the release build for use by the gem, run `./bin/release`.
+
+![Superconductor](spec/integration/screenshots/tasks-by_status.png)
 
 ## Installation
 
