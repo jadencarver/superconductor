@@ -13,7 +13,7 @@ RSpec.describe Superconductor::Middleware do
   }
 
   describe 'javascript' do
-    let(:path) { "/__pm.js" }
+    let(:path) { "/assets/__pm.js" }
 
     it 'is served' do
       status, headers, body = subject.call(env)
