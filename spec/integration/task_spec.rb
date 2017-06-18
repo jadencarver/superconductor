@@ -9,6 +9,7 @@ RSpec.feature 'Tasks' do
 
   scenario 'Setup', js: true do
     visit '/'
+    page.execute_script("PM.open()");
     expect(panel).to have_text 'Setup Instructions'
     start_a_project
     create_lots_of_tasks
