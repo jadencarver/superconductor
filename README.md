@@ -5,6 +5,8 @@ Superconductor is a Workflow and Project Management tool.
 It is written in `rust-lang/rust` and you currently have to compile the dylib manually.
 Install `rust-lang/rust` and `rust-lang/cargo` and then run `./bin/start`.
 
+From the documentation, you can [Try Superconductor](javascript:PM.toggle();).
+
 To compile the release build for use by the gem, run `./bin/release`.
 
 ![Superconductor](spec/integration/screenshots/tasks-by_status.png)
@@ -25,7 +27,6 @@ Or install it yourself as:
 
     $ gem install superconductor
 
-From here, you can [Try Superconductor](javascript:PM.toggle();).
 For more information, see [Contributing](#label-Contributing).
 
 ## Usage
