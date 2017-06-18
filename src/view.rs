@@ -191,9 +191,8 @@ pub fn panel_xslt() -> String {
                         input type="hidden" name="filter" data-name="{filter/name}" data-value="{filter/value}" {}
                         xsl:variable name="class" {
                             xsl:value-of select="concat('tasks--status-', translate(filter/value, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ', 'abcdefghijklmnopqrstuvwxyz-'))" {}
-                            " list"
                         }
-                        ul class="{$class}" {
+                        ul class="list {$class}" {
                             header {
                                 button type="submit" name="filter" {
                                     xsl:value-of select="filter/value" {}
@@ -235,10 +234,9 @@ pub fn panel_xslt() -> String {
                             }
                             xsl:variable name="class" {
                                 xsl:value-of select="concat('tasks--status-', translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ', 'abcdefghijklmnopqrstuvwxyz-'))" {}
-                                " tiles"
                             }
-                            ul class="{$class}" data-property-name="Status" data-property-value="{.}" {
-                                div.column data-property-name="Ordinal" data-property-value="{$next}" {
+                            ul class="tiles {$class}" data-property-name="Status" data-property-value="{.}" {
+                                div class="column {$class}" data-property-name="Ordinal" data-property-value="{$next}" {
                                     header {
                                         button type="submit" name="filter" data-name="Status" data-value="{.}" {
                                             xsl:value-of select="." {}
@@ -284,10 +282,9 @@ pub fn panel_xslt() -> String {
                     }
                 }
                 xsl:variable name="class" {
-                    "tile "
                     xsl:value-of select="concat('tile--status-', translate(property[name='Status']/value, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ', 'abcdefghijklmnopqrstuvwxyz-'))" {}
                 }
-                li class="{$class}" data-property-name="Ordinal" data-property-value="{$next}" {
+                li class="tile {$class}" data-property-name="Ordinal" data-property-value="{$next}" {
                     xsl:element name="div" {
                         xsl:attribute name="draggable" "true"
                         xsl:attribute name="tabindex" "99"

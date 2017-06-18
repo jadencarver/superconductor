@@ -29,48 +29,6 @@
     }
   }
 
-  //.tasks--status-in-progress {
-  //  header button {
-  //    background-color: $color-in-progress;
-  //    box-shadow: inset 0 1em 0.15em lighten($color-in-progress, 3%);
-  //    border: solid 1px darken($color-in-progress, 5%);
-  //  }
-  //}
-
-  //.tasks--status-in-review {
-  //  header button {
-  //    background-color: $color-in-review;
-  //    box-shadow: inset 0 1em 0.15em lighten($color-in-review, 20%);
-  //    border: solid 1px darken($color-in-review, 10%);
-  //  }
-  //}
-
-  //.tasks--status-blocked {
-  //  header button {
-  //    background-color: $color-blocked;
-  //    box-shadow: inset 0 1em 0.15em lighten($color-blocked, 10%);
-  //    border: solid 1px darken($color-blocked, 10%);
-  //    color: $color-base;
-  //  }
-  //}
-
-  //.tasks--status-done {
-  //  header button {
-  //    background-color: $color-done;
-  //    box-shadow: inset 0 1em 0.15em lighten($color-done, 10%);
-  //    border: solid 1px darken($color-done, 5%);
-  //  }
-  //}
-
-  //.tasks--backlog {
-  //  header button {
-  //    background-color: $color-backlog;
-  //    box-shadow: inset 0 1em 0.15em lighten($color-backlog, 3%);
-  //    border: solid 1px darken($color-backlog, 5%);
-  //    color: $color-base;
-  //  }
-  //}
-
 }
 
 #__pm__panel {
@@ -155,6 +113,49 @@
         box-shadow: inset 0 0.5em 0.15em rgba($color-base, 0.5);
       }
     }
+
+    &.droppable.tasks--status-in-progress {
+      header button {
+        background-color: $color-in-progress;
+        box-shadow: inset 0 1em 0.15em lighten($color-in-progress, 3%);
+        border: solid 1px darken($color-in-progress, 5%);
+      }
+    }
+
+    &.droppable.tasks--status-in-review {
+      header button {
+        background-color: $color-in-review;
+        box-shadow: inset 0 1em 0.15em lighten($color-in-review, 20%);
+        border: solid 1px darken($color-in-review, 10%);
+      }
+    }
+
+    &.droppable.tasks--status-blocked {
+      header button {
+        background-color: $color-blocked;
+        box-shadow: inset 0 1em 0.15em lighten($color-blocked, 10%);
+        border: solid 1px darken($color-blocked, 10%);
+        color: $color-base;
+      }
+    }
+
+    &.droppable.tasks--status-done {
+      header button {
+        background-color: $color-done;
+        box-shadow: inset 0 1em 0.15em lighten($color-done, 10%);
+        border: solid 1px darken($color-done, 5%);
+      }
+    }
+
+    &.droppable.tasks--backlog {
+      header button {
+        background-color: $color-backlog;
+        box-shadow: inset 0 1em 0.15em lighten($color-backlog, 3%);
+        border: solid 1px darken($color-backlog, 5%);
+        color: $color-base;
+      }
+    }
+
   }
 
   ul.tiles li.tile {
