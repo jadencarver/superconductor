@@ -1,14 +1,17 @@
 require 'superconductor'
+require 'pry'
 
 module Superconductor
   class Middleware
 
     PORT = Superconductor.start();
+    ENV["GIT_DIR"] = File.join(Dir.pwd, '.git')
 
     def initialize(app)
       @app = app
-      @assets = Dir[File.expand_path('../../../assets/**/*.{js,css}', __FILE__)].map { |d| d[Dir.pwd.length+1..-1] }
-      @assets += Dir[File.expand_path('../../../spec/integration/screenshots/*.png', __FILE__)].map { |d| d[Dir.pwd.length+1..-1] }
+      @gem_path = File.expand_path(File.join(File.dirname(__FILE__), '../..'))
+      @assets = Dir[File.join(@gem_path, 'assets/**/*.{js,css}')]
+      @assets += Dir[File.join(@gem_path, 'spec/integration/screenshots/*.png')]
     end
 
     def call(env)
@@ -19,10 +22,9 @@ module Superconductor
     private
 
     def serve_asset(path)
-      if asset = @assets.find { |p| p == path[1..-1] }
+      if asset = @assets.find { |p| path == p[@gem_path.length..-1] }
         status, headers = 200, {}
-        local_path = File.expand_path(File.join('..', '..', '..', asset), __FILE__)
-        body = [open(local_path).read]
+        body = [open(asset).read]
         headers['Content-Type'] = content_type(path)
         [status, headers, body]
       end
@@ -56,7 +58,7 @@ module Superconductor
       response.each do |res|
         body << res
       end
-      if headers["Content-Type"] == 'text/html'
+      if (type = headers["Content-Type"]) && type['text/html']
         panel_js = Superconductor.panel_js(PORT)
         panel_js.free = Superconductor[:cleanup]
         headers.delete('Content-Length')

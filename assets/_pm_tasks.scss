@@ -15,6 +15,7 @@
     button {
       width: calc(100% - 5pt);
       border: solid darken($color0, 5%) 1pt;
+      transition: none;
     }
 
     &:after {
@@ -252,7 +253,7 @@
       line-height: 2em;
       border-bottom: dotted 1px darken($color-base, 20%);
       margin-bottom: 0.5em;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.05em;
     }
 
     .task__property--description {

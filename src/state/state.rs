@@ -139,15 +139,15 @@ impl State {
                 }
             }
             Err(_) => {
-                println!("Initial Commit");
+                println!("  {}Initial Commit{}", color::Fg(color::LightBlue), color::Fg(color::Reset));
                 let mut yaml = String::new();
                 self.convert_to_yaml(&mut yaml, &repo, None);
                 let message = format!("{}\n{}", self.message, yaml);
-                repo.commit(Some("HEAD"), &author, &author, &message, &tree, &[]).unwrap();
+                repo.commit(None, &author, &author, &message, &tree, &[]).unwrap();
             }
         };
 
-        println!("  {}Saved changes to {}{} {:?}", color::Fg(color::LightRed), self.task, color::Fg(color::Reset), self);
+        println!("  {}Saved changes to {}{} {:?}", color::Fg(color::LightYellow), self.task, color::Fg(color::Reset), self);
         if self.new_task.is_some() {
             let num = rng.gen::<u16>();
             let new_task = format!("{:X}", num);
