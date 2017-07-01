@@ -409,16 +409,20 @@
     }
 
     PM.toggle = function () {
-        root.classList.toggle('open');
+        if (root.classList.contains('open')) PM.close();
+        else PM.open();
     };
 
     PM.close = function () {
         root.classList.remove('open');
+        window.sessionStorage.setItem('__pm__panel__open', 'N');
     };
 
     PM.open = function () {
         root.classList.add('open');
+        window.sessionStorage.setItem('__pm__panel__open', 'Y');
     };
 
-    //PM.open();
+    if (window.sessionStorage.getItem('__pm__panel__open') === 'Y') PM.open();
+
 })(window, PM);

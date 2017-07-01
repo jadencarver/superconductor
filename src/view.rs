@@ -199,7 +199,7 @@ pub fn panel_xslt() -> String {
                                 }
                             }
                             xsl:apply-templates select="(/state/task|./task)[property[name='Status'] and not(property[name='Status']/value='')]" {
-                                xsl:sort select="concat(property[name='Ordinal']/value, name)" {}
+                                xsl:sort select="property[name='Ordinal']/value" data-type="number" {}
                             }
                         }
                         ul.tasks--backlog.list {
@@ -209,7 +209,7 @@ pub fn panel_xslt() -> String {
                                 }
                             }
                             xsl:apply-templates select="(/state/task|./task)[not(property[name='Status']) or property[name='Status']/value='']" {
-                                xsl:sort select="name" {}
+                                xsl:sort select="timestamp" data-type="numeric" order="descending" {}
                             }
                         }
                     }
@@ -242,9 +242,8 @@ pub fn panel_xslt() -> String {
                                             xsl:value-of select="." {}
                                         }
                                     }
-                                    xsl:value-of select="concat(property[name='Ordinal']/value, name)" {}
                                     xsl:for-each select="key('task-status', $status)" {
-                                        xsl:sort select="concat(property[name='Ordinal']/value, name)" data-type="number" {}
+                                        xsl:sort select="property[name='Ordinal']/value" data-type="number" {}
                                         xsl:call-template name="task" {}
                                     }
                                 }

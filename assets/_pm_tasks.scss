@@ -55,7 +55,6 @@
       &:focus,
       &.selected {
         border-color: $color2;
-        box-shadow: inset 3pt 0 0 $color3;
         outline: none;
       }
     }
@@ -225,23 +224,43 @@
     }
 
     &.tile--status-sprint > .task {
-      box-shadow: inset 6pt 0 0 $color-sprint,      inset calc(6pt + 1px) 0 0 darken($color-sprint, 10%);
+      box-shadow: inset 6pt 0 0 $color-sprint, inset calc(6pt + 1px) 0 0 darken($color-sprint, 10%);
+
+      &.selected {
+        box-shadow: inset 6pt 0 0 $color2, inset calc(6pt + 1px) 0 0 darken($color-sprint, 10%);
+      }
     }
 
     &.tile--status-in-progress > .task {
       box-shadow: inset 6pt 0 0 $color-in-progress, inset calc(6pt + 1px) 0 0 darken($color-in-progress, 5%);
+
+      &.selected {
+        box-shadow: inset 6pt 0 0 lighten($color-in-progress, 10%), inset calc(6pt + 1px) 0 0 darken($color-in-progress, 10%);
+      }
     }
 
     &.tile--status-in-review > .task {
-      box-shadow: inset 6pt 0 0 $color-in-review,   inset calc(6pt + 1px) 0 0 darken($color-in-review, 10%);
+      box-shadow: inset 6pt 0 0 $color-in-review, inset calc(6pt + 1px) 0 0 darken($color-in-review, 10%);
+
+      &.selected {
+        box-shadow: inset 6pt 0 0 lighten($color-in-review, 10%), inset calc(6pt + 1px) 0 0 darken($color-in-review, 10%);
+      }
     }
 
     &.tile--status-blocked > .task {
-      box-shadow: inset 6pt 0 0 $color-blocked,     inset calc(6pt + 1px) 0 0 darken($color-blocked, 10%);
+      box-shadow: inset 6pt 0 0 $color-blocked, inset calc(6pt + 1px) 0 0 darken($color-blocked, 10%);
+
+      &.selected {
+        box-shadow: inset 6pt 0 0 lighten($color-blocked, 10%), inset calc(6pt + 1px) 0 0 darken($color-blocked, 10%);
+      }
     }
 
     &.tile--status-done > .task {
-      box-shadow: inset 6pt 0 0 $color-done,        inset calc(6pt + 1px) 0 0 darken($color-done, 5%);
+      box-shadow: inset 6pt 0 0 $color-done, inset calc(6pt + 1px) 0 0 darken($color-done, 5%);
+
+      &.selected {
+        box-shadow: inset 6pt 0 0 lighten($color-done, 10%), inset calc(6pt + 1px) 0 0 darken($color-done, 10%);
+      }
     }
 
     .task__name {

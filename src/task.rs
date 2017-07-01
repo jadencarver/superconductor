@@ -1,6 +1,7 @@
 use yaml_rust::{Yaml, YamlLoader};
 use yaml_rust::yaml::Hash;
 
+extern crate time;
 extern crate git2;
 use self::git2::{Repository, ObjectType};
 use self::git2::{Commit, Reference, Oid};
@@ -71,6 +72,15 @@ impl Task {
                 Some(Task::from_commit(&self.name, &parent))
             } else { None }
         } else { None }
+    }
+
+    pub fn timestamp(&self, repo: &Repository) -> i64 {
+        if let Some(commit_oid) = self.commit {
+            let commit = repo.find_commit(commit_oid).unwrap();
+            commit.time().seconds()
+        } else {
+            time::get_time().sec
+        }
     }
 
     pub fn changes(&self, repo: &Repository) -> Vec<(String, Option<String>, String)> {

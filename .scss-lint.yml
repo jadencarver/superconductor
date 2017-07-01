@@ -19,3 +19,9 @@ linters:
     enabled: false
   SelectorFormat:
     convention: hyphenated_BEM
+  VendorPrefix:
+    enabled: false
+  DuplicateProperty:
+    ignore_consecutive:
+      - background
+      - transition

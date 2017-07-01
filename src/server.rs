@@ -101,9 +101,9 @@ fn start_monitor(tx: Sender<NotifierMessage>) {
         let mut changes = vec![event];
         loop {
             if let Ok(event) = rx.try_recv() {
-                if (event.flag.contains(ITEM_MODIFIED) || event.flag.contains(ITEM_CREATED) || event.flag.contains(ITEM_REMOVED)) && (!event.path.contains(".git") || !event.path.contains(".lock")) {
+                //if (event.flag.contains(ITEM_MODIFIED) || event.flag.contains(ITEM_CREATED) || event.flag.contains(ITEM_REMOVED)) && (!event.path.contains(".git") || !event.path.contains(".lock")) {
                     changes.push(event);
-                }
+                //}
             } else {
                 break;
             }

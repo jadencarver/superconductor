@@ -293,6 +293,7 @@ fn diff(changes: Diff) -> Vec<PreEscaped<String>> {
 fn render_task(repo: &Repository, task: &Task, changes: Vec<(String, Option<String>, String)>) -> PreEscaped<String> {
     html!(task {
         name (task.name)
+        timestamp (task.timestamp(&repo))
         @for (name, before, value) in changes {
             property {
                 name (name)

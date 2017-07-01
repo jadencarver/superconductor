@@ -7,14 +7,15 @@ dependencies = [
  "fsevent 0.2.16 (registry+https://github.com/rust-lang/crates.io-index)",
  "git2 0.6.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.21 (registry+https://github.com/rust-lang/crates.io-index)",
- "maud 0.16.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "maud_macros 0.16.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "maud 0.16.2 (git+https://github.com/lfairy/maud.git)",
+ "maud_macros 0.16.3 (git+https://github.com/lfairy/maud.git)",
  "md5 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 0.8.23 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 0.8.23 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_xml 0.9.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "termion 1.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "time 0.1.36 (registry+https://github.com/rust-lang/crates.io-index)",
  "websocket 0.17.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "yaml-rust 0.3.5 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -235,15 +236,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "maud"
 version = "0.16.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
+source = "git+https://github.com/lfairy/maud.git#04eb61e870f8fce493d3ab31961302e31d4b0585"
 
 [[package]]
 name = "maud_macros"
-version = "0.16.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
+version = "0.16.3"
+source = "git+https://github.com/lfairy/maud.git#04eb61e870f8fce493d3ab31961302e31d4b0585"
 dependencies = [
  "if_chain 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "maud 0.16.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "maud 0.16.2 (git+https://github.com/lfairy/maud.git)",
 ]
 
 [[package]]
@@ -630,8 +631,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum libz-sys 1.0.13 (registry+https://github.com/rust-lang/crates.io-index)" = "e5ee912a45d686d393d5ac87fac15ba0ba18daae14e8e7543c63ebf7fb7e970c"
 "checksum log 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)" = "5141eca02775a762cc6cd564d8d2c50f67c0ea3a372cbf1c51592b3e029e10ad"
 "checksum matches 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)" = "efd7622e3022e1a6eaa602c4cea8912254e5582c9c692e9167714182244801b1"
-"checksum maud 0.16.2 (registry+https://github.com/rust-lang/crates.io-index)" = "4df5416f2a86c31a08cccd348921f2394450cf59c3474ae23b5490fc60f82f57"
-"checksum maud_macros 0.16.2 (registry+https://github.com/rust-lang/crates.io-index)" = "354834707aa8c1d9db2a17a3572cd6e57eb581df844af6f1b4033cb0b33d743c"
+"checksum maud 0.16.2 (git+https://github.com/lfairy/maud.git)" = "<none>"
+"checksum maud_macros 0.16.3 (git+https://github.com/lfairy/maud.git)" = "<none>"
 "checksum md5 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)" = "15956cea30df18e33e057755ef83f072eff7814ef8da051223de0d3b7fa8b347"
 "checksum mime 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)" = "5514f038123342d01ee5f95129e4ef1e0470c93bc29edf058a46f9ee3ba6737e"
 "checksum net2 0.2.27 (registry+https://github.com/rust-lang/crates.io-index)" = "18b9642ad6222faf5ce46f6966f59b71b9775ad5758c9e09fcf0a6c8061972b4"

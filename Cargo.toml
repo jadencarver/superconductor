@@ -7,8 +7,8 @@ authors = ["Jaden Carver <jaden.carver@gmail.com>"]
 crate-type = ["dylib"]
 
 [dependencies]
-maud = "*"
-maud_macros = "*"
+maud = { version = "*", git="https://github.com/lfairy/maud.git" }
+maud_macros = { version = "*", git="https://github.com/lfairy/maud.git" }
 libc = "*"
 git2 = { version = "*", default-features = false }
 websocket = { version = "*", default-features = false }
@@ -19,6 +19,7 @@ chrono = "*"
 base64 = "*"
 rand = "0.3"
 termion = "*"
+time = "*"
 
 serde = "0.8"
 serde_derive = "0.8"
