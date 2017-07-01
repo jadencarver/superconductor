@@ -20,6 +20,7 @@
 tmp = File.join(Dir.pwd, 'tmp')
 dummy = File.join(tmp, 'dummy')
 ENV["GIT_DIR"] = File.join(dummy, '.git')
+puts "Using #{ENV["GIT_DIR"]}"
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
@@ -106,6 +107,7 @@ RSpec.configure do |config|
     `rm -rf tmp/dummy`
     Dir.mkdir('tmp') unless Dir.exist?('tmp')
     Dir.mkdir(File.join('tmp','dummy'))
+    `git init #{File.join('tmp','dummy')}`
   end
 
   #config.before(:each) do |example|

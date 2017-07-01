@@ -13,9 +13,9 @@
     z-index: 1;
 
     button {
-      width: calc(100% - 5pt);
       border: solid darken($color0, 5%) 1pt;
       transition: none;
+      width: calc(100% - 5pt);
     }
 
     &:after {
@@ -49,8 +49,8 @@
       background-color: $color-base;
       border: solid darken($color-base, 25%) 1pt;
       margin-top: 1pt;
-      padding: 0 5pt;
       overflow: auto;
+      padding: 0 5pt;
 
       &:focus,
       &.selected {
@@ -62,34 +62,35 @@
 
     .task__property--description {
       float: left;
-      width: calc(100% - 7em);
-      white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      white-space: nowrap;
+      width: calc(100% - 7em);
     }
 
     .task__property--estimate {
       background-color: $color3;
       border-radius: 50%;
       color: $color0;
+      float: right;
       font-weight: bold;
       height: 2em;
       line-height: 2em;
       margin-top: 0.25em;
       text-align: center;
       width: 2em;
-      float: right;
     }
 
     .task__name {
+      float: left;
       font-weight: bold;
       width: 5em;
-      float: left;
     }
   }
 }
 
 #__pm__panel {
+
   ul.tiles {
     float: left;
     font-size: 0.8em;
@@ -118,24 +119,24 @@
     &.droppable.tasks--status-in-progress {
       header button {
         background-color: $color-in-progress;
-        box-shadow: inset 0 1em 0.15em lighten($color-in-progress, 3%);
         border: solid 1px darken($color-in-progress, 5%);
+        box-shadow: inset 0 1em 0.15em lighten($color-in-progress, 3%);
       }
     }
 
     &.droppable.tasks--status-in-review {
       header button {
         background-color: $color-in-review;
-        box-shadow: inset 0 1em 0.15em lighten($color-in-review, 20%);
         border: solid 1px darken($color-in-review, 10%);
+        box-shadow: inset 0 1em 0.15em lighten($color-in-review, 20%);
       }
     }
 
     &.droppable.tasks--status-blocked {
       header button {
         background-color: $color-blocked;
-        box-shadow: inset 0 1em 0.15em lighten($color-blocked, 10%);
         border: solid 1px darken($color-blocked, 10%);
+        box-shadow: inset 0 1em 0.15em lighten($color-blocked, 10%);
         color: $color-base;
       }
     }
@@ -143,16 +144,16 @@
     &.droppable.tasks--status-done {
       header button {
         background-color: $color-done;
-        box-shadow: inset 0 1em 0.15em lighten($color-done, 10%);
         border: solid 1px darken($color-done, 5%);
+        box-shadow: inset 0 1em 0.15em lighten($color-done, 10%);
       }
     }
 
     &.droppable.tasks--backlog {
       header button {
         background-color: $color-backlog;
-        box-shadow: inset 0 1em 0.15em lighten($color-backlog, 3%);
         border: solid 1px darken($color-backlog, 5%);
+        box-shadow: inset 0 1em 0.15em lighten($color-backlog, 3%);
         color: $color-base;
       }
     }
@@ -228,7 +229,7 @@
     }
 
     &.tile--status-in-progress > .task {
-      box-shadow: inset 6pt 0 0 $color-in-progress, inset calc(6pt + 1px) 0 0 darken($color-in-progress, 10%);
+      box-shadow: inset 6pt 0 0 $color-in-progress, inset calc(6pt + 1px) 0 0 darken($color-in-progress, 5%);
     }
 
     &.tile--status-in-review > .task {
@@ -240,7 +241,7 @@
     }
 
     &.tile--status-done > .task {
-      box-shadow: inset 6pt 0 0 $color-done,        inset calc(6pt + 1px) 0 0 darken($color-done, 10%);
+      box-shadow: inset 6pt 0 0 $color-done,        inset calc(6pt + 1px) 0 0 darken($color-done, 5%);
     }
 
     .task__name {
