@@ -1,7 +1,3 @@
-#![feature(plugin)]
-#![plugin(maud_macros)]
-
-extern crate maud;
 extern crate websocket;
 extern crate yaml_rust;
 extern crate libc;
@@ -18,7 +14,7 @@ extern crate rand;
 use rand::Rng;
 
 extern crate termion;
-
+extern crate markup;
 extern crate git2;
 
 pub static XML: &'static str = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";

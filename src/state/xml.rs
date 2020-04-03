@@ -1,3 +1,5 @@
+use markup;
+
 use state::State;
 use task::Task;
 
@@ -18,7 +20,6 @@ use state::Filter;
 
 extern crate md5;
 extern crate chrono;
-use maud::PreEscaped;
 use self::chrono::{TimeZone, FixedOffset};
 
 use yaml_rust::Yaml;
@@ -37,28 +38,9 @@ pub fn generate(state: Option<State>) -> String {
     
     // If there is no master branch, start the setup
     if repo.find_branch("master", BranchType::Local).is_err() {
-        return html! {
-            state {
-                setup "1"
-                @if let Some(state) = state {
-                    message (state.message)
-                    task {
-                        name "master"
-                        @for property in state.property {
-                            property {
-                                name (property.name)
-                                value (property.value)
-                            }
-                        }
-                    }
-                } @else {
-                    task {
-                        name "master"
-                    }
-                }
-                (project())
-            }
-        }.into_string()
+        return GeneratedState {
+            state: state
+       }.into_string()
     }
 
     let head = repo.head().unwrap();
@@ -148,7 +130,7 @@ pub fn generate(state: Option<State>) -> String {
                 message (state.message)
                 @if state.property.len() == 0 {
                     @let task = Task::from_ref(&branch) {
-                        (render_task(&repo, &task, task.properties(&repo)))
+                        {Task { repo: &repo, task: &task, properties: task.properties(&repo) }}
                     }
                 } @else {
                     task {
@@ -163,7 +145,7 @@ pub fn generate(state: Option<State>) -> String {
                 }
             } @else {
                 @let task = Task::from_ref(&branch) {
-                    (render_task(&repo, &task, task.properties(&repo)))
+                    {Task { repo: &repo, task: &task, properties: task.properties(&repo) }}
                 }
             }
             tasks {
@@ -176,17 +158,17 @@ pub fn generate(state: Option<State>) -> String {
                     }
                 }
                 @for task in tasks {
-                    (render_task(&repo, &task, task.properties(&repo)))
+                    {Task { repo: &repo, task: &task, properties: task.properties(&repo) }}
                 }
             }
             log {
                 @for (_, rev) in revwalk.enumerate() {
                     @let commit = repo.find_commit(rev.unwrap()).unwrap() {
                         commit {
-                            id (commit.id())
+                            id { commit.id() }
                             @let time = commit.time() {
-                                timestamp (time.seconds())
-                                localtime (FixedOffset::east(time.offset_minutes()*60).timestamp(time.seconds(), 0).to_rfc3339())
+                                timestamp {time.seconds()}
+                                localtime {FixedOffset::east(time.offset_minutes()*60).timestamp(time.seconds(), 0).to_rfc3339()}
                             }
                             user {
                                 @let author = commit.author() {
@@ -208,9 +190,9 @@ pub fn generate(state: Option<State>) -> String {
                 }
             }
             @if task.name == "master" {
-                (project())
+                {Project {}}
             } @else {
-                (properties())
+                {Properties {}}
             }
             changes {
                 @if let Ok(delta) = changes.stats() {
@@ -251,7 +233,7 @@ pub fn generate(state: Option<State>) -> String {
     payload
 }
 
-fn diff(changes: Diff) -> Vec<PreEscaped<String>> {
+fn diff(changes: Diff) -> Vec<String> {
     let result = RefCell::new(vec![]);
     changes.foreach(&mut |delta: DiffDelta, _: f32| {
         result.borrow_mut().push(html!(
@@ -262,17 +244,18 @@ fn diff(changes: Diff) -> Vec<PreEscaped<String>> {
         true
     }, Some(&mut |delta: DiffDelta, binary: DiffBinary| {
         if binary.contains_data() {
-            result.borrow_mut().push(html!(
-                img src=(format!("data:image/png,{}", (String::from_utf8_lossy(&binary.new_file().data())))) {}
-            ));
+            result.borrow_mut().push(DiffImage {
+                data: String::from_utf8_lossy(&binary.new_file().data())
+            });
         } else {
             let path = delta.new_file().path().unwrap();
             let mut file = File::open(path).unwrap();
             let mut contents = vec![];
             file.read_to_end(&mut contents).unwrap();
-            result.borrow_mut().push(html!(
-                img src=(format!("data:image/jpeg;base64,{}", encode(&contents))) alt=(format!("{}", path.to_str().unwrap())) {}
-            ));
+            result.borrow_mut().push(DiffImage64 {
+                data: encode(&contents),
+                path: path.to_str().unwrap()
+            });
         }
         true
     }), None, Some(&mut |_: DiffDelta, _: Option<DiffHunk>, line: DiffLine| {
@@ -282,99 +265,130 @@ fn diff(changes: Diff) -> Vec<PreEscaped<String>> {
             'H' | 'F' => "meta",
             _ => ""
         };
-        result.borrow_mut().push(html!(
-            span class=(class) (String::from_utf8_lossy(&line.content()))
-        ));
+        result.borrow_mut().push(DiffDiff { class: class, content: &line.content() });
         true
     })).unwrap();
     result.into_inner()
 }
 
-fn render_task(repo: &Repository, task: &Task, changes: Vec<(String, Option<String>, String)>) -> PreEscaped<String> {
-    html!(task {
-        name (task.name)
-        timestamp (task.timestamp(&repo))
-        @for (name, before, value) in changes {
-            property {
-                name (name)
-                @if let Some(before) = before {
-                    before (before)
+markup::define! {
+    GeneratedState(state: State) {
+        state {
+            setup { "1" }
+            @if let Some(state) = state {
+                message {{ state.message }}
+                task {
+                    name { "master" }
+                    @for property in state.property {
+                        property {
+                            name {{ property.name }}
+                            value {{ property.value }}
+                        }
+                    }
                 }
-                value (value)
+            } @else {
+                task {
+                    name { "master" }
+                }
             }
+            {Project {}}
         }
-    })
-}
+    }
 
-fn properties() -> PreEscaped<String> {
-    html! {
-        properties {
-            property {
-                name "Status"
-                options {
-                    option "Sprint"
-                    option "In Progress"
-                    option "In Review"
-                    option "Blocked"
-                    option "Done"
+    DiffImage(data: String) {
+        img[src={format!("data:image/png,{}", data)}] {}
+    }
+
+    DiffImage64(data: String, path: &str) {
+        img[src={format!("data:image/jpeg;base64,{}", data)}, alt={format!("{}", path)}] {}
+    }
+
+    DiffDiff(class: &'static str, content: String) {
+        span[class={class}] {{ String::from_utf8_lossy(content) }}
+    }
+
+    Task(repo: &Repository, task: &Task, changes: Vec<(String, Option<String>, String)>) {
+        task {
+            name {{ task.name }}
+            timestamp {{ task.timestamp(&repo) }}
+            @for (name, before, value) in changes {
+                property {
+                    name {{ name }}
+                    @if let Some(before) = before {
+                        before {{ before }}
+                    }
+                    value {{ value }}
                 }
-            }
-            property {
-                name "Ordinal"
-                value "1.0"
-            }
-            property {
-                name "Estimate"
-            }
-            property {
-                name "Developer"
-                value "Jaden Carver <jaden.carver@gmail.com>"
-                options {
-                    option value="Jaden Carver <jaden.carver@gmail.com>" "Jaden Carver"
-                    option value="Bob Dole <bdole69@gmail.com>" "Bob Dole"
-                }
-            }
-            property {
-                name "Manager"
-                value "Jaden Carver <jaden.carver@gmail.com>"
-                options {
-                    option value="Jaden Carver <jaden.carver@gmail.com>" "Jaden Carver"
-                    option value="Bob Dole <bdole69@gmail.com>" "Bob Dole"
-                }
-            }
-            property {
-                name "Description"
             }
         }
     }
-}
 
-fn project() -> PreEscaped<String> {
-    html! {
+    Properties {
         properties {
             property {
-                name "Project"
-            }
-            property {
-                name "Status"
+                name { "Status" }
                 options {
-                    option "Sprint"
-                    option "In Progress"
-                    option "In Review"
-                    option "Blocked"
-                    option "Done"
+                    option { "Sprint" }
+                    option { "In Progress" }
+                    option { "In Review" }
+                    option { "Blocked" }
+                    option { "Done" }
                 }
             }
             property {
-                name "Manager"
-                value "Jaden Carver <jaden.carver@gmail.com>"
+                name { "Ordinal" }
+                value { "1.0" }
+            }
+            property {
+                name { "Estimate" }
+            }
+            property {
+                name { "Developer" }
+                value { "Jaden Carver <jaden.carver@gmail.com>" }
                 options {
-                    option value="Jaden Carver <jaden.carver@gmail.com>" "Jaden Carver"
-                    option value="Bob Dole <bdole69@gmail.com>" "Bob Dole"
+                    option[value="Jaden Carver <jaden.carver@gmail.com>"] { "Jaden Carver" }
+                    option[value="Bob Dole <bdole69@gmail.com>"] { "Bob Dole" }
                 }
             }
             property {
-                name "Description"
+                name { "Manager" }
+                value { "Jaden Carver <jaden.carver@gmail.com>" }
+                options {
+                    option[value="Jaden Carver <jaden.carver@gmail.com>"] "Jaden Carver"
+                    option[value="Bob Dole <bdole69@gmail.com>"] "Bob Dole"
+                }
+            }
+            property {
+                name { "Description" }
+            }
+        }
+    }
+
+    Project {
+        properties {
+            property {
+                name { "Project" }
+            }
+            property {
+                name { "Status" }
+                options {
+                    option { "Sprint" }
+                    option { "In Progress" }
+                    option { "In Review" }
+                    option { "Blocked" }
+                    option { "Done" }
+                }
+            }
+            property {
+                name { "Manager" }
+                value { "Jaden Carver <jaden.carver@gmail.com>" }
+                options {
+                    option[value="Jaden Carver <jaden.carver@gmail.com>"] { "Jaden Carver" }
+                    option[value="Bob Dole <bdole69@gmail.com>"] { "Bob Dole" }
+                }
+            }
+            property {
+                name { "Description" }
             }
         }
     }
