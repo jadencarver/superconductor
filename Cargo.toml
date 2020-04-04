@@ -7,7 +7,8 @@ authors = ["Jaden Carver <jaden.carver@gmail.com>"]
 crate-type = ["dylib"]
 
 [dependencies]
-markup = "0.4"
+markup = { path="../markup.rs/markup" }
+markup-proc-macro = { path="../markup.rs/markup-proc-macro" }
 libc = "*"
 git2 = { version = "*", default-features = false }
 websocket = { version = "*", default-features = false }

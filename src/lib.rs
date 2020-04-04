@@ -55,19 +55,18 @@ pub extern "C" fn start() -> i32 {
 
 #[no_mangle]
 pub extern "C" fn panel_js(port: i32) -> *mut c_char {
-    let markup = html! {
-        script { "
-        if (window === window.top) {
+    let markup = format!("<script>
+        if (window === window.top) {}
             //var highlight = document.createElement('script');
             //highlight.setAttribute('src', '//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/highlight.min.js');
             //document.body.appendChild(highlight);
             PM = document.createElement('script');
             PM.setAttribute('src', '/assets/__pm.js');
-            PM.port = " (port) ";
+            PM.port = {};
             document.body.appendChild(PM);
-        }" }
-    };
-    CString::new(markup.into_string()).unwrap().into_raw()
+        {}
+        </script>", "{", port, "}");
+    CString::new(markup).unwrap().into_raw()
 }
 
 #[no_mangle]

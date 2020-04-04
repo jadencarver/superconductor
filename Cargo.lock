@@ -177,15 +177,13 @@ dependencies = [
 [[package]]
 name = "markup"
 version = "0.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "markup-proc-macro 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "markup-proc-macro 0.4.1",
 ]
 
 [[package]]
 name = "markup-proc-macro"
 version = "0.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "proc-macro2 1.0.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "quote 1.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -358,7 +356,8 @@ dependencies = [
  "fsevent 0.2.16 (registry+https://github.com/rust-lang/crates.io-index)",
  "git2 0.7.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.21 (registry+https://github.com/rust-lang/crates.io-index)",
- "markup 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "markup 0.4.1",
+ "markup-proc-macro 0.4.1",
  "md5 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 0.8.23 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -525,8 +524,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum libz-sys 1.0.18 (registry+https://github.com/rust-lang/crates.io-index)" = "87f737ad6cc6fd6eefe3d9dc5412f1573865bded441300904d2f42269e140f16"
 "checksum log 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)" = "5141eca02775a762cc6cd564d8d2c50f67c0ea3a372cbf1c51592b3e029e10ad"
 "checksum log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)" = "14b6052be84e6b71ab17edffc2eeabf5c2c3ae1fdb464aae35ac50c67a44e1f7"
-"checksum markup 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)" = "ea6ac8a12a86863ec68a3e8ec002f85212f8731e9f7723a4cdda8b5a45b0ccb4"
-"checksum markup-proc-macro 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)" = "c0ca1e2e1d8b8c6aeb80d14be1d22c13bfb949545b0e0a2bc35e369978a8c66c"
 "checksum matches 0.1.8 (registry+https://github.com/rust-lang/crates.io-index)" = "7ffc5c5338469d4d3ea17d269fa8ea3512ad247247c30bd2df69e68309ed0a08"
 "checksum md5 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)" = "15956cea30df18e33e057755ef83f072eff7814ef8da051223de0d3b7fa8b347"
 "checksum mime 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)" = "ba626b8a6de5da682e1caa06bdb42a335aee5a84db8e5046a3e8ab17ba0a3ae0"

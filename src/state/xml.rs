@@ -128,11 +128,11 @@ pub fn generate(state: Option<State>) -> String {
             }
             @if let Some(state) = state.clone() {
                 message (state.message)
-                @if state.property.len() == 0 {
+                @if state.property.len() == 0 then {
                     @let task = Task::from_ref(&branch) {
                         {Task { repo: &repo, task: &task, properties: task.properties(&repo) }}
                     }
-                } @else {
+                } else {
                     task {
                         name (state.task)
                         @for property in state.property {
@@ -143,7 +143,7 @@ pub fn generate(state: Option<State>) -> String {
                         }
                     }
                 }
-            } @else {
+            } else {
                 @let task = Task::from_ref(&branch) {
                     {Task { repo: &repo, task: &task, properties: task.properties(&repo) }}
                 }
@@ -189,9 +189,9 @@ pub fn generate(state: Option<State>) -> String {
                     }
                 }
             }
-            @if task.name == "master" {
+            @if task.name == "master" then {
                 {Project {}}
-            } @else {
+            } else {
                 {Properties {}}
             }
             changes {
@@ -236,11 +236,9 @@ pub fn generate(state: Option<State>) -> String {
 fn diff(changes: Diff) -> Vec<String> {
     let result = RefCell::new(vec![]);
     changes.foreach(&mut |delta: DiffDelta, _: f32| {
-        result.borrow_mut().push(html!(
-            @if let Some(path) = delta.new_file().path() {
-                label (path.to_str().unwrap_or("[invalid]"))
-            }
-        ));
+        if let Some(path) = delta.new_file().path() {
+            result.borrow_mut().push(DiffLabel {path: path});
+        }
         true
     }, Some(&mut |delta: DiffDelta, binary: DiffBinary| {
         if binary.contains_data() {
@@ -286,7 +284,7 @@ markup::define! {
                         }
                     }
                 }
-            } @else {
+            } else {
                 task {
                     name { "master" }
                 }
@@ -305,6 +303,10 @@ markup::define! {
 
     DiffDiff(class: &'static str, content: String) {
         span[class={class}] {{ String::from_utf8_lossy(content) }}
+    }
+
+    DiffLabel(path: ) {
+        label (path.to_str().unwrap_or("[invalid]"))
     }
 
     Task(repo: &Repository, task: &Task, changes: Vec<(String, Option<String>, String)>) {
