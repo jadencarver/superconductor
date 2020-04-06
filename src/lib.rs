@@ -1,8 +1,9 @@
-#![feature(plugin)]
-#![plugin(maud_macros)]
+#![feature(proc_macro_hygiene)]
 
 extern crate maud;
-extern crate websocket;
+extern crate actix;
+extern crate actix_web;
+extern crate actix_web_actors;
 extern crate yaml_rust;
 extern crate libc;
 
@@ -23,11 +24,12 @@ extern crate git2;
 
 pub static XML: &'static str = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
 
+use maud::html;
 
-mod state;
+//mod state;
 mod view;
 mod server;
-mod task;
+//mod task;
 
 #[no_mangle]
 pub extern "C" fn panel_xslt() -> *mut c_char {
@@ -35,43 +37,45 @@ pub extern "C" fn panel_xslt() -> *mut c_char {
 }
 
 #[no_mangle]
-pub extern "C" fn start() -> i32 {
+extern "C" fn start() -> i32 {
     let mut port = 2794;
     let mut _server = server::start(port);
-    if _server.is_err() {
-        println!("Failed to connect on default websocket port");
-        let mut rng = rand::thread_rng();
-        port = port + rng.gen::<i32>() % 10;
-        _server = server::start(port);
-    }
-    match _server {
-        Ok(server) => {
-            thread::spawn(move || {
-                for connection in server {
-                    thread::spawn(move || server::connect(connection.unwrap()));
-                }
-            });
-        },
-        _ => println!("Unable to start websocket server")
-    };
+    //if _server.is_err() {
+    //    println!("Failed to connect on default websocket port.  Retrying...");
+    //    let mut rng = rand::thread_rng();
+    //    port = port + rng.gen::<i32>() % 10;
+    //    _server = server::start(port);
+    //}
+    //match _server {
+    //    Ok(server) => {
+    //        println!("OK");
+    //    //    thread::spawn(move || {
+    //    //        for connection in server {
+    //    //            thread::spawn(move || server::connect(connection.unwrap()));
+    //    //        }
+    //    //    });
+    //    },
+    //    _ => println!("Unable to start websocket server")
+    //};
     port
 }
 
 #[no_mangle]
 pub extern "C" fn panel_js(port: i32) -> *mut c_char {
-    let markup = html! {
-        script { "
-        if (window === window.top) {
+    let markup = format!("
+    <script>
+        if (window === window.top) {{
             //var highlight = document.createElement('script');
             //highlight.setAttribute('src', '//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/highlight.min.js');
             //document.body.appendChild(highlight);
             PM = document.createElement('script');
             PM.setAttribute('src', '/assets/__pm.js');
-            PM.port = " (port) ";
+            PM.port = {};
             document.body.appendChild(PM);
-        }" }
-    };
-    CString::new(markup.into_string()).unwrap().into_raw()
+        }}
+    </script>
+    ", port);
+    CString::new(markup).unwrap().into_raw()
 }
 
 #[no_mangle]

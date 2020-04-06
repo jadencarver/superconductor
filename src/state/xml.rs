@@ -1,3 +1,4 @@
+use maud::html;
 use state::State;
 use task::Task;
 
@@ -39,7 +40,7 @@ pub fn generate(state: Option<State>) -> String {
     if repo.find_branch("master", BranchType::Local).is_err() {
         return html! {
             state {
-                setup "1"
+                setup { "1" }
                 @if let Some(state) = state {
                     message (state.message)
                     task {

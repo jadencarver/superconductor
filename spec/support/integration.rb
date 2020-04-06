@@ -6,7 +6,7 @@ require 'yard'
 module IntegrationSpec
   autoload :Screenshots, 'support/integration/screenshots'
 
-  #Capybara.javascript_driver = :poltergeist
+  Capybara.javascript_driver = :selenium_chrome
 
   Capybara.app = Rack::Builder.app do
     use Superconductor::Middleware
