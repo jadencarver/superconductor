@@ -1,4 +1,3 @@
-extern crate websocket;
 extern crate yaml_rust;
 extern crate libc;
 
@@ -16,6 +15,7 @@ use rand::Rng;
 extern crate termion;
 extern crate markup;
 extern crate git2;
+extern crate tungstenite;
 
 pub static XML: &'static str = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
 
@@ -43,7 +43,7 @@ pub extern "C" fn start() -> i32 {
     match _server {
         Ok(server) => {
             thread::spawn(move || {
-                for connection in server {
+                for connection in server.incoming() {
                     thread::spawn(move || server::connect(connection.unwrap()));
                 }
             });

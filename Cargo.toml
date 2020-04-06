@@ -11,7 +11,7 @@ markup = { path="../markup.rs/markup" }
 markup-proc-macro = { path="../markup.rs/markup-proc-macro" }
 libc = "*"
 git2 = { version = "*", default-features = false }
-websocket = { version = "*", default-features = false }
+tungstenite = "0.10.1"
 yaml-rust = "*"
 md5 = "*"
 fsevent = "*"

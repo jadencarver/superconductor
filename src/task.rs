@@ -1,7 +1,7 @@
 use yaml_rust::{Yaml, YamlLoader};
 use yaml_rust::yaml::Hash;
+use std::time::SystemTime;
 
-extern crate time;
 extern crate git2;
 use self::git2::{Repository, ObjectType};
 use self::git2::{Commit, Reference, Oid};
@@ -14,14 +14,14 @@ pub struct Task {
 }
 
 impl Task {
-    pub fn from_ref(reference: &Reference) -> Task {
-        let commit_obj = reference.peel(ObjectType::Commit).unwrap();
+    pub fn from_ref(reference: &Reference) -> Result<Task, git2::Error> {
+        let commit_obj = reference.peel(ObjectType::Commit)?;
         let commit = commit_obj.as_commit().unwrap();
         let name = reference.shorthand().unwrap_or("master");
         Task::from_commit(&name, &commit)
     }
 
-    pub fn from_commit(name: &str, commit: &Commit) -> Task {
+    pub fn from_commit(name: &str, commit: &Commit) -> Result<Task, git2::Error> {
         let mut messages = commit.message().unwrap().split("---\n");
         let _message = messages.next().unwrap();
         let mut tasks = vec![];
@@ -45,11 +45,11 @@ impl Task {
             }
         };
         tasks.retain(|c| c.name == name);
-        tasks.pop().unwrap_or(Task {
+        Ok(tasks.pop().unwrap_or(Task {
             name: String::from(name),
             commit: Some(commit.id()),
             changes: Hash::new()
-        })
+        }))
     }
 
     pub fn get(&self, repo: &Repository, property: &Yaml) -> Option<Yaml> {
@@ -57,7 +57,7 @@ impl Task {
             Some(value.clone())
         } else if let Some(commit) = self.commit {
             let commit = repo.find_commit(commit).expect("Unable to find commit!");
-            let parents = commit.parents().map(|parent| Task::from_commit(&self.name, &parent));
+            let parents = commit.parents().map(|parent| Task::from_commit(&self.name, &parent).unwrap());
             let mut candidates: Vec<Yaml> = parents.filter_map(|task| task.get(&repo, property)).collect();
             candidates.pop()
         } else {
@@ -69,7 +69,7 @@ impl Task {
         if let Some(commit_oid) = self.commit {
             let commit = repo.find_commit(commit_oid).unwrap();
             if let Some(parent) = commit.parents().next() {
-                Some(Task::from_commit(&self.name, &parent))
+                Some(Task::from_commit(&self.name, &parent).unwrap())
             } else { None }
         } else { None }
     }
@@ -79,7 +79,7 @@ impl Task {
             let commit = repo.find_commit(commit_oid).unwrap();
             commit.time().seconds()
         } else {
-            time::get_time().sec
+            SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs() as i64
         }
     }
 

@@ -40,7 +40,7 @@ pub fn generate(state: Option<State>) -> String {
     if repo.find_branch("master", BranchType::Local).is_err() {
         return GeneratedState {
             state: state
-       }.into_string()
+       }.to_string()
     }
 
     let head = repo.head().unwrap();
@@ -50,7 +50,7 @@ pub fn generate(state: Option<State>) -> String {
 
     let branches = repo.branches(Some(BranchType::Local)).unwrap().filter_map(|b|b.ok());
     let all_tasks: Vec<Task> = branches.filter_map(|(branch, _)| {
-        let task = Task::from_ref(branch.get());
+        let task = Task::from_ref(branch.get()).unwrap();
         if let Some(ref state) = state {
             if task.name != state.task { Some(task) } else { None }
         } else {
@@ -105,10 +105,10 @@ pub fn generate(state: Option<State>) -> String {
         None => head
     };
 
-    let task = Task::from_ref(&branch);
+    let task = Task::from_ref(&branch).unwrap();
 
     let mut revwalk = repo.revwalk().unwrap();
-    revwalk.set_sorting(git2::SORT_REVERSE);
+    revwalk.set_sorting(git2::Sort::REVERSE);
     revwalk.push(branch.target().unwrap()).unwrap();
     if branch.shorthand().unwrap() != "master" {
         revwalk.hide_ref("refs/heads/master").unwrap();
@@ -117,134 +117,34 @@ pub fn generate(state: Option<State>) -> String {
     let mut status_opts = StatusOptions::new();
     status_opts.include_untracked(true);
 
-    let payload = html! {
-        state {
-            @if let Some(commit) = state.clone() {
-                focus (commit.focus)
-            }
-            user {
-                name  (config.get_string("user.name" ).unwrap_or(String::from("Unknown")))
-                email (config.get_string("user.email").unwrap_or(String::from("root@localhost")))
-            }
-            @if let Some(state) = state.clone() {
-                message (state.message)
-                @if state.property.len() == 0 then {
-                    @let task = Task::from_ref(&branch) {
-                        {Task { repo: &repo, task: &task, properties: task.properties(&repo) }}
-                    }
-                } else {
-                    task {
-                        name (state.task)
-                        @for property in state.property {
-                            property {
-                                name (property.name)
-                                value (property.value)
-                            }
-                        }
-                    }
-                }
-            } else {
-                @let task = Task::from_ref(&branch) {
-                    {Task { repo: &repo, task: &task, properties: task.properties(&repo) }}
-                }
-            }
-            tasks {
-                @if let Some(filter) = filter {
-                    @if filter.name != "" {
-                        filter {
-                            name (filter.name)
-                            value (filter.value)
-                        }
-                    }
-                }
-                @for task in tasks {
-                    {Task { repo: &repo, task: &task, properties: task.properties(&repo) }}
-                }
-            }
-            log {
-                @for (_, rev) in revwalk.enumerate() {
-                    @let commit = repo.find_commit(rev.unwrap()).unwrap() {
-                        commit {
-                            id { commit.id() }
-                            @let time = commit.time() {
-                                timestamp {time.seconds()}
-                                localtime {FixedOffset::east(time.offset_minutes()*60).timestamp(time.seconds(), 0).to_rfc3339()}
-                            }
-                            user {
-                                @let author = commit.author() {
-                                    name (author.name().unwrap())
-                                    @let email = author.email().unwrap().trim() {
-                                        email (email)
-                                        image (format!("https://www.gravatar.com/avatar/{:x}?s=64", md5::compute(email.to_lowercase())))
-                                    }
-                                }
-                            }
-                            @let mut message = commit.message().unwrap().split("---\n") {
-                                message (message.next().unwrap())
-                                @let task = Task::from_commit(&branch.shorthand().unwrap(), &commit) {
-                                    (render_task(&repo, &task, task.changes(&repo)))
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            @if task.name == "master" then {
-                {Project {}}
-            } else {
-                {Properties {}}
-            }
-            changes {
-                @if let Ok(delta) = changes.stats() {
-                    @if delta.files_changed() + delta.insertions() + delta.deletions() > 0 {
-                        statistics {
-                            files (delta.files_changed())
-                            insertions (delta.insertions())
-                            deletions (delta.deletions())
-                        }
-                    }
-                }
-                @for change in repo.statuses(Some(&mut status_opts)).unwrap().iter() {
-                    @let path = change.path().unwrap() {
-                        change id=(path.replace("/", "_").replace(".", "_").replace(" ", "_")) {
-                            path (path)
-                            insertions {}
-                            deletions {}
-                            included @match change.head_to_index().map(|d| d.status()).unwrap_or(Delta::Unreadable) {
-                                Delta::Modified | Delta::Added | Delta::Deleted => "true",
-                                _ => "false"
-                            }
-                            removal @match change.head_to_index().map(|d| d.status()).unwrap_or(Delta::Unreadable) {
-                                Delta::Deleted => "true",
-                                _ => "false"
-                            }
-                        }
-                    }
-                }
-            }
-            diffs {
-                @for change in diff(changes) {
-                    (change)
-                }
-            }
-        }
-    }.into_string();
+    let payload = Payload {
+        repo: &repo,
+        state: state,
+        branch: branch,
+        filter: filter,
+        tasks: tasks,
+        task: task,
+        //revwalk: revwalk,
+        changes: changes,
+        status_opts: status_opts,
+        config: config
+    }.to_string();
     println!("  {}Sent payload of size: {}{}", color::Fg(color::LightGreen), payload.len(), color::Fg(color::Reset));
     payload
 }
 
-fn diff(changes: Diff) -> Vec<String> {
+fn diff<'a>(changes: &'a Diff) -> Vec<String> {
     let result = RefCell::new(vec![]);
     changes.foreach(&mut |delta: DiffDelta, _: f32| {
         if let Some(path) = delta.new_file().path() {
-            result.borrow_mut().push(DiffLabel {path: path});
+            result.borrow_mut().push(DiffLabel {path: path}.to_string());
         }
         true
     }, Some(&mut |delta: DiffDelta, binary: DiffBinary| {
         if binary.contains_data() {
             result.borrow_mut().push(DiffImage {
-                data: String::from_utf8_lossy(&binary.new_file().data())
-            });
+                data: String::from_utf8_lossy(&binary.new_file().data()).to_string()
+            }.to_string());
         } else {
             let path = delta.new_file().path().unwrap();
             let mut file = File::open(path).unwrap();
@@ -253,7 +153,7 @@ fn diff(changes: Diff) -> Vec<String> {
             result.borrow_mut().push(DiffImage64 {
                 data: encode(&contents),
                 path: path.to_str().unwrap()
-            });
+            }.to_string());
         }
         true
     }), None, Some(&mut |_: DiffDelta, _: Option<DiffHunk>, line: DiffLine| {
@@ -263,21 +163,141 @@ fn diff(changes: Diff) -> Vec<String> {
             'H' | 'F' => "meta",
             _ => ""
         };
-        result.borrow_mut().push(DiffDiff { class: class, content: &line.content() });
+        result.borrow_mut().push(DiffDiff {
+            class: class,
+            content: String::from_utf8_lossy(line.content()).to_string()
+        }.to_string());
         true
     })).unwrap();
     result.into_inner()
 }
 
 markup::define! {
-    GeneratedState(state: State) {
+    Payload<'a>(repo: &'a git2::Repository, state: Option<State>, config: git2::Config, branch: git2::Reference<'a>, filter: Option<Filter>, tasks: Vec<&'a Task>, task: Task, changes: git2::Diff<'a>, status_opts: StatusOptions) {
+        state {
+            @if let Some(commit) = state.clone() {
+                focus {{ commit.focus }}
+            }
+            user {
+                name  {{config.get_string("user.name" ).unwrap_or(String::from("Unknown"))}}
+                email {{config.get_string("user.email").unwrap_or(String::from("root@localhost"))}}
+            }
+            @if let Some(state) = state.clone() {
+                message {{state.message}}
+                @if state.property.len() == 0 {
+                    @if let Ok(task) = Task::from_ref(&branch) {
+                        {PayloadTask { repo: &repo, task: &task, properties: task.properties(&repo), changes: vec![] }}
+                    }
+                } else {
+                    task {
+                        name {{state.task}}
+                        @for property in state.property {
+                            property {
+                                name {{property.name}}
+                                value {{property.value}}
+                            }
+                        }
+                    }
+                }
+            } else {
+                @if let Ok(task) = Task::from_ref(&branch) {
+                    {PayloadTask { repo: &repo, task: &task, properties: task.properties(&repo), changes: vec![] }}
+                }
+            }
+            tasks {
+                @if let Some(filter) = {filter} {
+                    @if filter.name != "" {
+                        filter {
+                            name {{filter.name}}
+                            value {{filter.value}}
+                        }
+                    }
+                }
+                @for task in {tasks} {
+                    {PayloadTask { repo: &repo, task: &task, properties: task.properties(&repo), changes: vec![] }}
+                }
+            }
+            log {
+                //@for (_, rev) in revwalk.enumerate() {
+                //    @if let Ok(commit) = repo.find_commit(rev.unwrap()) {
+                //        commit {
+                //            id {{ format!("{}", commit.id()) }}
+                //            timestamp {{ commit.time().seconds() }}
+                //            localtime {{ FixedOffset::east(commit.time().offset_minutes()*60).timestamp(commit.time().seconds(), 0).to_rfc3339() }}
+                //            user {
+                //                @if let Some(author_name) = commit.author().name() {
+                //                    name {{ author_name }}
+                //                    @if let Some(author_email) = commit.author().email() {
+                //                        email {{ author_email.trim() }}
+                //                        image {{ format!("https://www.gravatar.com/avatar/{:x}?s=64", md5::compute(author_email.trim().to_lowercase())) }}
+                //                    }
+                //                }
+                //            }
+                //            @if let Some(mut message) = commit.message() {
+                //                message {{ message.split("---\n").next().unwrap() }}
+                //                @if let Ok(task) = Task::from_commit(&branch.shorthand().unwrap(), &commit) {
+                //                    {PayloadTask { repo: &repo, task: &task, properties: vec![], changes: task.changes(&repo) }}
+                //                }
+                //            }
+                //        }
+                //    }
+                //}
+            }
+            @if task.name == "master" {
+                {Project {}}
+            } else {
+                {Properties {}}
+            }
+            changes {
+                @if let Ok(delta) = changes.stats() {
+                    @if delta.files_changed() + delta.insertions() + delta.deletions() > 0 {
+                        statistics {
+                            files {{ delta.files_changed() }}
+                            insertions {{ delta.insertions() }}
+                            deletions {{ delta.deletions() }}
+                        }
+                    }
+                }
+                //@for change in repo.statuses(Some(&mut status_opts)).unwrap().iter() {
+                //    @if let Some(path) = change.path() {
+                //        change[id={path.replace("/", "_").replace(".", "_").replace(" ", "_")}] {
+                //            path {{path}}
+                //            insertions {}
+                //            deletions {}
+                //            included {
+                //                {match change.head_to_index().map(|d| d.status()).unwrap_or(Delta::Unreadable) {
+                //                    Delta::Modified | Delta::Added | Delta::Deleted => "true",
+                //                    _ => "false"
+                //                }}
+                //            }
+                //            removal {
+                //                {match change.head_to_index().map(|d| d.status()).unwrap_or(Delta::Unreadable) {
+                //                    Delta::Deleted => "true",
+                //                    _ => "false"
+                //                }}
+                //            }
+                //        }
+                //    }
+                //}
+            }
+            diffs {
+                @for change in diff(changes) {
+                    {change}
+                }
+            }
+        }
+    }
+}
+
+markup::define! {
+    GeneratedState(state: Option<State>) {
         state {
             setup { "1" }
-            @if let Some(state) = state {
+            @if let Some(state) = {state} {
                 message {{ state.message }}
                 task {
                     name { "master" }
-                    @for property in state.property {
+                    @for property in {state.property} {
                         property {
                             name {{ property.name }}
                             value {{ property.value }}
@@ -297,26 +317,26 @@ markup::define! {
         img[src={format!("data:image/png,{}", data)}] {}
     }
 
-    DiffImage64(data: String, path: &str) {
+    DiffImage64<'a>(data: String, path: &'a str) {
         img[src={format!("data:image/jpeg;base64,{}", data)}, alt={format!("{}", path)}] {}
     }
 
     DiffDiff(class: &'static str, content: String) {
-        span[class={class}] {{ String::from_utf8_lossy(content) }}
+        span[class={class}] {{ content }}
     }
 
-    DiffLabel(path: ) {
-        label (path.to_str().unwrap_or("[invalid]"))
+    DiffLabel<'a>(path: &'a std::path::Path) {
+        label {{ path.to_str().unwrap_or("[invalid]") }}
     }
 
-    Task(repo: &Repository, task: &Task, changes: Vec<(String, Option<String>, String)>) {
+    PayloadTask<'a>(repo: &'a Repository, task: &'a Task, changes: Vec<(String, Option<String>, String)>, properties: Vec<(String, Option<String>, String)>) {
         task {
             name {{ task.name }}
             timestamp {{ task.timestamp(&repo) }}
-            @for (name, before, value) in changes {
+            @for (name, before, value) in {changes} {
                 property {
                     name {{ name }}
-                    @if let Some(before) = before {
+                    @if let Some(before) = {before} {
                         before {{ before }}
                     }
                     value {{ value }}
@@ -356,8 +376,8 @@ markup::define! {
                 name { "Manager" }
                 value { "Jaden Carver <jaden.carver@gmail.com>" }
                 options {
-                    option[value="Jaden Carver <jaden.carver@gmail.com>"] "Jaden Carver"
-                    option[value="Bob Dole <bdole69@gmail.com>"] "Bob Dole"
+                    option[value="Jaden Carver <jaden.carver@gmail.com>"] { "Jaden Carver" }
+                    option[value="Bob Dole <bdole69@gmail.com>"] { "Bob Dole" }
                 }
             }
             property {

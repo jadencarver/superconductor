@@ -131,7 +131,7 @@ impl State {
                 let head = branch.into_reference();
                 let commit = head.peel(ObjectType::Commit).unwrap();
                 let mut yaml = String::new();
-                let task = Task::from_ref(&head);
+                let task = Task::from_ref(&head).unwrap();
                 self.convert_to_yaml(&mut yaml, &repo, Some(task));
                 if self.message.len() > 0 || yaml.len() > 0 {
                     let message = format!("{}\n{}", self.message, yaml);
