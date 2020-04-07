@@ -1,4 +1,3 @@
-require 'pry'
 require 'ansi'
 require 'mini_magick'
 

@@ -3,11 +3,13 @@
 @import 'pm_commits';
 @import 'pm_setup';
 
-#__pm__panel {
+// rsass doesn't know how to scope import
   @import 'checkbox';
   @import 'details';
   @import 'buttons';
   @import 'tokens';
+
+#__pm__panel {
 
   background:         linear-gradient(top, $color0, mix($color0, $color3, 75%));
   //background: -webkit-linear-gradient(top, $color0, mix($color0, $color3, 75%));

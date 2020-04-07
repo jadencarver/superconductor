@@ -1,9 +1,13 @@
-use std::process::Command;
-use XML;
+use maud::html;
+use crate::XML;
+use rsass::{OutputStyle, compile_scss_file};
+use std::path::Path;
 
 pub fn panel_xslt() -> String {
-    let scss = Command::new("/usr/local/bin/sassc").arg("/Users/jadencarver/dev/superconductor/assets/__pm.scss").output().unwrap();
-    let css = String::from_utf8(scss.stdout).unwrap();
+    let css = match compile_scss_file(Path::new("assets/__pm.scss"), OutputStyle::Compressed) {
+        Ok(css) => String::from_utf8_lossy(&css).to_string(),
+        Err(error) => format!("#__pm__panel::after {{ display: block; position: fixed; top: 0; bottom: 0; left: 0; right: 0; z-index: 99999; background-color: rgba(255, 255, 255, 0.75); padding: 15%; font-size: 2em; content: \'{}\' }};", error)
+    };
     
     let markup = html! {
         xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" {
@@ -13,8 +17,8 @@ pub fn panel_xslt() -> String {
             xsl:template match="/" {
                 div#__pm__panel {
                     form#__pm__commit method="post" name="commit" {
-                        style type="text/css" (css)
-                        style type="text/css" "@import url('//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/styles/agate.min.css');"
+                        style type="text/css" {(css)}
+                        style type="text/css" {"@import url('//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.10.0/styles/agate.min.css');"}
                         div#__pm__task {
                             input type="checkbox" id="__pm__commit__dragged" name="dragged" value="true" {}
                             input type="hidden" id="__pm__commit__task" name="task" value="{/state/task/name}" {}
@@ -32,8 +36,12 @@ pub fn panel_xslt() -> String {
                             }
                             div#__pm__new_commit {
                                 ul#__pm__new_commit__actions {
-                                    li input type="submit" tabindex="5" name="new_task" value="New Task" {}
-                                    li input type="submit" tabindex="4" name="save_update" value="Save Update" {}
+                                    li {
+                                        input type="submit" tabindex="5" name="new_task" value="New Task" {}
+                                    }
+                                    li {
+                                        input type="submit" tabindex="4" name="save_update" value="Save Update" {}
+                                    }
                                 }
                                 xsl:if test="/state/changes/change" {
                                     fieldset#__pm__commit__changes.details {
@@ -75,8 +83,8 @@ pub fn panel_xslt() -> String {
                         xsl:choose {
                             xsl:when test="/state/setup" {
                                 div.setup {
-                                    h1 "Setup Instructions"
-                                    p "Begin by entering your project name, and selecting the appropriate properties."
+                                    h1 {"Setup Instructions"}
+                                    p {"Begin by entering your project name, and selecting the appropriate properties."}
                                 }
                             }
                             xsl:when test="/state/diffs/*" {
@@ -93,7 +101,7 @@ pub fn panel_xslt() -> String {
                 xsl:choose {
                     xsl:when test="name = 'Project'" {
                         div.property.property--inline {
-                            dt { label for="__pm__commit__properties--project" "Project" }
+                            dt { label for="__pm__commit__properties--project" {"Project"} }
                             dd.input {
                                 input type="text" id="__pm__commit__properties--project" name="property" data-name="Project" value="{/state/task/property[name[text()='Project']]/value}" {}
                             }
@@ -101,41 +109,41 @@ pub fn panel_xslt() -> String {
                     }
                     xsl:when test="name = 'Status'" {
                         div.property.property--inline {
-                            dt { label for="__pm__commit__properties--status" "Status" }
+                            dt { label for="__pm__commit__properties--status" {"Status"} }
                             dd.select tabindex="1" {
                                 xsl:value-of select="/state/task/property[name[text()='Status']]/value" {}
                                 select id="__pm__commit__properties--status" name="property" data-name="Status" {
                                     option value="" {}
-                                    xsl:apply-templates "options/option" {}
+                                    xsl:apply-templates select="options/option" {}
                                 }
                             }
                         }
                     }
                     xsl:when test="name = 'Developer'" {
                         div.property.property--inline {
-                            dt { label for="__pm__commit__properties--developer" "Developer" }
+                            dt { label for="__pm__commit__properties--developer" {"Developer"} }
                             dd.select {
                                 input type="text" id="__pm__commit__properties--developer" value="{/state/task/property[name[text()='Developer']]/value}" {}
                                 select name="property" data-name="Developer" {
-                                    xsl:apply-templates "options/option" {}
+                                    xsl:apply-templates select="options/option" {}
                                 }
                             }
                         }
                     }
                     xsl:when test="name = 'Manager'" {
                         div.property.property--inline {
-                            dt { label for="__pm__commit__properties--owner" "Manager" }
+                            dt { label for="__pm__commit__properties--owner" {"Manager"} }
                             dd.select {
                                 input type="text" id="__pm__commit__properties--manager" value="{/state/task/property[name[text()='Manager']]/value}" {}
                                 select name="property" data-name="Manager" {
-                                    xsl:apply-templates "options/option" {}
+                                    xsl:apply-templates select="options/option" {}
                                 }
                             }
                         }
                     }
                     xsl:when test="name = 'Description'" {
                         div.property {
-                            dt { label for="__pm__commit__properties--description" "Description" }
+                            dt { label for="__pm__commit__properties--description" {"Description"} }
                             dd {
                                 textarea id="__pm__commit__properties--description" name="property" data-name="Description" {
                                     xsl:value-of select="/state/task/property[name[text()='Description']]/value" {}
@@ -145,7 +153,7 @@ pub fn panel_xslt() -> String {
                     }
                     xsl:when test="name = 'Estimate'" {
                         div.property.property--inline {
-                            dt { label for="__pm__commit__properties--estimate" "Estimate" }
+                            dt { label for="__pm__commit__properties--estimate" {"Estimate"} }
                             dd.input {
                                 input type="range" id="__pm__commit__properties--estimate" name="property" data-name="Estimate" value="{/state/task/property[name[text()='Estimate']]/value}" {}
                             }
@@ -167,7 +175,7 @@ pub fn panel_xslt() -> String {
                         xsl:value-of select="." {}
                     }
                     xsl:if test="/state/task/property[name[text()=$name]]/value = ." {
-                        xsl:attribute name="selected" "selected"
+                        xsl:attribute name="selected" { "selected" }
                     }
                     xsl:value-of select="." {}
                 }
@@ -286,8 +294,8 @@ pub fn panel_xslt() -> String {
                 }
                 li class="tile {$class}" data-property-name="Ordinal" data-property-value="{$next}" {
                     xsl:element name="div" {
-                        xsl:attribute name="draggable" "true"
-                        xsl:attribute name="tabindex" "99"
+                        xsl:attribute name="draggable" { "true" }
+                        xsl:attribute name="tabindex" { "99" }
                         xsl:attribute name="id" {
                             xsl:value-of select="concat('__pm__task_', name)" {}
                         }
@@ -318,7 +326,7 @@ pub fn panel_xslt() -> String {
             xsl:template match="/state/log/commit" {
                 li {
                     xsl:if test="./preceding-sibling::commit[1]/user/email=user/email and ./preceding-sibling::commit[1]/timestamp - timestamp > -7200" {
-                        xsl:attribute name="class" "continuous"
+                        xsl:attribute name="class" {"continuous"}
                     }
                     img src="{user/image}" alt="{user/name} <{user/email}>" {}
                     xsl:if test="changes" {
@@ -373,8 +381,8 @@ pub fn panel_xslt() -> String {
                         xsl:attribute name="value" {
                             xsl:value-of select="path" {}
                         }
-                        xsl:attribute name="tabindex" "-1"
-                        xsl:attribute name="type" "checkbox"
+                        xsl:attribute name="tabindex" { "-1" }
+                        xsl:attribute name="type" { "checkbox" }
                         xsl:if test="included='true'" {
                             xsl:attribute name="checked" {}
                         }

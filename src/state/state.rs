@@ -6,7 +6,7 @@ use rand::Rng;
 use termion::color;
 use rand;
 
-use task::Task;
+use crate::task::Task;
 
 use yaml_rust::yaml::Hash;
 use yaml_rust::{Yaml, YamlEmitter};
@@ -80,7 +80,7 @@ impl State {
         self.new_task = None;
     }
 
-    pub fn apply(&mut self, mut last_state: Option<State>, rng: &mut rand::ThreadRng) -> Result<Option<State>, StateError> {
+    pub fn apply(&mut self, mut last_state: Option<&State>, rng: &mut rand::ThreadRng) -> Result<Option<State>, StateError> {
         let new_last_state = self.clone();
         let repo = Repository::open_from_env().unwrap_or(Repository::init(".").unwrap());
         if let Some(ref mut last) = last_state {
@@ -92,14 +92,14 @@ impl State {
                 println!("  {}Task changing{}  {} => {}", color::Fg(color::LightYellow), color::Fg(color::Reset), last.task, self.task);
                 if self.dragged.is_some() {
                     println!("  {}Saving last state due to dragging{}", color::Fg(color::LightGreen), color::Fg(color::Reset));
-                    last.save_update(&repo, rng);
+                    //last.save_update(&repo, rng);
                     self.reset_with_status();
                 } else {
                     let switching_to_task = self.task.clone();
                     self.task = last.task.clone();
                     self.save_update(&repo, rng);
-                    self.task = switching_to_task;
                     self.reset();
+                    self.task = switching_to_task;
                 }
             } else {
                 println!("  {}Updating task {}{}", color::Fg(color::LightGreen), self.task, color::Fg(color::Reset));

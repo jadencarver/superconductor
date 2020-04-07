@@ -229,7 +229,7 @@
     }
 
     function openSocket() {
-        var socket = new WebSocket("ws://127.0.0.1:"+PM.port, "superconductor");
+        var socket = new WebSocket("ws://127.0.0.1:"+PM.port+"/ws/", "superconductor");
         socket.onmessage = function (event) {
             var form = DOM.querySelector('#__pm__commit');
             if (event.data === 'submit' && form) {

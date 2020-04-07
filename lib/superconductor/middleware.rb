@@ -1,5 +1,4 @@
 require 'superconductor'
-require 'pry'
 
 module Superconductor
   class Middleware

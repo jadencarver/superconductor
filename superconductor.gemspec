@@ -27,12 +27,12 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_development_dependency "bundler", "~> 1.12"
+  spec.add_development_dependency "bundler", "~> 2.1"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "yard", "~> 0.9.2"
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "selenium-webdriver", "~> 3.4.0"
-  #spec.add_development_dependency "poltergeist", "~> 1.15.0"
+  spec.add_development_dependency "poltergeist", "~> 1.15.0"
   spec.add_development_dependency "capybara-screenshot", "~> 0.3.3"
   spec.add_development_dependency "ansi", "~> 1.5.0"
   spec.add_development_dependency "mini_magick", "~> 4.7.1"

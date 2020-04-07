@@ -5,6 +5,7 @@ extern crate time;
 extern crate git2;
 use self::git2::{Repository, ObjectType};
 use self::git2::{Commit, Reference, Oid};
+use std::time::SystemTime;
 
 #[derive(Debug)]
 pub struct Task {
@@ -79,7 +80,7 @@ impl Task {
             let commit = repo.find_commit(commit_oid).unwrap();
             commit.time().seconds()
         } else {
-            time::get_time().sec
+            SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs() as i64
         }
     }
 
