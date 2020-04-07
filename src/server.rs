@@ -54,7 +54,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsClient {
                     .unwrap_or(self.last_state.clone()
                                .unwrap_or(State::blank()));
                 self.last_state = state.apply(self.last_state.as_ref(), &mut rng).unwrap();
-                ctx.text(generate(self.last_state.clone()))
+                ctx.text(generate(Some(state)))
             },
             Ok(ws::Message::Binary(bin)) => ctx.binary(bin),
             _ => (),

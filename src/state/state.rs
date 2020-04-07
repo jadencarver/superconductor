@@ -98,8 +98,8 @@ impl State {
                     let switching_to_task = self.task.clone();
                     self.task = last.task.clone();
                     self.save_update(&repo, rng);
-                    self.task = switching_to_task;
                     self.reset();
+                    self.task = switching_to_task;
                 }
             } else {
                 println!("  {}Updating task {}{}", color::Fg(color::LightGreen), self.task, color::Fg(color::Reset));
