@@ -49,9 +49,11 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsClient {
         match msg {
             Ok(ws::Message::Ping(msg)) => ctx.pong(&msg),
             Ok(ws::Message::Text(text)) => {
-                //let mut rng = rand::thread_rng();
-                //let mut state: State = xml::from_str(&text).unwrap_or(self.last_state.clone().unwrap_or(State::blank()));
-                //self.last_state = state.apply(self.last_state.as_ref(), &mut rng).unwrap();
+                let mut rng = rand::thread_rng();
+                let mut state: State = xml::from_str(&text)
+                    .unwrap_or(self.last_state.clone()
+                               .unwrap_or(State::blank()));
+                self.last_state = state.apply(self.last_state.as_ref(), &mut rng).unwrap();
                 ctx.text(generate(self.last_state.clone()))
             },
             Ok(ws::Message::Binary(bin)) => ctx.binary(bin),
