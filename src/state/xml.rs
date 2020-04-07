@@ -1,6 +1,6 @@
 use maud::html;
-use state::State;
-use task::Task;
+use crate::state::State;
+use crate::task::Task;
 
 use std::cell::RefCell;
 use std::fs::File;
@@ -15,7 +15,7 @@ use self::git2::Delta;
 use self::git2::BranchType;
 use self::git2::{Diff, DiffDelta, DiffHunk, DiffLine, DiffBinary};
 use git2::ObjectType;
-use state::Filter;
+use crate::state::Filter;
 
 extern crate md5;
 extern crate chrono;
@@ -42,19 +42,19 @@ pub fn generate(state: Option<State>) -> String {
             state {
                 setup { "1" }
                 @if let Some(state) = state {
-                    message (state.message)
+                    message {(state.message)}
                     task {
-                        name "master"
+                        name { "master" }
                         @for property in state.property {
                             property {
-                                name (property.name)
-                                value (property.value)
+                                name {(property.name)}
+                                value {(property.value)}
                             }
                         }
                     }
                 } @else {
                     task {
-                        name "master"
+                        name {"master"}
                     }
                 }
                 (project())
@@ -127,7 +127,7 @@ pub fn generate(state: Option<State>) -> String {
     let task = Task::from_ref(&branch);
 
     let mut revwalk = repo.revwalk().unwrap();
-    revwalk.set_sorting(git2::SORT_REVERSE);
+    revwalk.set_sorting(git2::Sort::REVERSE);
     revwalk.push(branch.target().unwrap()).unwrap();
     if branch.shorthand().unwrap() != "master" {
         revwalk.hide_ref("refs/heads/master").unwrap();
@@ -139,40 +139,38 @@ pub fn generate(state: Option<State>) -> String {
     let payload = html! {
         state {
             @if let Some(commit) = state.clone() {
-                focus (commit.focus)
+                focus {(commit.focus)}
             }
             user {
-                name  (config.get_string("user.name" ).unwrap_or(String::from("Unknown")))
-                email (config.get_string("user.email").unwrap_or(String::from("root@localhost")))
+                name  {(config.get_string("user.name" ).unwrap_or(String::from("Unknown")))}
+                email {(config.get_string("user.email").unwrap_or(String::from("root@localhost")))}
             }
             @if let Some(state) = state.clone() {
-                message (state.message)
+                message {(state.message)}
                 @if state.property.len() == 0 {
-                    @let task = Task::from_ref(&branch) {
-                        (render_task(&repo, &task, task.properties(&repo)))
-                    }
+                    @let task = Task::from_ref(&branch);
+                    (render_task(&repo, &task, task.properties(&repo)))
                 } @else {
                     task {
-                        name (state.task)
+                        name {(state.task)}
                         @for property in state.property {
                             property {
-                                name (property.name)
-                                value (property.value)
+                                name  {(property.name)}
+                                value {(property.value)}
                             }
                         }
                     }
                 }
             } @else {
-                @let task = Task::from_ref(&branch) {
-                    (render_task(&repo, &task, task.properties(&repo)))
-                }
+                @let task = Task::from_ref(&branch);
+                (render_task(&repo, &task, task.properties(&repo)))
             }
             tasks {
                 @if let Some(filter) = filter {
                     @if filter.name != "" {
                         filter {
-                            name (filter.name)
-                            value (filter.value)
+                            name  {(filter.name)}
+                            value {(filter.value)}
                         }
                     }
                 }
@@ -182,29 +180,23 @@ pub fn generate(state: Option<State>) -> String {
             }
             log {
                 @for (_, rev) in revwalk.enumerate() {
-                    @let commit = repo.find_commit(rev.unwrap()).unwrap() {
-                        commit {
-                            id (commit.id())
-                            @let time = commit.time() {
-                                timestamp (time.seconds())
-                                localtime (FixedOffset::east(time.offset_minutes()*60).timestamp(time.seconds(), 0).to_rfc3339())
-                            }
-                            user {
-                                @let author = commit.author() {
-                                    name (author.name().unwrap())
-                                    @let email = author.email().unwrap().trim() {
-                                        email (email)
-                                        image (format!("https://www.gravatar.com/avatar/{:x}?s=64", md5::compute(email.to_lowercase())))
-                                    }
-                                }
-                            }
-                            @let mut message = commit.message().unwrap().split("---\n") {
-                                message (message.next().unwrap())
-                                @let task = Task::from_commit(&branch.shorthand().unwrap(), &commit) {
-                                    (render_task(&repo, &task, task.changes(&repo)))
-                                }
-                            }
+                    @let commit = repo.find_commit(rev.unwrap()).unwrap();
+                    commit {
+                        id {(commit.id())}
+                        @let time = commit.time();
+                        timestamp {(time.seconds())}
+                        localtime {(FixedOffset::east(time.offset_minutes()*60).timestamp(time.seconds(), 0).to_rfc3339())}
+                        user {
+                            @let author = commit.author();
+                            name {(author.name().unwrap())}
+                            @let email = author.email().unwrap().trim();
+                            email {(email)}
+                            image {(format!("https://www.gravatar.com/avatar/{:x}?s=64", md5::compute(email.to_lowercase())))}
                         }
+                        @let mut message = commit.message().unwrap().split("---\n");
+                        message {(message.next().unwrap())}
+                        @let task = Task::from_commit(&branch.shorthand().unwrap(), &commit);
+                        (render_task(&repo, &task, task.changes(&repo)))
                     }
                 }
             }
@@ -217,23 +209,26 @@ pub fn generate(state: Option<State>) -> String {
                 @if let Ok(delta) = changes.stats() {
                     @if delta.files_changed() + delta.insertions() + delta.deletions() > 0 {
                         statistics {
-                            files (delta.files_changed())
-                            insertions (delta.insertions())
-                            deletions (delta.deletions())
+                            files       {(delta.files_changed())}
+                            insertions  {(delta.insertions())}
+                            deletions   {(delta.deletions())}
                         }
                     }
                 }
                 @for change in repo.statuses(Some(&mut status_opts)).unwrap().iter() {
-                    @let path = change.path().unwrap() {
-                        change id=(path.replace("/", "_").replace(".", "_").replace(" ", "_")) {
-                            path (path)
-                            insertions {}
-                            deletions {}
-                            included @match change.head_to_index().map(|d| d.status()).unwrap_or(Delta::Unreadable) {
+                    @let path = change.path().unwrap();
+                    change id=(path.replace("/", "_").replace(".", "_").replace(" ", "_")) {
+                        path {(path)}
+                        insertions {}
+                        deletions  {}
+                        included {
+                            @match change.head_to_index().map(|d| d.status()).unwrap_or(Delta::Unreadable) {
                                 Delta::Modified | Delta::Added | Delta::Deleted => "true",
                                 _ => "false"
                             }
-                            removal @match change.head_to_index().map(|d| d.status()).unwrap_or(Delta::Unreadable) {
+                        }
+                        removal {
+                            @match change.head_to_index().map(|d| d.status()).unwrap_or(Delta::Unreadable) {
                                 Delta::Deleted => "true",
                                 _ => "false"
                             }
@@ -243,7 +238,7 @@ pub fn generate(state: Option<State>) -> String {
             }
             diffs {
                 @for change in diff(changes) {
-                    (change)
+                    {(change)}
                 }
             }
         }
@@ -257,7 +252,7 @@ fn diff(changes: Diff) -> Vec<PreEscaped<String>> {
     changes.foreach(&mut |delta: DiffDelta, _: f32| {
         result.borrow_mut().push(html!(
             @if let Some(path) = delta.new_file().path() {
-                label (path.to_str().unwrap_or("[invalid]"))
+                label {(path.to_str().unwrap_or("[invalid]"))}
             }
         ));
         true
@@ -284,7 +279,7 @@ fn diff(changes: Diff) -> Vec<PreEscaped<String>> {
             _ => ""
         };
         result.borrow_mut().push(html!(
-            span class=(class) (String::from_utf8_lossy(&line.content()))
+            span class=(class) {(String::from_utf8_lossy(&line.content()))}
         ));
         true
     })).unwrap();
@@ -293,15 +288,15 @@ fn diff(changes: Diff) -> Vec<PreEscaped<String>> {
 
 fn render_task(repo: &Repository, task: &Task, changes: Vec<(String, Option<String>, String)>) -> PreEscaped<String> {
     html!(task {
-        name (task.name)
-        timestamp (task.timestamp(&repo))
+        name      {(task.name)}
+        timestamp {(task.timestamp(&repo))}
         @for (name, before, value) in changes {
             property {
-                name (name)
+                name {(name)}
                 @if let Some(before) = before {
-                    before (before)
+                    before {(before)}
                 }
-                value (value)
+                value {(value)}
             }
         }
     })
@@ -311,40 +306,40 @@ fn properties() -> PreEscaped<String> {
     html! {
         properties {
             property {
-                name "Status"
+                name {"Status"}
                 options {
-                    option "Sprint"
-                    option "In Progress"
-                    option "In Review"
-                    option "Blocked"
-                    option "Done"
+                    option {"Sprint"}
+                    option {"In Progress"}
+                    option {"In Review"}
+                    option {"Blocked"}
+                    option {"Done"}
                 }
             }
             property {
-                name "Ordinal"
-                value "1.0"
+                name {"Ordinal"}
+                value {"1.0"}
             }
             property {
-                name "Estimate"
+                name {"Estimate"}
             }
             property {
-                name "Developer"
-                value "Jaden Carver <jaden.carver@gmail.com>"
+                name {"Developer"}
+                value {"Jaden Carver <jaden.carver@gmail.com>"}
                 options {
-                    option value="Jaden Carver <jaden.carver@gmail.com>" "Jaden Carver"
-                    option value="Bob Dole <bdole69@gmail.com>" "Bob Dole"
+                    option value="Jaden Carver <jaden.carver@gmail.com>" {"Jaden Carver"}
+                    option value="Bob Dole <bdole69@gmail.com>" {"Bob Dole"}
                 }
             }
             property {
-                name "Manager"
-                value "Jaden Carver <jaden.carver@gmail.com>"
+                name {"Manager"}
+                value {"Jaden Carver <jaden.carver@gmail.com>"}
                 options {
-                    option value="Jaden Carver <jaden.carver@gmail.com>" "Jaden Carver"
-                    option value="Bob Dole <bdole69@gmail.com>" "Bob Dole"
+                    option value="Jaden Carver <jaden.carver@gmail.com>" {"Jaden Carver"}
+                    option value="Bob Dole <bdole69@gmail.com>" {"Bob Dole"}
                 }
             }
             property {
-                name "Description"
+                name {"Description"}
             }
         }
     }
@@ -354,28 +349,28 @@ fn project() -> PreEscaped<String> {
     html! {
         properties {
             property {
-                name "Project"
+                name {"Project"}
             }
             property {
-                name "Status"
+                name {"Status"}
                 options {
-                    option "Sprint"
-                    option "In Progress"
-                    option "In Review"
-                    option "Blocked"
-                    option "Done"
+                    option {"Sprint"}
+                    option {"In Progress"}
+                    option {"In Review"}
+                    option {"Blocked"}
+                    option {"Done"}
                 }
             }
             property {
-                name "Manager"
-                value "Jaden Carver <jaden.carver@gmail.com>"
+                name  {"Manager"}
+                value {"Jaden Carver <jaden.carver@gmail.com>"}
                 options {
-                    option value="Jaden Carver <jaden.carver@gmail.com>" "Jaden Carver"
-                    option value="Bob Dole <bdole69@gmail.com>" "Bob Dole"
+                    option value="Jaden Carver <jaden.carver@gmail.com>" {"Jaden Carver"}
+                    option value="Bob Dole <bdole69@gmail.com>" {"Bob Dole"}
                 }
             }
             property {
-                name "Description"
+                name {"Description"}
             }
         }
     }

@@ -26,10 +26,10 @@ pub static XML: &'static str = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
 
 use maud::html;
 
-//mod state;
+mod state;
 mod view;
 mod server;
-//mod task;
+mod task;
 
 #[no_mangle]
 pub extern "C" fn panel_xslt() -> *mut c_char {

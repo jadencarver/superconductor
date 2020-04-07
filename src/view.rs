@@ -1,10 +1,13 @@
 use maud::html;
-use std::process::Command;
 use crate::XML;
+use rsass::{OutputStyle, compile_scss_file};
+use std::path::Path;
 
 pub fn panel_xslt() -> String {
-    let scss = Command::new("/usr/local/bin/sassc").arg("/Users/jadencarver/dev/superconductor/assets/__pm.scss").output().unwrap();
-    let css = String::from_utf8(scss.stdout).unwrap();
+    let css = match compile_scss_file(Path::new("assets/__pm.scss"), OutputStyle::Compressed) {
+        Ok(css) => String::from_utf8_lossy(&css).to_string(),
+        Err(error) => format!("#__pm__panel::after {{ display: block; position: fixed; top: 0; bottom: 0; left: 0; right: 0; z-index: 99999; background-color: rgba(255, 255, 255, 0.75); padding: 15%; font-size: 2em; content: \'{}\' }};", error)
+    };
     
     let markup = html! {
         xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" {

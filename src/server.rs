@@ -10,8 +10,8 @@ use actix::{Actor, StreamHandler};
 use actix_web::{web, App, Error, HttpRequest, HttpResponse, HttpServer};
 use actix_web_actors::ws;
 
-//use state::generate;
-//use state::State;
+use crate::state::generate;
+use crate::state::State;
 
 extern crate fsevent;
 //use self::fsevent::{ITEM_MODIFIED, ITEM_CREATED, ITEM_REMOVED};
@@ -27,14 +27,20 @@ use serde_xml as xml;
 const HEARTBEAT: u64 = 250;
 
 // Define http actor
-struct MyWs;
+struct WsClient {
+    last_state: Option<State>
+}
 
-impl Actor for MyWs {
+impl Actor for WsClient {
     type Context = ws::WebsocketContext<Self>;
 }
 
 /// Handler for ws::Message message
-impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWs {
+impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsClient {
+    fn started(&mut self, ctx: &mut Self::Context) {
+        ctx.text(generate(None));
+    }
+
     fn handle(
         &mut self,
         msg: Result<ws::Message, ws::ProtocolError>,
@@ -42,7 +48,12 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWs {
     ) {
         match msg {
             Ok(ws::Message::Ping(msg)) => ctx.pong(&msg),
-            Ok(ws::Message::Text(text)) => ctx.text(text),
+            Ok(ws::Message::Text(text)) => {
+                //let mut rng = rand::thread_rng();
+                //let mut state: State = xml::from_str(&text).unwrap_or(self.last_state.clone().unwrap_or(State::blank()));
+                //self.last_state = state.apply(self.last_state.as_ref(), &mut rng).unwrap();
+                ctx.text(generate(self.last_state.clone()))
+            },
             Ok(ws::Message::Binary(bin)) => ctx.binary(bin),
             _ => (),
         }
@@ -50,7 +61,8 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWs {
 }
 
 async fn index(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse, Error> {
-    let resp = ws::start(MyWs {}, &req, stream);
+    let client = WsClient { last_state: None};
+    let resp = ws::start(client, &req, stream);
     println!("{:?}", resp);
     resp
 }
