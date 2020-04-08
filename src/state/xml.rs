@@ -143,7 +143,7 @@ pub fn generate(state: Option<State>) -> String {
             }
             user {
                 name  {(config.get_string("user.name" ).unwrap_or(String::from("Unknown")))}
-                email {(config.get_string("user.email").unwrap_or(String::from("root@localhost")))}
+                email {(config.get_string("user.email").unwrap_or(String::from("anonymous@localhost")))}
             }
             @if let Some(state) = state.clone() {
                 message {(state.message)}

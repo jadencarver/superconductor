@@ -65,7 +65,6 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsClient {
 async fn index(req: HttpRequest, stream: web::Payload) -> Result<HttpResponse, Error> {
     let client = WsClient { last_state: None};
     let resp = ws::start(client, &req, stream);
-    println!("{:?}", resp);
     resp
 }
 

@@ -112,6 +112,8 @@ impl State {
         } else {
             if self.save_update.is_some() || self.new_task.is_some() {
                 self.save_update(&repo, rng);
+            } else {
+                self.reset();
             }
         }
         Ok(Some(new_last_state))
