@@ -1,11 +1,9 @@
-#![feature(proc_macro_hygiene)]
-
-extern crate maud;
 extern crate actix;
 extern crate actix_web;
 extern crate actix_web_actors;
 extern crate yaml_rust;
 extern crate libc;
+extern crate markup;
 
 #[macro_use]
 extern crate serde_derive;
@@ -23,8 +21,6 @@ extern crate termion;
 extern crate git2;
 
 pub static XML: &'static str = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
-
-use maud::html;
 
 mod state;
 mod view;

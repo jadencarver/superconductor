@@ -8,8 +8,7 @@ edition = "2018"
 crate-type = ["dylib"]
 
 [dependencies]
-maud = { version = "*", git="https://github.com/lfairy/maud.git" }
-maud_macros = { version = "*", git="https://github.com/lfairy/maud.git" }
+markup = { path="../markup.rs/markup" }
 libc = "*"
 git2 = { version = "*", default-features = false }
 actix = "*"

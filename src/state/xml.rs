@@ -1,4 +1,3 @@
-use maud::html;
 use crate::state::State;
 use crate::task::Task;
 
@@ -19,7 +18,6 @@ use crate::state::Filter;
 
 extern crate md5;
 extern crate chrono;
-use maud::PreEscaped;
 use self::chrono::{TimeZone, FixedOffset};
 
 use yaml_rust::Yaml;
@@ -27,6 +25,34 @@ use yaml_rust::Yaml;
 extern crate base64;
 
 use self::base64::encode;
+
+markup::define! {
+    SetupState(state: State) {
+        state {
+            setup { "1" }
+            @match state {
+                Some(state) => {
+                    message {(state.message)}
+                    task {
+                        name { "master" }
+                        @for property in state.property {
+                            property {
+                                name {(property.name)}
+                                value {(property.value)}
+                            }
+                        }
+                    }
+                },
+                None => {
+                    task {
+                        name {"master"}
+                    }
+                }
+            }
+            {project()}
+        }
+    }
+}
 
 pub fn generate(state: Option<State>) -> String {
     let repo = match Repository::open_from_env() {
@@ -38,28 +64,7 @@ pub fn generate(state: Option<State>) -> String {
     
     // If there is no master branch, start the setup
     if repo.find_branch("master", BranchType::Local).is_err() {
-        return html! {
-            state {
-                setup { "1" }
-                @if let Some(state) = state {
-                    message {(state.message)}
-                    task {
-                        name { "master" }
-                        @for property in state.property {
-                            property {
-                                name {(property.name)}
-                                value {(property.value)}
-                            }
-                        }
-                    }
-                } @else {
-                    task {
-                        name {"master"}
-                    }
-                }
-                (project())
-            }
-        }.into_string()
+        return (SetupState {state: state}).to_string()
     }
 
     let head = repo.head().unwrap();
@@ -136,7 +141,7 @@ pub fn generate(state: Option<State>) -> String {
     let mut status_opts = StatusOptions::new();
     status_opts.include_untracked(true);
 
-    let payload = html! {
+    let payload = markup! {
         state {
             @if let Some(commit) = state.clone() {
                 focus {(commit.focus)}
@@ -150,7 +155,7 @@ pub fn generate(state: Option<State>) -> String {
                 @if state.property.len() == 0 {
                     @let task = Task::from_ref(&branch);
                     (render_task(&repo, &task, task.properties(&repo)))
-                } @else {
+                } else {
                     task {
                         name {(state.task)}
                         @for property in state.property {
@@ -161,7 +166,7 @@ pub fn generate(state: Option<State>) -> String {
                         }
                     }
                 }
-            } @else {
+            } else {
                 @let task = Task::from_ref(&branch);
                 (render_task(&repo, &task, task.properties(&repo)))
             }
@@ -202,7 +207,7 @@ pub fn generate(state: Option<State>) -> String {
             }
             @if task.name == "master" {
                 (project())
-            } @else {
+            } else {
                 (properties())
             }
             changes {
@@ -247,10 +252,10 @@ pub fn generate(state: Option<State>) -> String {
     payload
 }
 
-fn diff(changes: Diff) -> Vec<PreEscaped<String>> {
+fn diff(changes: Diff) -> Vec<Render<String>> {
     let result = RefCell::new(vec![]);
     changes.foreach(&mut |delta: DiffDelta, _: f32| {
-        result.borrow_mut().push(html!(
+        result.borrow_mut().push(markup!(
             @if let Some(path) = delta.new_file().path() {
                 label {(path.to_str().unwrap_or("[invalid]"))}
             }
@@ -258,7 +263,7 @@ fn diff(changes: Diff) -> Vec<PreEscaped<String>> {
         true
     }, Some(&mut |delta: DiffDelta, binary: DiffBinary| {
         if binary.contains_data() {
-            result.borrow_mut().push(html!(
+            result.borrow_mut().push(markup!(
                 img src=(format!("data:image/png,{}", (String::from_utf8_lossy(&binary.new_file().data())))) {}
             ));
         } else {
@@ -266,7 +271,7 @@ fn diff(changes: Diff) -> Vec<PreEscaped<String>> {
             let mut file = File::open(path).unwrap();
             let mut contents = vec![];
             file.read_to_end(&mut contents).unwrap();
-            result.borrow_mut().push(html!(
+            result.borrow_mut().push(markup!(
                 img src=(format!("data:image/jpeg;base64,{}", encode(&contents))) alt=(format!("{}", path.to_str().unwrap())) {}
             ));
         }
@@ -278,7 +283,7 @@ fn diff(changes: Diff) -> Vec<PreEscaped<String>> {
             'H' | 'F' => "meta",
             _ => ""
         };
-        result.borrow_mut().push(html!(
+        result.borrow_mut().push(markup!(
             span class=(class) {(String::from_utf8_lossy(&line.content()))}
         ));
         true
@@ -286,24 +291,34 @@ fn diff(changes: Diff) -> Vec<PreEscaped<String>> {
     result.into_inner()
 }
 
-fn render_task(repo: &Repository, task: &Task, changes: Vec<(String, Option<String>, String)>) -> PreEscaped<String> {
-    html!(task {
-        name      {(task.name)}
-        timestamp {(task.timestamp(&repo))}
-        @for (name, before, value) in changes {
-            property {
-                name {(name)}
-                @if let Some(before) = before {
-                    before {(before)}
+markup::define! {
+    RenderTask(repo: &Repository, task: &Task, changes: Vec<(String, Option<String>, String)>) {
+        task {
+            name      {{task.name}}
+            timestamp {{task.timestamp(&repo)}}
+            @for (name, before, value) in changes {
+                property {
+                    name {{name}}
+                    @if let Some(before) = before {
+                        before {{before}}
+                    }
+                    value {{value}}
                 }
-                value {(value)}
             }
         }
-    })
+    }
 }
 
-fn properties() -> PreEscaped<String> {
-    html! {
+fn render_task(repo: &Repository, task: &Task, changes: Vec<(String, Option<String>, String)>) -> RenderTask {
+    RenderTask {
+        repo: repo,
+        task: task,
+        changes: changes
+    }
+}
+
+markup::define! {
+    Properties {
         properties {
             property {
                 name {"Status"}
@@ -326,27 +341,33 @@ fn properties() -> PreEscaped<String> {
                 name {"Developer"}
                 value {"Jaden Carver <jaden.carver@gmail.com>"}
                 options {
-                    option value="Jaden Carver <jaden.carver@gmail.com>" {"Jaden Carver"}
-                    option value="Bob Dole <bdole69@gmail.com>" {"Bob Dole"}
+                    option[value="Jaden Carver <jaden.carver@gmail.com>"] {"Jaden Carver"}
+                    option[value="Bob Dole <bdole69@gmail.com>"] {"Bob Dole"}
                 }
             }
             property {
                 name {"Manager"}
                 value {"Jaden Carver <jaden.carver@gmail.com>"}
                 options {
-                    option value="Jaden Carver <jaden.carver@gmail.com>" {"Jaden Carver"}
-                    option value="Bob Dole <bdole69@gmail.com>" {"Bob Dole"}
+                    option[value="Jaden Carver <jaden.carver@gmail.com>"] {"Jaden Carver"}
+                    option[value="Bob Dole <bdole69@gmail.com>"] {"Bob Dole"}
                 }
             }
             property {
                 name {"Description"}
             }
         }
+
     }
 }
 
+fn properties() -> Properties {
+    warn!("Deprecated");
+    Properties {}
+}
+
 fn project() -> PreEscaped<String> {
-    html! {
+    markup! {
         properties {
             property {
                 name {"Project"}
